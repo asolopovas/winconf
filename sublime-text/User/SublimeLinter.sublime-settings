@@ -1,0 +1,10 @@
+// SublimeLinter Settings - User
+{
+  "gutter_theme": "Circle",
+  "paths":
+  {
+    "linux": [],
+    "osx": [],
+    "windows": []
+  },
+}

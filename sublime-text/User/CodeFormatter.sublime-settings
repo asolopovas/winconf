@@ -1,0 +1,79 @@
+{
+    "codeformatter_debug": false,
+    "codeformatter_php_options": {
+        "syntaxes": "php", // Syntax names which must process PHP formatter
+        "php_path": "", // Path for PHP executable, e.g. "/usr/lib/php" or "C:/Program Files/PHP/php.exe". If empty, uses command "php" from system environments
+        "format_on_save": false, // Format on save
+        "php55_compat": false, // PHP 5.5 compatible mode
+        "psr1": false, // Activate PSR1 style
+        "psr1_naming": false, // Activate PSR1 style - Section 3 and 4.3 - Class and method names case
+        "psr2": true, // Activate PSR2 style
+        "indent_with_space": 2, // Use spaces instead of tabs for indentation
+        "enable_auto_align": true, // Enable auto align of = and =>
+        "visibility_order": true, // Fixes visibility order for method in classes - PSR-2 4.2
+        "smart_linebreak_after_curly": true, // Convert multistatement blocks into multiline blocks
+        // Enable specific transformations. Example: ["ConvertOpenTagWithEcho", "PrettyPrintDocBlocks"]
+        // You can list all available transformations from command palette: CodeFormatter: Show PHP Transformations
+        "passes": ["PrettyPrintDocBlocks", "ShortArray", "OnlyOrderUseClauses"],
+        // Disable specific transformations
+        "exclude": []
+    },
+    "codeformatter_js_options": {
+        "syntaxes": "javascript,json, json (sublime), json (javascriptnext),json (npm), javascript (gulp), javascript (webpack), javascriptnext", // Syntax names which must process JS formatter
+        "format_on_save": false, // Format on save. Either a boolean (true/false) or a string regexp tested on filename. Example : "^((?!.min.|vendor).)*$"
+        "indent_size": 2, // indentation size
+        "indent_char": " ", // Indent character
+        "indent_with_tabs": false, // Indent with one tab (overrides indent_size and indent_char options)
+        "eol": "\n", // EOL symbol
+        "preserve_newlines": false, // whether existing line breaks should be preserved,
+        "max_preserve_newlines": 10, // maximum number of line breaks to be preserved in one chunk
+        "space_in_paren": false, // Add padding spaces within paren, ie. f( a, b )
+        "space_in_empty_paren": false, // Add padding spaces within paren if parent empty, ie. f(  )
+        "e4x": false, // Pass E4X xml literals through untouched
+        "jslint_happy": false, // if true, then jslint-stricter mode is enforced. Example function () vs function()
+        "brace_style": "expand", // "collapse" | "expand" | "end-expand". put braces on the same line as control statements (default), or put braces on own line (Allman / ANSI style), or just put end braces on own line.
+        "keep_array_indentation": false, // keep array indentation.
+        "keep_function_indentation": false, // keep function indentation.
+        "eval_code": false, // eval code
+        "unescape_strings": false, // Decode printable characters encoded in xNN notation
+        "wrap_line_length": 0, // Wrap lines at next opportunity after N characters
+        "break_chained_methods": false, // Break chained method calls across subsequent lines
+        "end_with_newline": true, // Add new line at end of file
+        "comma_first": false, // Add comma first
+        "space_after_anon_function": false
+    },
+    "codeformatter_css_options": {
+        "syntaxes": "css,less", // Syntax names which must process CSS formatter
+        "format_on_save": false, // Format on save
+        "indent_size": 2, // Indentation size
+        "indent_char": " ", // Indentation character
+        "indent_with_tabs": false, // Indent with one tab (overrides indent_size and indent_char options)
+        "selector_separator_newline": false, // Add new lines after selector separators
+        "end_with_newline": false, // Add new line of end in file
+        "newline_between_rules": false, // Add new line between rules
+        "eol": "\n" // EOL symbol
+    },
+    "codeformatter_scss_options": {
+        "syntaxes": "scss", // Indentation size
+        "format_on_save": false, // Format on save
+        "indent_size": 2, // Indentation size
+        "indent_char": " ", // Indentation character
+        "indent_with_tabs": false, // Indent with one tab (overrides indent_size and indent_char options)
+        "selector_separator_newline": true, // Add new lines after selector separators
+        "end_with_newline": true // Add new line of end in file
+    },
+    "codeformatter_html_options": {
+        "syntaxes": "html,asp,xml", // Syntax names which must process HTML formatter
+        "format_on_save": false, // Format on save
+        "indent_size": 2, // indentation size
+        "indent_char": " ", // Indentation character
+        "indent_with_tabs": false, // Indent with one tab (overrides indent_size and indent_char options)
+        "exception_on_tag_mismatch": false, // If the last closing tag is not at the same indentation level as the first opening tag, there's probably a tag mismatch in the file
+        "expand_javascript": false, // Expand JavaScript inside of <script> tags (also affects CSS purely by coincidence)
+        "expand_tags": false, // Expand tag attributes onto new lines
+        "minimum_attribute_count": 2, // Minimum number of attributes needed before tag attributes are expanded to new lines
+        "first_attribute_on_new_line": false, // Put all attributes on separate lines from the tag (only uses 1 indentation unit as opposed to lining all attributes up with the first)
+        "reduce_empty_tags": false, // Put closing tags on same line as opening tag if there is no content between them
+        "custom_singletons": "" // Custom singleton tags for various template languages outside of the HTML5 spec
+    },
+}

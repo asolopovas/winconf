@@ -1,0 +1,10 @@
+[
+     {
+        "caption": "Terminus: Open iPython",
+        "command": "terminus_open",
+        "args"   : {
+            "cmd": "powershell",
+            "title": "iPython"
+        }
+    }
+]

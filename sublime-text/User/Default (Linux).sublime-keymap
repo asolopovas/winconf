@@ -1,0 +1,48 @@
+[
+{
+  "button": "button1",
+  "count": 1,
+  "modifiers": ["ctrl", "alt"],
+  "press_command": "drag_select",
+  "press_args":
+  {
+    "additive": true
+  }
+},
+{
+  "keys": ["ctrl+alt+s"],
+  "command": "open_file",
+  "args":  {
+    "default": "${packages}/Default/Preferences.sublime-settings",
+    "custom": "${packages}/User/Preferences.sublime-settings"
+  }
+},
+{
+  "keys": ["alt+shift+o"],
+  "command": "close_other"
+},
+{
+  "keys": ["j", "j"],
+  "command": "exit_insert_mode",
+  "context": [
+  {
+    "key": "setting.command_mode",
+    "operand": false
+  },
+  {
+    "key": "setting.is_widget",
+    "operand": false
+  }]
+},
+{
+  "keys": ["alt+1"],
+  "command": "toggle_side_bar"
+},
+{
+  "keys": ["alt+o"],
+  "command": "toggle_side_bar"
+},
+{
+  "keys": ["ctrl+shift+alt+t"],
+  "command": "open_terminal_project_folder"
+}]

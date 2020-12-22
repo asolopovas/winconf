@@ -1,0 +1,49 @@
+{
+	"added_words":
+	[
+		"Fira",
+		"php",
+		"google",
+		"Enrolment"
+	],
+	"always_show_minimap_viewport": true,
+	"bold_folder_labels": true,
+	"color_scheme": "Packages/Colorsublime - Themes/legacy.tmTheme",
+	"default_encoding": "UTF-8",
+	"default_line_ending": "unix",
+	"ensure_newline_at_eof_on_save": true,
+	"font_face": "Consolas",
+	"font_size": 15,
+	"hot_exit": false,
+	"ignored_packages":
+	[
+		"AutoFileName",
+		"CloseOtherWindows",
+		"Dockerfile Syntax Highlighting",
+		"ExtendScript",
+		"Git Config",
+		"Golang Tools Integration",
+		"Hosts",
+		"HTML5",
+		"INI",
+		"SublimeLinter-tslint"
+	],
+	"indent_guide_options":
+	[
+		"draw_normal",
+		"draw_active"
+	],
+	"line_padding_bottom": 6,
+	"line_padding_top": 6,
+	"overlay_scroll_bars": "enabled",
+	"remember_full_screen": true,
+	"show_encoding": true,
+	"show_minimap": false,
+	"spell_check": true,
+	"tab_size": 2,
+	"theme": "Material-Theme.sublime-theme",
+	"translate_tabs_to_spaces": true,
+	"trim_trailing_white_space_on_save": true,
+	"vintage_start_in_command_mode": true,
+	"vintage_use_clipboard": true
+}

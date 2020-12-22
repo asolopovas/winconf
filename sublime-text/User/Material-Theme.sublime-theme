@@ -1,0 +1,62 @@
+[
+    {
+        "class": "sidebar_label",
+        "font.bold": false,
+        "font.size": 16
+    },
+    {
+        "class": "sidebar_container",
+        "layer0.tint": [20, 25, 31],
+    },
+    {
+        "class": "status_bar",
+        // Layer 0 base
+        "layer0.tint": [23, 43, 54],
+    },
+    {
+        "class": "tree_row",
+        "layer0.tint": [20, 25, 31],
+        "layer0.opacity": 0.0,
+        "layer0.inner_margin": [1, 1]
+    },
+    {
+        "class": "title_bar",
+        "fg": [96, 125, 139],
+        "bg": [20, 25, 31],
+    },
+    {
+        "class": "tabset_control",
+        "layer0.tint": [23, 43, 54],
+        "tint_index": 1,
+        "layer0.inner_margin": [2, 6],
+        "layer0.opacity": 1.0,
+        "content_margin": [6, 0, 8, 0],
+        "tab_overlap": 0,
+        "tab_width": 180,
+        "tab_min_width": 64,
+        "tab_height": 45,
+        "mouse_wheel_switch": false
+    },
+    {
+        "class": "sidebar_tree",
+        "layer0.tint": [10, 14, 20],
+    },
+    {
+        "class": "tab_label",
+        "fg": [84, 175, 189, 196],
+        "shadow_color": [255, 255, 255, 0],
+        "font.bold": false,
+        "font.size": 14
+    },
+    {
+        "class": "tab_label",
+        "parents": [
+        {
+            "class": "tab_control",
+            "attributes": ["selected"]
+        }],
+        "fg": [255, 255, 255, 255],
+        "shadow_color": [255, 255, 255, 0],
+        "shadow_offset": [0, 0]
+    }, 
+]

@@ -1,0 +1,26 @@
+{
+	"access_token": "e6e6468c4305f367117bd2f12b3a98c58b2a8c53",
+	"auto_upgrade": false,
+	"excluded_files":
+	[
+		"*.dmg",
+		"*.DS_Store*",
+		"*.exe",
+		"*.Spotlight-V100",
+		"*.Trashes",
+		"*ehthumbs.db",
+		"*oscrypto-ca-bundle.crt",
+		"*Package Control.cache/*",
+		"*Package Control.last-run",
+		"*Package Control.merged-ca-bundle",
+		"*Package Control.system-ca-bundle",
+		"*Package Control.user-ca-bundle",
+		"*Thumbs.db"
+	],
+	"gist_id": "205ea391bc044b72015d140794d7c327",
+	"http_proxy": "",
+	"https_proxy": "",
+	"included_files":
+	[
+	]
+}
