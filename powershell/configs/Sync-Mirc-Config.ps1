@@ -1,4 +1,4 @@
-$configSrc = "$Env:userprofile\AppData\Roaming\mIRC"
-$configTarget = "$Env:userprofile\Google Drive\configs\mIRC"
+$src = "$HOME\AppData\Roaming\mIRC"
+$target = "$HOME\Google Drive\configs\mIRC"
 
-Sync-Config $configSrc $configTarget
+Sync-Config $src $target

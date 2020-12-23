@@ -1,5 +1,5 @@
 $document = [Environment]::GetFolderPath("MyDocuments")
-$configSrc = "$document\Rainmeter"
-$configTarget = "$PSScriptRoot\..\..\..\rainmeter"
+$src = "$document\Rainmeter"
+$target = "$PSScriptRoot\..\..\..\rainmeter"
 
 Sync-Config  $configSrc $configTarget

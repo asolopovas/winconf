@@ -155,6 +155,7 @@ function Clear-Defender-History() {
 . $PSScriptRoot\sub\files.ps1
 . $PSScriptRoot\sub\security.ps1
 . $PSScriptRoot\sub\wsl-helpers.ps1
+. $PSScriptRoot\sub\sync-configs.ps1
 
 
 Export-ModuleMember -Function *
