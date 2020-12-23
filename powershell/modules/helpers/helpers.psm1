@@ -154,7 +154,7 @@ function Clear-Defender-History() {
 . $PSScriptRoot\sub\convertions.ps1
 . $PSScriptRoot\sub\files.ps1
 . $PSScriptRoot\sub\security.ps1
-. $PSScriptRoot\sub\wsl-portproxy.ps1
+. $PSScriptRoot\sub\wsl-helpers.ps1
 
 
 Export-ModuleMember -Function *
