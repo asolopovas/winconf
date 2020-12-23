@@ -9,13 +9,21 @@ function Sync-Configs {
     # Sync Configurations
     $scriptDirectory = "$env:USERPROFILE\winconf\powershell"
     Import-Module -DisableNameChecking "$scriptDirectory\modules\helpers\helpers.psm1" -WarningAction SilentlyContinue
+    Write-Output "Setting up Autohotkey-Boot"
     & "$scriptDirectory\configs\Autohotkey-Boot.ps1"
+    Write-Output "Settings up Nvim"
     & "$scriptDirectory\configs\Sync-NvimConfig.ps1"
+    Write-Output "Settings up Mirc"
     & "$scriptDirectory\configs\Sync-Mirc-Config.ps1"
+    Write-Output "Settings up Rainmeter"
     & "$scriptDirectory\configs\Sync-Rainmeter.ps1"
+    Write-Output "Settings up Sublime"
     & "$scriptDirectory\configs\Sync-SublimeText-Config.ps1"
+    Write-Output "Settings up Windows Terminal"
     & "$scriptDirectory\configs\Sync-WindowsTerminal.ps1"
+    Write-Output "Settings up Powershell"
     & "$scriptDirectory\configs\Sync-PowerShell-Config.ps1"
+    Write-Output "Settings up Environment-Paths"
     & "$scriptDirectory\configs\Set-Environment-Paths.ps1"
 
     $keys = @(
