@@ -10,8 +10,8 @@ function Sync-Configs {
     Import-Module -DisableNameChecking "$powershell\modules\helpers\helpers.psm1" -WarningAction SilentlyContinue
     Write-Output "Setting up Autohotkey-Boot"
     & "$powershell\configs\Autohotkey-Boot.ps1"
-    Write-Output "Setting up Nvim"
-    & "$powershell\configs\Sync-NvimConfig.ps1"
+    # Write-Output "Setting up Nvim"
+    # & "$powershell\configs\Sync-NvimConfig.ps1"
     Write-Output "Setting up Mirc"
     & "$powershell\configs\Sync-Mirc-Config.ps1"
     Write-Output "Setting up Rainmeter"
