@@ -23,3 +23,6 @@ Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
 # Autocompletion for arrow keys
 Set-PSReadlineKeyHandler -Key UpArrow -Function HistorySearchBackward
 Set-PSReadlineKeyHandler -Key DownArrow -Function HistorySearchForward
+
+# Ctrl + t and Ctrl + r for fzf
+Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+t' -PSReadlineChordReverseHistory 'Ctrl+r'

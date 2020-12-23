@@ -9,7 +9,6 @@ Import-Module -DisableNameChecking ..\modules\helpers\helpers.psm1 -WarningActio
 & "$PSScriptRoot/configs/Sync-Mirc-Config.ps1"
 & "$PSScriptRoot/configs/Sync-Rainmeter.ps1"
 & "$PSScriptRoot/configs/Sync-SublimeText-Config.ps1"
-& "$PSScriptRoot/configs/Sync-Con-Emu.ps1"
 & "$PSScriptRoot/configs/Sync-WindowsTerminal.ps1"
 & "$PSScriptRoot/configs/Sync-PowerShell-Config.ps1"
 
