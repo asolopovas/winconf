@@ -12,10 +12,10 @@ function Sync-Configs {
     & "$scriptDirectory\configs\Autohotkey-Boot.ps1"
     & "$scriptDirectory\configs\Sync-NvimConfig.ps1"
     & "$scriptDirectory\configs\Sync-Mirc-Config.ps1"
-    # & "$scriptDirectory\configs\Sync-Rainmeter.ps1"
-    # & "$scriptDirectory\configs\Sync-SublimeText-Config.ps1"
-    # & "$scriptDirectory\configs\Sync-WindowsTerminal.ps1"
-    # & "$scriptDirectory\configs\Sync-PowerShell-Config.ps1"
+    & "$scriptDirectory\configs\Sync-Rainmeter.ps1"
+    & "$scriptDirectory\configs\Sync-SublimeText-Config.ps1"
+    & "$scriptDirectory\configs\Sync-WindowsTerminal.ps1"
+    & "$scriptDirectory\configs\Sync-PowerShell-Config.ps1"
 
     $keys = @(
         "registry::HKEY_CLASSES_ROOT\Directory\shell\git_gui",
