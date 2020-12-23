@@ -16,6 +16,7 @@ function Sync-Configs {
     & "$scriptDirectory\configs\Sync-SublimeText-Config.ps1"
     & "$scriptDirectory\configs\Sync-WindowsTerminal.ps1"
     & "$scriptDirectory\configs\Sync-PowerShell-Config.ps1"
+    & "$scriptDirectory\configs\Set-Environment-Paths.ps1"
 
     $keys = @(
         "registry::HKEY_CLASSES_ROOT\Directory\shell\git_gui",
