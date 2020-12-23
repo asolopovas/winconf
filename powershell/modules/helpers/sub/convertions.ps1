@@ -32,7 +32,7 @@ function  Convert-ExcelToCsvDir {
 }
 
 function String-To([string]$case, [string]$string) {
-  return node "$PSScriptRoot\..\js\string-case.js" $case $string
+  return node "$HOME\winconf\powershel\modules\js\string-case.js" $case $string
 }
 
 Export-ModuleMember -Function Convert-ToUxinEndings, Convert-ExcelToCsv, Convert-ExcelToCsvDir, String-To
