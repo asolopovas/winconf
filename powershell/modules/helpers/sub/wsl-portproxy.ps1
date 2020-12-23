@@ -1,4 +1,4 @@
-function Invoke-PortProxy ($task = $false, $ports = 22) {
+function wslPortProxy ($task = $false, $ports = 22) {
     $ipAddress = wsl ip addr show dev eth0 | wsl sed -u -n 3p | wsl awk '{print \$2}' | wsl cut -d / -f1
     $ports = 22,3000
     $ports_string = $ports -join ','
@@ -21,3 +21,5 @@ function Invoke-PortProxy ($task = $false, $ports = 22) {
     }
 
 }
+
+Export-ModuleMember -Function wslPortProxy

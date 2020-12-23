@@ -144,6 +144,9 @@ Function FindLockingProcess {
 
 }
 
+function Clear-Defender-History() {
+   Remove-Item -Recurse "C:\ProgramData\Microsoft\Windows Defender\Scans\History\Service"
+}
 
 
 . $PSScriptRoot\sub\rm-pattern.ps1
@@ -151,6 +154,7 @@ Function FindLockingProcess {
 . $PSScriptRoot\sub\convertions.ps1
 . $PSScriptRoot\sub\files.ps1
 . $PSScriptRoot\sub\security.ps1
+. $PSScriptRoot\sub\wsl-portproxy.ps1
 
 
 Export-ModuleMember -Function *

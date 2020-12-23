@@ -17,16 +17,18 @@
 	"hot_exit": false,
 	"ignored_packages":
 	[
-		"AutoFileName",
+		"A File Icon",
 		"CloseOtherWindows",
+		"Colorsublime",
 		"Dockerfile Syntax Highlighting",
 		"ExtendScript",
 		"Git Config",
 		"Golang Tools Integration",
 		"Hosts",
-		"HTML5",
 		"INI",
-		"SublimeLinter-tslint"
+		"PowerShell",
+		"SublimeLinter-tslint",
+		"zzz A File Icon zzz"
 	],
 	"indent_guide_options":
 	[

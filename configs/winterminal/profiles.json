@@ -73,7 +73,7 @@
     {
       "command": "newTab",
       "keys": [
-        "ctrl+shift+t"
+        "ctrl+t"
       ]
     },
     {
