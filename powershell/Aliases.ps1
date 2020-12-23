@@ -16,7 +16,7 @@ function gd { git diff $args }
 function gch { git checkout $args }
 function gp { git push }
 function gl { git pull }
-function gw { git add -A; git commit -m 'save'; git push;}
+function gw { git add -A; git commit -m 'save'}
 
 function nah { git reset --hard }
 

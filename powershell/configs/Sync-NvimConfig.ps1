@@ -13,6 +13,8 @@ Sync-Config $src $target
 # Install pynvim
 choco install microsoft-visual-cpp-build-tools python3 -y | Out-Null
 C:\Python39\Scripts\pip3.exe install pynvim | Out-Null
+Copy-Item C:\Python39\python.exe C:\Python39\python3.exe
+Remove-Item  C:\Users\Andrius\AppData\Local\Microsoft\WindowsApps\python3.exe -ErrorAction SilentlyContinue
 
 # Create autoload directory
 $autoload_dir = "$src\autoload"

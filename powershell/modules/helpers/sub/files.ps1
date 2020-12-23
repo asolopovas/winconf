@@ -44,7 +44,7 @@ function File-Get($url, $path = '') {
 
 function Sync-Config ($src, $target) {
     if (Test-IsSymLink $src) {
-        Write-Output "Syncing `r`n src: $src `r`n target: $target `r`n"
+        # Write-Output "Syncing `r`n src: $src `r`n target: $target `r`n"
         New-Item -ItemType SymbolicLink -Path $src -Target $target -Force | Out-Null
     }
     elseif (Test-Path $src) {

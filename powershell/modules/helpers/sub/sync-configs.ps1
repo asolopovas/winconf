@@ -29,6 +29,7 @@ function Sync-Configs {
             Remove-Item $key | Out-Null
         }
     }
+    & "$scriptDirectory\configs\Set-Environment-Paths.ps1"
 }
 
 Export-ModuleMember -Function Sync-Configs
