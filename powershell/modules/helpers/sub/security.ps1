@@ -1,5 +1,5 @@
 function Firewall-DisablePathExecutables($path) {
-  $prefix = String-To camelCase (get-item $path).Parent.Name
+  $prefix = String-To camelCase (get-item $path).Directory.Parent.Name
   Get-ChildItem -Path $path -Recurse -Filter "*.exe" | Foreach-Object { Firewall-Rule $_.FullName $prefix }
  }
 

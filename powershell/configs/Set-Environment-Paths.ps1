@@ -1,5 +1,5 @@
 $paths = @(
-    "$HOME\Google Drive\bin"
+    "$HOME\gdrive\bin"
     "C:\Program Files\nodejs"
 )
 

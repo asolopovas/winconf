@@ -25,7 +25,7 @@ function choco-installed-list { choco list --local-only }
 
 # Tools
 function hosts-edit {
-  Start-Process -FilePath "C:\Program Files\Sublime Text 3\sublime_text.exe" -ArgumentList "C:\Windows\System32\drivers\etc\hosts"
+  nvim.exe "C:\Windows\System32\drivers\etc\hosts"
 }
 
 function log($value) {

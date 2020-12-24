@@ -34,7 +34,7 @@ if (-Not (Test-Path $autoload_dir)) {
 # Create Shell Shortcuts
 $nvimQtPath = "C:\tools\neovim\Neovim\bin\nvim-qt.exe"
 $regPath = "registry::HKEY_CLASSES_ROOT\Directory\Background\shell"
-if (-Not (Test-Path "$regPath\Neovim")) {
+if (-Not (Test-RegistryValue -Path $regPath -Value "Neovim")) {
     New-Item -Path $regPath -Name "Neovim" -Value "Open in Nvim" | Out-Null
     New-ItemProperty -Path "$regPath\Neovim" -Name "Icon" -Value $nvimQtPath | Out-Null
     New-Item -Path "$regPath\Neovim" -Name "command" -Value "$nvimQtPath `"+cd %V`"" | Out-Null

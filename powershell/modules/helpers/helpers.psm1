@@ -144,6 +144,26 @@ Function FindLockingProcess {
 
 }
 
+function New-ShellContextItem($name, $reg, $exe) {
+    New-PSDrive -PSProvider registry -Root HKEY_CLASSES_ROOT -Name HKCR | Out-Null
+    if (!(Test-Path $reg\$name )) {
+        New-Item -Path $reg -Name "$name" -Value "Open in $name" | Out-Null
+        New-ItemProperty -Path "$reg\$name" -Name "Icon" -Value $exe | Out-Null
+        New-Item -Path "$reg\$name" -Name "command" -Value "$exe `"%V`"" | Out-Null
+    }
+}
+
+function Add-ShellContext($name, $exe, $context = 'dir') {
+    New-PSDrive -PSProvider registry -Root HKEY_CLASSES_ROOT -Name HKCR | Out-Null
+    $direReg = "HKCR:\Directory\Background\shell"
+    $fileReg = "HKCR:\``*\shell"
+    if ($context -eq 'dir') {
+        New-ShellContextItem $name $direReg $exe
+    } else {
+        New-ShellContextItem $name $fileReg $exe
+    }
+}
+
 function Clear-Defender-History() {
    Remove-Item -Recurse "C:\ProgramData\Microsoft\Windows Defender\Scans\History\Service"
 }

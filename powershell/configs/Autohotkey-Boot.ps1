@@ -12,7 +12,7 @@ if (!(Test-ScheduledTask Autohotkey)) {
 # Disable Lock Key
 $reg_root = "registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion"
 $policies_path = "$reg_root\Policies"
-if (!(Test-Path "$policies_path\System")) {
+if (!(Test-RegistryValue -Path $policies_path -Value "System")) {
   New-Item -Path $policies_path -Name "System" | Out-Null
   New-ItemProperty -Path "$policies_path\System" -Name "DisableLockWorkstation" -Value 1 | Out-Null
 }
