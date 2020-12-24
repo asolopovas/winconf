@@ -26,7 +26,7 @@ function Sync-Configs {
     Write-Output "Setting up Environment-Paths"
     & "$powershell\configs\Set-Environment-Paths.ps1"
     Write-Output "Setting Varios System Configurations"
-    & "$powershell\configs\Sync-System-Settings.ps1.ps1"
+    & "$powershell\configs\Sync-System-Settings.ps1"
 
     $keys = @(
         "registry::HKEY_CLASSES_ROOT\Directory\shell\git_gui",
