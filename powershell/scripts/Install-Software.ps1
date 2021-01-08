@@ -15,6 +15,7 @@ $apps = @(
     # "openssl.light",
     "git",
     "poshgit",
+    "coretemp",
     # "jre8",
     # "mariadb",
     # "composer",

@@ -21,7 +21,7 @@ Return
     if WinExist("ahk_exe chrome.exe")
         WinActivate
     else
-        RunAsUser("C:\Program Files (x86)\Google\Chrome\Application\chrome.exe")
+        RunAsUser("C:\Program Files\Google\Chrome\Application\chrome.exe")
 Return
 
 #m::
