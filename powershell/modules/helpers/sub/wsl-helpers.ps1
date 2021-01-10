@@ -1,6 +1,6 @@
 function PortProxy($task = $false, $ports = 22) {
     $ipAddress = wsl ip addr show dev eth0 | wsl sed -u -n 3p | wsl awk '{print \$2}' | wsl cut -d / -f1
-    $ports = 22,3000
+    $ports = 22,3000,35729
     $ports_string = $ports -join ','
 
     if (!$task) {
