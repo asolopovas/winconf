@@ -36,7 +36,7 @@ Return
     if WinExist("Administrator: Windows PowerShell")
         WinActivate ;
     else {
-        Run, "C:\Program Files\WindowsApps\Microsoft.WindowsTerminal_1.7.1033.0_x64__8wekyb3d8bbwe\wt.exe"
+        Run, "wt.exe"
         WinWait, Administrator: Windows PowerShell, , 3
         WinActivate ;
     }
@@ -46,7 +46,7 @@ return
     if WinExist("~")
         WinActivate ;
     else {
-        Run "C:\Program Files\WindowsApps\Microsoft.WindowsTerminal_1.7.1033.0_x64__8wekyb3d8bbwe\wt.exe" -p "Ubuntu"
+        Run "wt.exe" -p "Ubuntu"
         WinWait, ~, , 3
         WinActivate ;
     }
