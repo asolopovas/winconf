@@ -75,11 +75,11 @@ Return
 return
 
 #Enter::
-    RunOrActivateTerminal("PowerShell", false)
+    RunOrActivateTerminal("PowerShell")
 return
 
 !Enter::
-    RunOrActivateTerminal("Ubuntu", false)
+    RunOrActivateTerminal("Ubuntu")
 return
 
 #+Enter::
@@ -90,37 +90,35 @@ return
     RunOrActivateTerminal("Ubuntu", true)
 return
 
-RunOrActivateTerminal(windowTitle, alwaysNewInstance) {
+F10::
+    RunOrActivateTerminal("PowerShell", true, true)
+return
+
+RunOrActivateTerminal(windowTitle, alwaysNewInstance := false, runAsAdmin := false) {
     EnvGet, username, username
     terminalPath := "C:\Users\" username "\AppData\Local\Microsoft\WindowsApps\wt.exe"
     args := "-w " windowTitle " nt -p " windowTitle " --title " windowTitle " --suppressApplicationTitle"
     windowID := windowTitle " ahk_class CASCADIA_HOSTING_WINDOW_CLASS"
+    if (runAsAdmin) {
+        windowID := "Administrator: " . windowTitle
+    }
 
-    if WinExist(windowTitle) and !alwaysNewInstance {
-        WinActivate, %windowID%
+    if WinExist(windowID) and !alwaysNewInstance {
+        If WinActive(windowID) {
+            WinMinimize
+        } else {
+            WinActivate, %windowID%
+        }
     } else {
-        RunAsUser(terminalPath, args)
+        if (runAsAdmin) {
+            Run *RunAs %terminalPath% %args%
+        } else {
+            RunAsUser(terminalPath, args)
+        }
         WinWait, %windowID%
         WinActivate, %windowID%
     }
 }
-
-
-F10::
-    EnvGet, username, username
-    itemClass := "Administrator: PowerShell"
-    terminalExe := "C:\Users\" username "\AppData\Local\Microsoft\WindowsApps\wt.exe"
-    if WinExist(itemClass) {
-        If WinActive(itemClass) {
-            WinMinimize
-        } else {
-            WinActivate
-        }
-    } else {
-        Run, %terminalExe%
-        WinActivate
-    }
-Return
 
 +F12::
     RegWrite, REG_DWORD, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Policies\System, DisableLockWorkstation, 0
