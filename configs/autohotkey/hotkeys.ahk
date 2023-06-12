@@ -75,36 +75,35 @@ Return
 return
 
 #Enter::
-    EnvGet, username, username
-    windowTitle := "PowerShell"
-    terminalPath := "C:\Users\" username "\AppData\Local\Microsoft\WindowsApps\wt.exe"
-    args := "-w PowerShell nt -p PowerShell --title PowerShell --suppressApplicationTitle"
-    windowID := "ahk_class CASCADIA_HOSTING_WINDOW_CLASS"
-
-    if WinExist(windowTitle) {
-        WinActivate, %windowID%
-    } else {
-        RunAsUser(terminalPath, args)
-        WinWait, %windowID%
-        WinActivate, %windowID%
-    }
+    RunOrActivateTerminal("PowerShell", false)
 return
 
 !Enter::
-    EnvGet, username, username
-    windowTitle := "Ubuntu"
-    terminalPath := "C:\Users\" username "\AppData\Local\Microsoft\WindowsApps\wt.exe"
-    args := "-w Ubuntu nt -p Ubuntu --title Ubuntu --suppressApplicationTitle"
-    windowID := "ahk_class CASCADIA_HOSTING_WINDOW_CLASS"
+    RunOrActivateTerminal("Ubuntu", false)
+return
 
-    if WinExist(windowTitle) {
+#+Enter::
+    RunOrActivateTerminal("PowerShell", true)
+return
+
+!+Enter::
+    RunOrActivateTerminal("Ubuntu", true)
+return
+
+RunOrActivateTerminal(windowTitle, alwaysNewInstance) {
+    EnvGet, username, username
+    terminalPath := "C:\Users\" username "\AppData\Local\Microsoft\WindowsApps\wt.exe"
+    args := "-w " windowTitle " nt -p " windowTitle " --title " windowTitle " --suppressApplicationTitle"
+    windowID := windowTitle " ahk_class CASCADIA_HOSTING_WINDOW_CLASS"
+
+    if WinExist(windowTitle) and !alwaysNewInstance {
         WinActivate, %windowID%
     } else {
         RunAsUser(terminalPath, args)
         WinWait, %windowID%
         WinActivate, %windowID%
     }
-return
+}
 
 
 F10::
