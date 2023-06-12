@@ -1,6 +1,7 @@
 $wingetApps = @(
     "Bccuninstaller",
     "7zip.7zip",
+    "Google.PlatformTools",
     "OpenJS.NodeJS.LTS",
     "VideoLAN.VLC",
     "Microsoft.PowerToys",
