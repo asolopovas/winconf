@@ -106,13 +106,12 @@ Return
     spotifyPath := A_AppData "\Spotify\Spotify.exe"
 
     if !FileExist(spotifyPath) {
-        downloadUrl := "https://download.scdn.co/SpotifySetup.exe"
-        setupPath := A_Temp "\SpotifySetup.exe"
+        winget install --id Spotify.Spotify
 
-        UrlDownloadToFile, % downloadUrl, % setupPath
-        RunAsUser(setupPath)
-        WinWait, ahk_exe SpotifySetup.exe
-        WinWaitClose, ahk_exe SpotifySetup.exe
+        ; Wait for winget to finish installation
+        ; Assumes that winget's executable name is 'winget.exe'
+        WinWait, ahk_exe winget.exe
+        WinWaitClose, ahk_exe winget.exe
     }
 
     if WinExist(spotifyClass) {
@@ -124,6 +123,7 @@ Return
         Run, % spotifyPath
     }
 Return
+
 
 #+Enter::
     EnvGet, username, username
