@@ -29,7 +29,7 @@ RestartExplorer(delay=-1) {
     RegWrite, REG_DWORD, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Policies\System, DisableLockWorkstation, 1
 return
 
-#+x::
+^F12::
     RestartExplorer()
 Return
 
@@ -106,10 +106,7 @@ Return
     spotifyPath := A_AppData "\Spotify\Spotify.exe"
 
     if !FileExist(spotifyPath) {
-        winget install --id Spotify.Spotify
-
-        ; Wait for winget to finish installation
-        ; Assumes that winget's executable name is 'winget.exe'
+        RunAsUser("winget install --id Spotify.Spotify")
         WinWait, ahk_exe winget.exe
         WinWaitClose, ahk_exe winget.exe
     }
