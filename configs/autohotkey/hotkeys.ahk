@@ -52,3 +52,13 @@ return
 ^F12::
     RestartExplorer()
 Return
+
+; Autoreload on Save
+#SingleInstance force
+~^s::
+    IfWinActive, hotkeys.ahk - winconf - Visual Studio Code
+    {
+        Sleep, 200
+        Reload
+    }
+return
