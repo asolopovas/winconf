@@ -1,4 +1,5 @@
 #Include helpers/runasuser.ahk
+#Include hotkeys-apps.ahk
 
 RestartExplorer(delay=-1) {
     If (A_OSVersion != "WIN_XP") {
@@ -27,41 +28,8 @@ RestartExplorer(delay=-1) {
 #k::#Up
 #l::#Right
 
-LWin & i::AltTab
-LWin & u::ShiftAltTab
-
-#c::
-    itemClass := "ahk_class Chrome_WidgetWin_1 ahk_exe chrome.exe"
-    if WinExist(itemClass) {
-        If WinActive(itemClass){
-            WinMinimize
-        } else {
-            WinActivate
-        }
-    } else {
-        RunAsUser("C:\Program Files\Google\Chrome\Application\chrome.exe")
-    }
-Return
-
-#m::
-    spotifyClass := "ahk_class Chrome_WidgetWin_0 ahk_exe Spotify.exe"
-    spotifyPath := A_AppData "\Spotify\Spotify.exe"
-
-    if !FileExist(spotifyPath) {
-        RunAsUser("winget install --id Spotify.Spotify")
-        WinWait, ahk_exe winget.exe
-        WinWaitClose, ahk_exe winget.exe
-    }
-
-    if WinExist(spotifyClass) {
-        if WinActive(spotifyClass)
-            PostMessage, 0x112, 0xF060,,, % "ahk_id " WinActive("A")
-        else
-            WinActivate
-    } else {
-        Run, % spotifyPath
-    }
-Return
+LWin & .::AltTab
+LWin & ,::ShiftAltTab
 
 #f::
     WinGet MMX, MinMax, A
@@ -73,52 +41,6 @@ Return
     WinGetTitle, Title, A
     PostMessage, 0x112, 0xF060,,, %Title%
 return
-
-#Enter::
-    RunOrActivateTerminal("PowerShell")
-return
-
-!Enter::
-    RunOrActivateTerminal("Ubuntu")
-return
-
-#+Enter::
-    RunOrActivateTerminal("PowerShell", true)
-return
-
-!+Enter::
-    RunOrActivateTerminal("Ubuntu", true)
-return
-
-F10::
-    RunOrActivateTerminal("PowerShell", true, true)
-return
-
-RunOrActivateTerminal(windowTitle, alwaysNewInstance := false, runAsAdmin := false) {
-    EnvGet, username, username
-    terminalPath := "C:\Users\" username "\AppData\Local\Microsoft\WindowsApps\wt.exe"
-    args := "-w " windowTitle " nt -p " windowTitle " --title " windowTitle " --suppressApplicationTitle"
-    windowID := windowTitle " ahk_class CASCADIA_HOSTING_WINDOW_CLASS"
-    if (runAsAdmin) {
-        windowID := "Administrator: " . windowTitle
-    }
-
-    if WinExist(windowID) and !alwaysNewInstance {
-        If WinActive(windowID) {
-            WinMinimize
-        } else {
-            WinActivate, %windowID%
-        }
-    } else {
-        if (runAsAdmin) {
-            Run *RunAs %terminalPath% %args%
-        } else {
-            RunAsUser(terminalPath, args)
-        }
-        WinWait, %windowID%
-        WinActivate, %windowID%
-    }
-}
 
 +F12::
     RegWrite, REG_DWORD, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Policies\System, DisableLockWorkstation, 0
