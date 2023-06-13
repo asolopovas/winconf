@@ -1,17 +1,17 @@
 {
     "$help": "https://aka.ms/terminal-documentation",
     "$schema": "https://aka.ms/terminal-profiles-schema",
-    "actions": 
+    "actions":
     [
         {
-            "command": 
+            "command":
             {
                 "action": "copy"
             },
             "keys": "ctrl+shift+c"
         },
         {
-            "command": 
+            "command":
             {
                 "action": "newTab",
                 "index": 1
@@ -23,7 +23,7 @@
             "keys": "ctrl+shift+v"
         },
         {
-            "command": 
+            "command":
             {
                 "action": "moveFocus",
                 "direction": "right"
@@ -31,7 +31,7 @@
             "keys": "ctrl+shift+h"
         },
         {
-            "command": 
+            "command":
             {
                 "action": "newTab",
                 "index": 0
@@ -39,14 +39,14 @@
             "keys": "f1"
         },
         {
-            "command": 
+            "command":
             {
                 "action": "closeTab"
             },
             "keys": "ctrl+w"
         },
         {
-            "command": 
+            "command":
             {
                 "action": "moveFocus",
                 "direction": "left"
@@ -78,7 +78,7 @@
             "keys": "ctrl+shift+2"
         },
         {
-            "command": 
+            "command":
             {
                 "action": "newTab"
             }
@@ -89,36 +89,37 @@
     "centerOnLaunch": true,
     "copyOnSelect": true,
     "defaultProfile": "{05b9d966-86e5-4a1f-a9df-d87cef4d716e}",
-    "disabledProfileSources": 
+    "disabledProfileSources":
     [
         "Windows.Terminal.Azure",
         "Windows.Terminal.PowershellCore"
     ],
     "initialCols": 100,
     "initialRows": 25,
-    "newTabMenu": 
+    "newTabMenu":
     [
         {
             "type": "remainingProfiles"
         }
     ],
-    "profiles": 
+    "profiles":
     {
-        "defaults": 
+        "defaults":
         {
             "colorScheme": "Legacy",
-            "font": 
+            "font":
             {
                 "face": "FiraMono Nerd Font Mono",
                 "size": 13.0
             },
             "startingDirectory": null
         },
-        "list": 
+        "list":
         [
             {
+                "name": "PowerShell",
                 "commandline": "C:\\Program Files\\PowerShell\\7\\pwsh.exe -nologo",
-                "font": 
+                "font":
                 {
                     "face": "FiraMono Nerd Font Mono",
                     "size": 14.0,
@@ -127,46 +128,46 @@
                 "guid": "{05b9d966-86e5-4a1f-a9df-d87cef4d716e}",
                 "hidden": false,
                 "icon": "ms-appx:///ProfileIcons/{61c54bbd-c2c6-5271-96e7-009a87ff44bf}.png",
-                "name": "PowerShell",
                 "opacity": 95,
                 "startingDirectory": "%USERPROFILE%",
                 "useAcrylic": false
             },
             {
-                "font": 
+                "name": "Windows PowerShell",
+                "font":
                 {
                     "face": "FiraMono Nerd Font Mono"
                 },
                 "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
-                "hidden": false,
-                "name": "Windows PowerShell"
+                "hidden": false
             },
             {
+                "name": "Command Prompt",
                 "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
-                "hidden": false,
-                "name": "Command Prompt"
+                "hidden": false
             },
             {
-                "font": 
+                "name": "Ubuntu",
+                "font":
                 {
                     "face": "FiraMono Nerd Font Mono"
                 },
                 "guid": "{51855cb2-8cce-5362-8f54-464b92b32386}",
                 "hidden": false,
-                "name": "Ubuntu",
                 "source": "CanonicalGroupLimited.Ubuntu_79rhkp1fndgsc"
             },
             {
+                "name": "Developer Command Prompt for VS 2017",
                 "guid": "{30fafdad-6592-5d4b-bd1f-1a8fb3aa0e85}",
                 "hidden": true,
-                "name": "Developer Command Prompt for VS 2017",
                 "source": "Windows.Terminal.VisualStudio"
             }
         ]
     },
-    "schemes": 
+    "schemes":
     [
         {
+            "name": "Campbell",
             "background": "#0C0C0C",
             "black": "#0C0C0C",
             "blue": "#0037DA",
@@ -182,7 +183,6 @@
             "cyan": "#3A96DD",
             "foreground": "#CCCCCC",
             "green": "#13A10E",
-            "name": "Campbell",
             "purple": "#881798",
             "red": "#C50F1F",
             "selectionBackground": "#FFFFFF",
@@ -190,6 +190,7 @@
             "yellow": "#C19C00"
         },
         {
+            "name": "Campbell Powershell",
             "background": "#012456",
             "black": "#0C0C0C",
             "blue": "#0037DA",
@@ -205,7 +206,6 @@
             "cyan": "#3A96DD",
             "foreground": "#CCCCCC",
             "green": "#13A10E",
-            "name": "Campbell Powershell",
             "purple": "#881798",
             "red": "#C50F1F",
             "selectionBackground": "#FFFFFF",
@@ -213,6 +213,7 @@
             "yellow": "#C19C00"
         },
         {
+            "name": "Legacy",
             "background": "#14191F",
             "black": "#000000",
             "blue": "#287BDE",
@@ -228,7 +229,6 @@
             "cyan": "#6272A4",
             "foreground": "#F8F8F2",
             "green": "#004A00",
-            "name": "Legacy",
             "purple": "#6272A4",
             "red": "#FF5555",
             "selectionBackground": "#FFFFFF",
@@ -236,6 +236,7 @@
             "yellow": "#FFB86C"
         },
         {
+            "name": "One Half Dark",
             "background": "#282C34",
             "black": "#282C34",
             "blue": "#61AFEF",
@@ -251,7 +252,6 @@
             "cyan": "#56B6C2",
             "foreground": "#DCDFE4",
             "green": "#98C379",
-            "name": "One Half Dark",
             "purple": "#C678DD",
             "red": "#E06C75",
             "selectionBackground": "#FFFFFF",
@@ -259,6 +259,7 @@
             "yellow": "#E5C07B"
         },
         {
+            "name": "One Half Light",
             "background": "#FAFAFA",
             "black": "#383A42",
             "blue": "#0184BC",
@@ -274,7 +275,6 @@
             "cyan": "#0997B3",
             "foreground": "#383A42",
             "green": "#50A14F",
-            "name": "One Half Light",
             "purple": "#A626A4",
             "red": "#E45649",
             "selectionBackground": "#FFFFFF",
@@ -305,6 +305,7 @@
             "yellow": "#B58900"
         },
         {
+            "name": "Solarized Light",
             "background": "#FDF6E3",
             "black": "#002B36",
             "blue": "#268BD2",
@@ -320,7 +321,6 @@
             "cyan": "#2AA198",
             "foreground": "#657B83",
             "green": "#859900",
-            "name": "Solarized Light",
             "purple": "#D33682",
             "red": "#DC322F",
             "selectionBackground": "#FFFFFF",
@@ -328,6 +328,7 @@
             "yellow": "#B58900"
         },
         {
+            "name": "Tango Dark",
             "background": "#000000",
             "black": "#000000",
             "blue": "#3465A4",
@@ -343,7 +344,6 @@
             "cyan": "#06989A",
             "foreground": "#D3D7CF",
             "green": "#4E9A06",
-            "name": "Tango Dark",
             "purple": "#75507B",
             "red": "#CC0000",
             "selectionBackground": "#FFFFFF",
@@ -351,6 +351,7 @@
             "yellow": "#C4A000"
         },
         {
+            "name": "Tango Light",
             "background": "#FFFFFF",
             "black": "#000000",
             "blue": "#3465A4",
@@ -366,7 +367,6 @@
             "cyan": "#06989A",
             "foreground": "#555753",
             "green": "#4E9A06",
-            "name": "Tango Light",
             "purple": "#75507B",
             "red": "#CC0000",
             "selectionBackground": "#FFFFFF",
@@ -374,6 +374,7 @@
             "yellow": "#C4A000"
         },
         {
+            "name": "Ubuntu-ColorScheme",
             "background": "#300A24",
             "black": "#171421",
             "blue": "#0037DA",
@@ -389,7 +390,6 @@
             "cyan": "#3A96DD",
             "foreground": "#FFFFFF",
             "green": "#26A269",
-            "name": "Ubuntu-ColorScheme",
             "purple": "#881798",
             "red": "#C21A23",
             "selectionBackground": "#FFFFFF",
@@ -397,6 +397,7 @@
             "yellow": "#A2734C"
         },
         {
+            "name": "Vintage",
             "background": "#000000",
             "black": "#000000",
             "blue": "#000080",
@@ -412,7 +413,6 @@
             "cyan": "#008080",
             "foreground": "#C0C0C0",
             "green": "#008000",
-            "name": "Vintage",
             "purple": "#800080",
             "red": "#800000",
             "selectionBackground": "#FFFFFF",
