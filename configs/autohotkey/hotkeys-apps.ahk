@@ -50,21 +50,24 @@ RunOrActivateSpotify(itemClass, itemPath) {
     RunOrActivateTerminal("PowerShell")
 return
 
-!Enter::
-    RunOrActivateTerminal("Ubuntu")
-return
-
 #+Enter::
     RunOrActivateTerminal("PowerShell", true)
-return
-
-!+Enter::
-    RunOrActivateTerminal("Ubuntu", true)
 return
 
 F10::
     RunOrActivateTerminal("PowerShell", true, true)
 return
+
+^Enter::
+    RunOrActivateTerminal("Ubuntu", true)
+return
+
+^+Enter::
+    RunOrActivateTerminal("Ubuntu")
+return
+
+
+
 
 #c::
     chromeClass := "ahk_class Chrome_WidgetWin_1 ahk_exe chrome.exe"
