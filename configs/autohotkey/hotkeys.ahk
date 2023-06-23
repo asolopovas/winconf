@@ -42,6 +42,28 @@ Return
     PostMessage, 0x112, 0xF060,,, %Title%
 return
 
+
+
+#SingleInstance force
+~^s::
+    IfWinActive, hotkeys.ahk - winconf - Visual Studio Code
+    {
+        Sleep, 200
+        Reload
+    }
+    else IfWinActive, hotkeys-apps.ahk - winconf - Visual Studio Code
+    {
+        Sleep, 200
+        Reload
+    }
+    else IfWinActive, load.ahk - winconf - Visual Studio Code
+    {
+        Sleep, 200
+        Reload
+    }
+    ; Add more else IfWinActive conditions here for each additional file
+return
+
 +F12::
     RegWrite, REG_DWORD, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Policies\System, DisableLockWorkstation, 0
     DllCall("LockWorkStation")
@@ -52,13 +74,3 @@ return
 ^F12::
     RestartExplorer()
 Return
-
-; Autoreload on Save
-#SingleInstance force
-~^s::
-    IfWinActive, hotkeys.ahk - winconf - Visual Studio Code
-    {
-        Sleep, 200
-        Reload
-    }
-return

@@ -13,6 +13,7 @@ $wingetApps = @(
     "Git.Git",
     "voidtools.Everything",
     "AutoHotkey.AutoHotkey",
+    "Twilio.Authy",
     "ALCPU.CoreTemp",
     "mIRC.mIRC",
     "qBittorrent.qBittorrent",
