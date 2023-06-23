@@ -66,13 +66,6 @@ F10::
     RunOrActivateTerminal("PowerShell", true, true)
 return
 
-^Enter::
-    RunOrActivateTerminal("Ubuntu", true)
-return
-
-^+Enter::
-    RunOrActivateTerminal("Ubuntu")
-return
 #c::
     chromeClass := "ahk_class Chrome_WidgetWin_1 ahk_exe chrome.exe"
     chromePath := "C:\Program Files\Google\Chrome\Application\chrome.exe"
