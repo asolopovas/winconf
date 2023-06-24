@@ -50,12 +50,12 @@ F8::
     RunOrActivateTerminal("PowerShell")
 return
 
-F9::
-    RunOrActivateTerminal("Ubuntu")
-return
-
 +F8::
     RunOrActivateTerminal("PowerShell", true)
+return
+
+F9::
+    RunOrActivateTerminal("Ubuntu")
 return
 
 +F9::

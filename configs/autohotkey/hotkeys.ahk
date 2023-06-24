@@ -42,8 +42,6 @@ Return
     PostMessage, 0x112, 0xF060,,, %Title%
 return
 
-
-
 #SingleInstance force
 ~^s::
     IfWinActive, hotkeys.ahk - winconf - Visual Studio Code
@@ -61,7 +59,6 @@ return
         Sleep, 200
         Reload
     }
-    ; Add more else IfWinActive conditions here for each additional file
 return
 
 +F12::
