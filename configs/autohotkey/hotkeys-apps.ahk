@@ -46,22 +46,17 @@ RunOrActivateSpotify(itemClass, itemPath) {
     }
 }
 
-F8::
-    RunOrActivateTerminal("PowerShell")
-return
-
-+F8::
-    RunOrActivateTerminal("PowerShell", true)
-return
-
-F9::
+#Enter::
     RunOrActivateTerminal("Ubuntu")
 return
 
-+F9::
+#+Enter::
     RunOrActivateTerminal("Ubuntu", true)
 return
 
++F10::
+    RunOrActivateTerminal("PowerShell", true)
+return
 F10::
     RunOrActivateTerminal("PowerShell", true, true)
 return
