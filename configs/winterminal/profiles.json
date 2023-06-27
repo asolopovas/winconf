@@ -1,87 +1,44 @@
 {
     "$help": "https://aka.ms/terminal-documentation",
     "$schema": "https://aka.ms/terminal-profiles-schema",
-    "actions":
-    [
+    "actions": [
         {
-            "command":
-            {
+            "command": {
                 "action": "copy"
             },
             "keys": "ctrl+shift+c"
         },
         {
-            "command":
-            {
-                "action": "newTab",
-                "index": 1
-            },
-            "keys": "f2"
-        },
-        {
             "command": "paste",
-            "keys": "ctrl+shift+v"
+            "keys": "shift+insert"
         },
+
         {
-            "command":
-            {
+            "command": {
                 "action": "moveFocus",
                 "direction": "right"
             },
-            "keys": "ctrl+shift+h"
+            "keys": "ctrl+shift+l"
         },
         {
-            "command":
-            {
-                "action": "newTab",
-                "index": 0
+            "command": {
+                "action": "moveFocus",
+                "direction": "right"
             },
-            "keys": "f1"
+            "keys": "ctrl+shift+l"
         },
         {
-            "command":
-            {
+            "command": {
                 "action": "closeTab"
             },
             "keys": "ctrl+w"
         },
         {
-            "command":
-            {
+            "command": {
                 "action": "moveFocus",
                 "direction": "left"
             },
             "keys": "ctrl+shift+l"
-        },
-        {
-            "command": "unbound",
-            "keys": "ctrl+a"
-        },
-        {
-            "command": "unbound",
-            "keys": "ctrl+b"
-        },
-        {
-            "command": "unbound",
-            "keys": "ctrl+l"
-        },
-        {
-            "command": "unbound",
-            "keys": "ctrl+h"
-        },
-        {
-            "command": "unbound",
-            "keys": "ctrl+shift+1"
-        },
-        {
-            "command": "unbound",
-            "keys": "ctrl+shift+2"
-        },
-        {
-            "command":
-            {
-                "action": "newTab"
-            }
         }
     ],
     "alwaysOnTop": false,
@@ -89,38 +46,31 @@
     "centerOnLaunch": true,
     "copyOnSelect": true,
     "defaultProfile": "{05b9d966-86e5-4a1f-a9df-d87cef4d716e}",
-    "disabledProfileSources":
-    [
+    "disabledProfileSources": [
         "Windows.Terminal.Azure",
         "Windows.Terminal.PowershellCore"
     ],
     "initialCols": 100,
     "initialRows": 25,
-    "newTabMenu":
-    [
+    "newTabMenu": [
         {
             "type": "remainingProfiles"
         }
     ],
-    "profiles":
-    {
-        "defaults":
-        {
+    "profiles": {
+        "defaults": {
             "colorScheme": "Legacy",
-            "font":
-            {
+            "font": {
                 "face": "FiraMono Nerd Font Mono",
                 "size": 13.0
             },
             "startingDirectory": null
         },
-        "list":
-        [
+        "list": [
             {
                 "name": "PowerShell",
                 "commandline": "C:\\Program Files\\PowerShell\\7\\pwsh.exe -nologo",
-                "font":
-                {
+                "font": {
                     "face": "FiraMono Nerd Font Mono",
                     "size": 14.0,
                     "weight": "normal"
@@ -134,8 +84,7 @@
             },
             {
                 "name": "Windows PowerShell",
-                "font":
-                {
+                "font": {
                     "face": "FiraMono Nerd Font Mono"
                 },
                 "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
@@ -148,8 +97,7 @@
             },
             {
                 "name": "Ubuntu",
-                "font":
-                {
+                "font": {
                     "face": "FiraMono Nerd Font Mono"
                 },
                 "guid": "{51855cb2-8cce-5362-8f54-464b92b32386}",
@@ -164,8 +112,7 @@
             }
         ]
     },
-    "schemes":
-    [
+    "schemes": [
         {
             "name": "Legacy",
             "background": "#14191F",
@@ -189,7 +136,7 @@
             "white": "#AEC2E0",
             "yellow": "#FFB86C"
         }
-   ],
+    ],
     "tabWidthMode": "compact",
     "theme": "dark",
     "themes": [],
