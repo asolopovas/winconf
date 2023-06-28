@@ -61,13 +61,13 @@ return
     }
 return
 
-+F12::
+!F11::
     RegWrite, REG_DWORD, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Policies\System, DisableLockWorkstation, 0
     DllCall("LockWorkStation")
     sleep, 1000
     RegWrite, REG_DWORD, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Policies\System, DisableLockWorkstation, 1
 return
 
-^F12::
+!+F11::
     RestartExplorer()
 Return

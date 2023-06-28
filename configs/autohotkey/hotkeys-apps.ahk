@@ -54,10 +54,11 @@ return
     RunOrActivateTerminal("Ubuntu", true)
 return
 
-F10::
+!F12::
     RunOrActivateTerminal("PowerShell", true)
 return
-+F10::
+
+!+F12::
     RunOrActivateTerminal("PowerShell", true, true)
 return
 
