@@ -53,13 +53,12 @@ Return
         WinWaitClose, ahk_exe winget.exe
     }
 
-    if WinExist(windowID) {
-        if WinActive(windowID) {
-            PostMessage, 0x112, 0xF060,,, % "ahk_id " WinActive("A")
-        } else {
-            WinActivate
-        }
-    } else {
-        Run, % exePath
+    if (!WinExist(windowID)) {
+        RunAsUser(exePath)
+    } else if (WinActive(windowID)) {
+        PostMessage, 0x112, 0xF060,,, % "ahk_id " WinActive("A")
     }
+
+    WinActivate
+
 Return
