@@ -1,50 +1,38 @@
-RunOrActivate(windowID, terminalPath, args, alwaysNewInstance, runAsAdmin) {
+RunOrActivate(windowID, exePath, args, runAsAdmin, alwaysNewInstance) {
     if WinExist(windowID) and !alwaysNewInstance {
         If WinActive(windowID) {
-            WinMinimize
+            WinMinimize, % "ahk_id " . WinExist(windowID)  ; specify window to minimize
         } else {
             WinActivate, %windowID%
         }
     } else {
         if (runAsAdmin) {
-            Run *RunAs %terminalPath% %args%
+            Run *RunAs %exePath% %args%
         } else {
-            RunAsUser(terminalPath, args)
+            RunAsUser(exePath, args)
         }
         WinWait, %windowID%
         WinActivate, %windowID%
     }
 }
 
-RunOrActivateTerminal(windowTitle, alwaysNewInstance := false, runAsAdmin := false) {
+RunOrActivateTerminal(windowTitle, runAsAdmin := false, alwaysNewInstance := false) {
+
     EnvGet, username, username
     terminalPath := "C:\Users\" username "\AppData\Local\Microsoft\WindowsApps\wt.exe"
-    args := "-w " windowTitle " nt -p " windowTitle " --title " windowTitle " --suppressApplicationTitle"
+    args := "-w """ windowTitle """ nt -p """ windowTitle """ --suppressApplicationTitle"
     windowID := windowTitle " ahk_class CASCADIA_HOSTING_WINDOW_CLASS"
-    if (runAsAdmin) {
-        windowID := "Administrator: " . windowTitle
-    }
 
-    RunOrActivate(windowID, terminalPath, args, alwaysNewInstance, runAsAdmin)
+    RunOrActivate(windowID, terminalPath, args, runAsAdmin, alwaysNewInstance )
 }
 
-RunOrActivateApplication(itemClass, itemPath, alwaysNewInstance := false, runAsAdmin := false) {
-    windowID := itemClass
-    RunOrActivate(windowID, itemPath, "", alwaysNewInstance, runAsAdmin)
-}
+F12::
+    RunOrActivateTerminal("PowerShell")
+return
 
-RunOrActivateSpotify(itemClass, itemPath) {
-    windowID := itemClass
-    if WinExist(windowID) {
-        if WinActive(windowID) {
-            PostMessage, 0x112, 0xF060,,, % "ahk_id " WinActive("A")
-        } else {
-            WinActivate
-        }
-    } else {
-        Run, % itemPath
-    }
-}
++F12::
+    RunOrActivateTerminal("PowerShell Admin", true)
+return
 
 #Enter::
     RunOrActivateTerminal("Ubuntu")
@@ -54,29 +42,29 @@ return
     RunOrActivateTerminal("Ubuntu", true)
 return
 
-!F12::
-    RunOrActivateTerminal("PowerShell", true)
-return
-
-!+F12::
-    RunOrActivateTerminal("PowerShell", true, true)
-return
-
 #c::
-    chromeClass := "ahk_class Chrome_WidgetWin_1 ahk_exe chrome.exe"
-    chromePath := "C:\Program Files\Google\Chrome\Application\chrome.exe"
-    runOrActivateApplication(chromeClass, chromePath)
+    windowID := "ahk_class Chrome_WidgetWin_1 ahk_exe chrome.exe"
+    exePath := "C:\Program Files\Google\Chrome\Application\chrome.exe"
+    RunOrActivate(windowId, itemPath, "", runAsAdmin, alwaysNewInstance)
 Return
 
 #m::
-    spotifyClass := "ahk_class Chrome_WidgetWin_0 ahk_exe Spotify.exe"
-    spotifyPath := A_AppData "\Spotify\Spotify.exe"
+    windowID := "ahk_class Chrome_WidgetWin_0 ahk_exe Spotify.exe"
+    exePath := A_AppData "\Spotify\Spotify.exe"
 
-    if !FileExist(spotifyPath) {
+    if !FileExist(exePath) {
         RunAsUser("winget install --id Spotify.Spotify")
         WinWait, ahk_exe winget.exe
         WinWaitClose, ahk_exe winget.exe
     }
 
-    runOrActivateSpotify(spotifyClass, spotifyPath)
+    if WinExist(windowID) {
+        if WinActive(windowID) {
+            PostMessage, 0x112, 0xF060,,, % "ahk_id " WinActive("A")
+        } else {
+            WinActivate
+        }
+    } else {
+        Run, % exePath
+    }
 Return
