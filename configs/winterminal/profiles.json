@@ -1,11 +1,9 @@
 {
     "$help": "https://aka.ms/terminal-documentation",
     "$schema": "https://aka.ms/terminal-profiles-schema",
-    "actions": 
-    [
+    "actions": [
         {
-            "command": 
-            {
+            "command": {
                 "action": "copy"
             },
             "keys": "ctrl+shift+c"
@@ -15,15 +13,31 @@
             "keys": "shift+insert"
         },
         {
-            "command": 
-            {
+            "command": {
+                "action": "closeOtherTabs"
+            },
+            "keys": "alt+shift+o"
+        },
+        {
+            "command": {
+                "action": "prevTab"
+            },
+            "keys": "alt+j"
+        },
+        {
+            "command": {
+                "action": "nextTab"
+            },
+            "keys": "alt+k"
+        },
+        {
+            "command": {
                 "action": "newTab"
             },
             "keys": "ctrl+enter"
         },
         {
-            "command": 
-            {
+            "command": {
                 "action": "newTab"
             },
             "keys": "alt+t"
@@ -38,8 +52,7 @@
     "centerOnLaunch": true,
     "copyOnSelect": true,
     "defaultProfile": "{51855cb2-8cce-5362-8f54-464b92b32386}",
-    "disabledProfileSources": 
-    [
+    "disabledProfileSources": [
         "Windows.Terminal.Azure",
         "Windows.Terminal.PowershellCore"
     ],
@@ -47,30 +60,24 @@
     "initialCols": 100,
     "initialRows": 25,
     "launchMode": "default",
-    "newTabMenu": 
-    [
+    "newTabMenu": [
         {
             "type": "remainingProfiles"
         }
     ],
-    "profiles": 
-    {
-        "defaults": 
-        {
+    "profiles": {
+        "defaults": {
             "colorScheme": "Legacy",
-            "font": 
-            {
+            "font": {
                 "face": "FiraMono Nerd Font Mono",
                 "size": 13.0
             },
             "startingDirectory": null
         },
-        "list": 
-        [
+        "list": [
             {
                 "commandline": "C:\\Program Files\\PowerShell\\7\\pwsh.exe -nologo",
-                "font": 
-                {
+                "font": {
                     "face": "FiraMono Nerd Font Mono",
                     "size": 14.0,
                     "weight": "normal"
@@ -85,8 +92,7 @@
                 "useAcrylic": false
             },
             {
-                "font": 
-                {
+                "font": {
                     "face": "FiraMono Nerd Font Mono",
                     "size": 14.0,
                     "weight": "normal"
@@ -98,8 +104,7 @@
             },
             {
                 "elevate": true,
-                "font": 
-                {
+                "font": {
                     "face": "FiraMono Nerd Font Mono",
                     "size": 14.0,
                     "weight": "normal"
@@ -115,8 +120,7 @@
             }
         ]
     },
-    "schemes": 
-    [
+    "schemes": [
         {
             "background": "#0C0C0C",
             "black": "#0C0C0C",
@@ -373,46 +377,39 @@
     ],
     "tabWidthMode": "compact",
     "theme": "dark",
-    "themes": 
-    [
+    "themes": [
         {
             "name": "legacyDark",
-            "tab": 
-            {
+            "tab": {
                 "background": null,
                 "showCloseButton": "always",
                 "unfocusedBackground": null
             },
-            "window": 
-            {
+            "window": {
                 "applicationTheme": "dark",
                 "useMica": false
             }
         },
         {
             "name": "legacyLight",
-            "tab": 
-            {
+            "tab": {
                 "background": null,
                 "showCloseButton": "always",
                 "unfocusedBackground": null
             },
-            "window": 
-            {
+            "window": {
                 "applicationTheme": "light",
                 "useMica": false
             }
         },
         {
             "name": "legacySystem",
-            "tab": 
-            {
+            "tab": {
                 "background": null,
                 "showCloseButton": "always",
                 "unfocusedBackground": null
             },
-            "window": 
-            {
+            "window": {
                 "applicationTheme": "system",
                 "useMica": false
             }
