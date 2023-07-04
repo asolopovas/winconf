@@ -1,29 +1,24 @@
-RunOrActivate(windowID, exePath, args, runAsAdmin, alwaysNewInstance) {
-    if WinExist(windowID) and !alwaysNewInstance {
-        If WinActive(windowID) {
-            WinMinimize, % "ahk_id " . WinExist(windowID)  ; specify window to minimize
+RunOrActivate(windowID, exePath, args, alwaysNewInstance := false) {
+    if (!alwaysNewInstance && WinExist(windowID)) {
+        if WinActive(windowID) {
+            WinMinimize, % "ahk_id " . WinExist(windowID)
         } else {
             WinActivate, %windowID%
         }
     } else {
-        if (runAsAdmin) {
-            Run *RunAs %exePath% %args%
-        } else {
-            RunAsUser(exePath, args)
-        }
+        RunAsUser(exePath, args)
         WinWait, %windowID%
         WinActivate, %windowID%
     }
 }
 
-RunOrActivateTerminal(windowTitle, runAsAdmin := false, alwaysNewInstance := false) {
-
+RunOrActivateTerminal(windowTitle, alwaysNewInstance := false) {
     EnvGet, username, username
     terminalPath := "C:\Users\" username "\AppData\Local\Microsoft\WindowsApps\wt.exe"
     args := "-w """ windowTitle """ nt -p """ windowTitle """ --suppressApplicationTitle"
     windowID := windowTitle " ahk_class CASCADIA_HOSTING_WINDOW_CLASS"
 
-    RunOrActivate(windowID, terminalPath, args, runAsAdmin, alwaysNewInstance )
+    RunOrActivate(windowID, terminalPath, args, alwaysNewInstance)
 }
 
 F12::
@@ -45,7 +40,7 @@ return
 #c::
     windowID := "ahk_class Chrome_WidgetWin_1 ahk_exe chrome.exe"
     exePath := "C:\Program Files\Google\Chrome\Application\chrome.exe"
-    RunOrActivate(windowId, itemPath, "", runAsAdmin, alwaysNewInstance)
+    RunOrActivate(windowId, itemPath, "")
 Return
 
 #m::
