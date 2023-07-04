@@ -40,7 +40,7 @@ return
 #c::
     windowID := "ahk_class Chrome_WidgetWin_1 ahk_exe chrome.exe"
     exePath := "C:\Program Files\Google\Chrome\Application\chrome.exe"
-    RunOrActivate(windowId, itemPath, "")
+    RunOrActivate(windowId, exePath, "")
 Return
 
 #m::
