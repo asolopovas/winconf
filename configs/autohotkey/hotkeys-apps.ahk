@@ -21,7 +21,7 @@ RunOrActivateTerminal(windowTitle, alwaysNewInstance := false) {
     RunOrActivate(windowID, terminalPath, args, alwaysNewInstance)
 }
 
-F12::
+!F12::
     RunOrActivateTerminal("PowerShell")
 return
 
