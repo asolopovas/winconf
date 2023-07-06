@@ -172,23 +172,28 @@ function sshCopyID($hostname) {
     Get-Content ~/.ssh/id_rsa.pub | ssh $hostname 'Add-Content | Out-File C:\ProgramData\ssh\administrators_authorized_keys; icacls.exe ""$env:ProgramData\ssh\administrators_authorized_keys"" /inheritance:r /grant ""Administrators:F"" /grant ""SYSTEM:F""'
 }
 
-function gitRmPreviousCommits() {
-    $repoName = git remote get-url origin 2>&1 | ForEach-Object {
-        if ($_ -is [System.Management.Automation.ErrorRecord]) {
-            Write-Error $_
+function gitRmPreviousCommits {
+    $yn = Read-Host -Prompt "This will delete all previous commits in the current repository. Are you sure you want to proceed? (yes/no)"
+    switch -Wildcard ($yn) {
+        "y*" {
+            if (-not (Test-Path .git)) { return }
+            $originUrl = git remote get-url origin
+            if ([string]::IsNullOrEmpty($originUrl)) { return }
+            Remove-Item .git -Recurse -Force
+            git init
+            git add .
+            git commit -m 'initial commit'
+            git remote add origin $originUrl
+            git branch -M main
+            git push --force -u origin main
         }
-        else {
-            $_
-        }
+        "n*" { Write-Output "Exiting..."; exit }
+        default { Write-Output "Invalid response."; exit 1 }
     }
-    Remove-Item  -Force -Recurse .git
-    Write-Output $repoName
-    git init
-    git add .
-    git commit -m 'initial commit'
-    git remote add origin "$repoName"
-    git push --force -u origin main
 }
+
+Delete-PreviousGithubCommits
+
 
 . $PSScriptRoot\system.ps1
 . $PSScriptRoot\convertions.ps1
