@@ -78,6 +78,7 @@
         'gch',
         'gp',
         'gl',
+        'gk',
         'gw',
         'dc',
         'nah',
