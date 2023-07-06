@@ -187,7 +187,7 @@ function gitRmPreviousCommits() {
     git add .
     git commit -m 'initial commit'
     git remote add origin "$repoName"
-    git push --force -u origin master
+    git push --force -u origin main
 }
 
 . $PSScriptRoot\system.ps1
