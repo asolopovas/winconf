@@ -1,6 +1,7 @@
 $paths = @(
-    "$env:USERPROFILE\gdrive\bin"
-    "C:\Program Files\nodejs"
+    "C:\Users\Andrius\AppData\Local\Microsoft\WinGet\Links"
+    "C:\Program Files\starship\bin\"
+
 )
 
 foreach ($path in $paths) {

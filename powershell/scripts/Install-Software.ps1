@@ -1,12 +1,12 @@
 $wingetApps = @(
-    "Bccuninstaller",
+    "Klocman.BulkCrapUninstaller",
     "7zip.7zip",
     "Google.PlatformTools",
     "OpenJS.NodeJS.LTS",
     "VideoLAN.VLC",
     "Microsoft.PowerToys",
-    "Miniconda3",
-    "Gpg4win",
+    "Anaconda.Miniconda3",
+    "GnuPG.Gpg4win",
     "Gyan.FFmpeg",
     "sharkdp.fd",
     "junegunn.fzf",
@@ -20,7 +20,7 @@ $wingetApps = @(
     "ShareX.ShareX",
     "youtube-dl.youtube-dl",
     "Calibre.calibre",
-    "Starhip.Starship",
+    "Starship.Starship",
     "Piriform.CCleaner",
     "Rufus.Rufus",
     "Microsoft.Sysinternals.ProcessMonitor",
@@ -28,5 +28,6 @@ $wingetApps = @(
 )
 
 foreach($app in $wingetApps) {
+    Write-Host "Installing $app"
     winget install --id $app
 }
