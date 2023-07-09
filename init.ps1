@@ -1,7 +1,7 @@
 
 Start-Transcript $ENV:TEMP\winconf.log -Append
 $root = "$env:userprofile\winconf"
-$scripts_dir = "$root\powershell\scripts"
+$scripts_dir = "$root\scripts"
 $repoUrl = 'git@github.com:asolopovas/winconf.git'
 
 function Test-CommandExists {
@@ -37,9 +37,7 @@ $source_files = @(
     'Sync-Powershell'
     'Sync-Terminal'
     'Sync-Autohotkey'
-    'Sync-GPT'
     'Sync-DirectoryOpus'
-    # 'Sync-Mirc'
     'Sync-OpenSSH'
 )
 
