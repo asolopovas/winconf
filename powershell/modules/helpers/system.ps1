@@ -82,8 +82,7 @@ function Add-ToPath {
     }
 }
 
-
-function RefreshUserPath ($envFilePath) {
+function RefreshUserPath ($envFilePath = "$env:USERPROFILE\winconf\.sys-env") {
     $paths = Get-Content $envFilePath
     $currentPaths = $env:Path -split ';' | ForEach-Object { $_.TrimEnd('\').ToLower() }
 
