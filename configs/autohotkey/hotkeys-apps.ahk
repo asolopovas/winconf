@@ -33,6 +33,10 @@ return
     RunOrActivateTerminal("PowerShell Admin", true)
 return
 
+!+F12::
+    RunOrActivateTerminal("PowerShell Admin", true)
+return
+
 #Enter::
     RunOrActivateTerminal("Ubuntu")
 return
