@@ -125,7 +125,8 @@
         'DistroImport',
         'DistroRemove',
         'gitRmPreviousCommits',
-        'sshCopyID'
+        'sshCopyID',
+        'RefreshUserPath'
     )
 
 }

@@ -81,3 +81,19 @@ function Add-ToPath {
         Write-Host "Already '$PATH' in $LOCATION Path variable."
     }
 }
+
+
+function RefreshUserPath ($envFilePath) {
+    $paths = Get-Content $envFilePath
+    $currentPaths = $env:Path -split ';' | ForEach-Object { $_.TrimEnd('\').ToLower() }
+
+    foreach ($path in $paths) {
+        $expandedPath = $ExecutionContext.InvokeCommand.ExpandString($path)
+        $normalizedPath = $expandedPath.TrimEnd('\').ToLower()
+
+        if ((Test-Path -Path $expandedPath) -and ($currentPaths -notcontains $normalizedPath)) {
+            Add-ToPath -Path $expandedPath
+        }
+    }
+}
+

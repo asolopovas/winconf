@@ -1,0 +1,7 @@
+C:\Program Files\starship\bin
+$env:LOCALAPPDATA\Microsoft\WinGet\Links
+$env:USERPROFILE\winconf\bin
+$env:USERPROFILE\miniconda3
+$env:USERPROFILE\src\redlined-pdf
+$env:USERPROFILE\src\news-search
+$env:USERPROFILE\src\excel-to-pdf

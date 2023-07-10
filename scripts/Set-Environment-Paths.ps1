@@ -1,13 +1,27 @@
-$paths = @(
-   $env:LOCALAPPDATA + "\Microsoft\WinGet\Links"
-    "C:\Program Files\starship\bin\"
-    $env:USERPROFILE + "\winconf\bin"
-    $env:USERPROFILE  + "\miniconda3"
-)
+# Get the .sys-env file content
+$paths = Get-Content "../.sys-env"
 
+# Convert PATH to an array for easier manipulation and normalize paths
+$currentPaths = $env:Path -split ';' | ForEach-Object { $_.TrimEnd('\').ToLower() }
+
+# Iterate over the paths from the .sys-env file
 foreach ($path in $paths) {
-    if ($env:PATH -notlike "*$path*") {
-        Write-Host "Adding $path to System PATH ..."
-        [Environment]::SetEnvironmentVariable("Path", $env:Path + ";$path", "User")
+    # Expand environment variables in the path
+    $expandedPath = $ExecutionContext.InvokeCommand.ExpandString($path)
+
+    # Normalize expanded path
+    $normalizedPath = $expandedPath.TrimEnd('\').ToLower()
+
+    if ((Test-Path -Path $expandedPath) -and ($currentPaths -notcontains $normalizedPath)) {
+        # Add path to local array
+        $currentPaths += $expandedPath
+        Write-Host "Adding $expandedPath to System PATH ..."
+    }
+    else {
+        Write-Host "$expandedPath does not exist or is already in PATH..."
     }
 }
+
+# Join the array back into a single string and update PATH
+$newPath = $currentPaths -join ';'
+[Environment]::SetEnvironmentVariable("Path", $newPath, "User")
