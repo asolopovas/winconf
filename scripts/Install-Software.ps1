@@ -8,6 +8,7 @@ $wingetApps = @(
     "VideoLAN.VLC",
     "Microsoft.PowerToys",
     "Anaconda.Miniconda3",
+    "StrawberryPerl.StrawberryPerl",
     "GnuPG.Gpg4win",
     "Gyan.FFmpeg",
     "sharkdp.fd",
