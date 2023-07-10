@@ -11,6 +11,3 @@ Import-Module PSReadLine
 
 . $power_shell_dir\starship.ps1
 
-If (Test-Path "$env:userprofile\miniconda3\Scripts\conda.exe") {
-    (& "$env:userprofile\miniconda3\Scripts\conda.exe" "shell.powershell" "hook") | Out-String | ?{$_} | Invoke-Expression
-}
