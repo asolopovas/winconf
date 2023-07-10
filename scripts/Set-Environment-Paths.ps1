@@ -1,7 +1,7 @@
 $paths = @(
-    "C:\Users\Andrius\AppData\Local\Microsoft\WinGet\Links"
+   $env:LOCALAPPDATA + "\Microsoft\WinGet\Links"
     "C:\Program Files\starship\bin\"
-
+    $env:USERPROFILE + "\winconf\bin"
 )
 
 foreach ($path in $paths) {
