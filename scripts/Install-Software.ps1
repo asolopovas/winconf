@@ -1,3 +1,5 @@
+
+
 $wingetApps = @(
     "Klocman.BulkCrapUninstaller",
     "7zip.7zip",
