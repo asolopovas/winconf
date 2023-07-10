@@ -22,7 +22,7 @@ $wingetApps = @(
     "Calibre.calibre",
     "Starship.Starship",
     "Piriform.CCleaner",
-    "MiKTeX.MiKTeX"
+    "MiKTeX.MiKTeX",
     "Rufus.Rufus",
     "Microsoft.Sysinternals.ProcessMonitor",
     "Microsoft.Sysinternals.ProcessExplorer"
