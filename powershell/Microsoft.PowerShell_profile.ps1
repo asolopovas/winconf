@@ -10,3 +10,4 @@ $ENV:STARSHIP_CONFIG = "$power_shell_dir\starship.toml"
 Import-Module PSReadLine
 
 . $power_shell_dir\starship.ps1
+
