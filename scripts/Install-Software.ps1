@@ -24,7 +24,6 @@ $wingetApps = @(
     "youtube-dl.youtube-dl",
     "Calibre.calibre",
     "Starship.Starship",
-    "Piriform.CCleaner",
     "MiKTeX.MiKTeX",
     "Rufus.Rufus",
     "Microsoft.Sysinternals.ProcessMonitor",
