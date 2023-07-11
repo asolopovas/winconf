@@ -192,7 +192,29 @@ function gitRmPreviousCommits {
     }
 }
 
-Delete-PreviousGithubCommits
+function Remove-RegistryKeys {
+    param (
+        [Parameter(Mandatory = $false)]
+        [string[]] $removeRegistryKeys = @(
+            "HKCR:\Directory\Background\shell\git_shell",
+            "HKCR:\Directory\Background\shell\git_gui",
+            "HKCR:\Directory\shell\git_shell",
+            "HKCR:\Directory\shell\git_gui",
+            "HKCR:\Directory\shell\PlayWithVLC",
+            "HKCR:\Directory\shell\AddToPlaylistVLC",
+            "HKCR:\Directory\shell\ShareX",
+            "HKCR:\Directory\shell\CaptureOne"
+        )
+    )
+
+    New-PSDrive -PSProvider registry -Root HKEY_CLASSES_ROOT -Name HKCR
+
+    foreach ($key in $removeRegistryKeys) {
+        if (Test-Path $key) {
+            Remove-Item -Path $key -Recurse -Force -Verbose
+        }
+    }
+}
 
 
 . $PSScriptRoot\system.ps1

@@ -125,6 +125,7 @@
         'DistroImport',
         'DistroRemove',
         'gitRmPreviousCommits',
+        'Remove-RegistryKeys',
         'sshCopyID',
         'RefreshUserPath'
     )
