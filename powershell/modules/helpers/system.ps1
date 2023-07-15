@@ -158,5 +158,4 @@ function confsync {
             git -C $path pull
         }
     }
-
 }
