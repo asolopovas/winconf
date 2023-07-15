@@ -122,29 +122,21 @@ function confsync {
         [string]$action
     )
 
-    $wsl_user = wsl whoami
     $win_user = [Environment]::UserName
     $Paths = @(
-        "C:/Users/$win_user/winconf",
-        "/home/$wsl_user/dotfiles",
-        "/home/$wsl_user/www/dev"
+        "$env:USERPROFILE/winconf"
     )
 
     function gitAction($action, $path) {
         $message = "$($action.Substring(0,1).ToUpper() + $action.Substring(1))ing $path ..."
         Write-ColorOutput green $message
-        $cmd = if ($path -like "C:*") { "git" } else { "wsl git" }
         if ($action -eq "push") {
-            iex "$cmd -C $path add ."
-            iex "$cmd -C $path commit -m 'Save changes'"
-            iex "$cmd -C $path push"
+            git -C $path add .
+            git -C $path commit -m 'Save'
+            git -C $path push
         }
         else {
-            iex "$cmd -C $path pull"
+            git -C $path pull
         }
-    }
-
-    foreach ($path in $Paths) {
-        gitAction $action $path
     }
 }
