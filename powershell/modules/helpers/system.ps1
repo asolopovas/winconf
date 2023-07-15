@@ -96,7 +96,7 @@ function RefreshUserPath ($envFilePath = "$env:USERPROFILE\winconf\.sys-env") {
     }
 }
 
-function sysConf {
+function sysconf {
     param (
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateSet('save', 'pull')]
@@ -115,12 +115,14 @@ function sysConf {
                 Write-Output "Saving to git: $path ..."
                 wsl git -C $path add .
                 wsl git -C $path commit -m $message
+                wsl git -C $path push
             }
 
             foreach ($winpath in $WinPaths) {
                 Write-Output "Saving to git: $winpath ..."
                 git -C $winpath add .
                 git -C $winpath commit -m $message
+                git -C $winpath push
             }
         }
         "pull" {
