@@ -127,7 +127,8 @@
         'gitRmPreviousCommits',
         'Remove-RegistryKeys',
         'sshCopyID',
-        'RefreshUserPath'
+        'RefreshUserPath',
+        "sysConf"
     )
 
 }

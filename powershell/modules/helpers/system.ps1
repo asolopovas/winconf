@@ -96,3 +96,47 @@ function RefreshUserPath ($envFilePath = "$env:USERPROFILE\winconf\.sys-env") {
     }
 }
 
+function sysConf {
+    param (
+        [Parameter(Mandatory = $true, Position = 0)]
+        [ValidateSet('save', 'pull')]
+        [string]$action
+    )
+
+    $win_user = [Environment]::UserName
+    $WSLPaths = @("/home/$win_user/dotfiles", "/home/$win_user/www/dev")
+    $WinPaths = @("C:/Users/$win_user/winconf")
+    $message = "Save changes"
+
+    switch ($action) {
+        "save" {
+            foreach ($path in $WSLPaths) {
+                Write-Output "Saving to git: $path ..."
+                wsl git -C $path add .
+                wsl git -C $path commit -m $message
+            }
+
+            foreach ($winpath in $WinPaths) {
+                Write-Output "Saving to git: $winpath ..."
+                git -C $winpath add .
+                git -C $winpath commit -m $message
+            }
+        }
+        "pull" {
+            foreach ($path in $WSLPaths) {
+                Write-Output "Pulling from git: $path ..."
+                wsl git -C $path pull
+            }
+
+            foreach ($winpath in $WinPaths) {
+                Write-Output "Pulling from git: $winpath ..."
+                git -C $winpath pull
+            }
+        }
+    }
+
+    # Usage:
+    # Manage-Git save
+    # Manage-Git pull
+
+}
