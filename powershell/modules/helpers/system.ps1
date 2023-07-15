@@ -127,12 +127,16 @@ function sysconf {
     $Paths = @("/home/$wsl_user/dotfiles", "/home/$wsl_user/www/dev", "C:/Users/$win_user/winconf")
 
     function gitAction($action, $path) {
-        Write-ColorOutput green "${action^}ing to git: $path ..."
-        $cmd = if($path -like "C:*") {"git"} else {"wsl git"}
-        iex "$cmd -C $path $action"
+        $message = "$($action.Substring(0,1).ToUpper() + $action.Substring(1))ing to git: $path ..."
+        Write-ColorOutput green $message
+        $cmd = if ($path -like "C:*") { "git" } else { "wsl git" }
         if ($action -eq "push") {
             iex "$cmd -C $path add ."
             iex "$cmd -C $path commit -m 'Save changes'"
+            iex "$cmd -C $path push"
+        }
+        else {
+            iex "$cmd -C $path pull"
         }
     }
 
