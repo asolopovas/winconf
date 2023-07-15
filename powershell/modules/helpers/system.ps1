@@ -1,3 +1,22 @@
+function Write-ColorOutput($ForegroundColor) {
+    # save the current color
+    $fc = $host.UI.RawUI.ForegroundColor
+
+    # set the new color
+    $host.UI.RawUI.ForegroundColor = $ForegroundColor
+
+    # output
+    if ($args) {
+        Write-Output $args
+    }
+    else {
+        $input | Write-Output
+    }
+
+    # restore the original color
+    $host.UI.RawUI.ForegroundColor = $fc
+}
+
 function Test-EnvPath() {
 
     param (
@@ -112,14 +131,14 @@ function sysconf {
     switch ($action) {
         "save" {
             foreach ($path in $WSLPaths) {
-                Write-Output "Saving to git: $path ..."
+                Write-ColorOutput green "Saving to git: $path ..."
                 wsl git -C $path add .
                 wsl git -C $path commit -m $message
                 wsl git -C $path push
             }
 
             foreach ($winpath in $WinPaths) {
-                Write-Output "Saving to git: $winpath ..."
+                Write-ColorOutput green "Saving to git: $winpath ..."
                 git -C $winpath add .
                 git -C $winpath commit -m $message
                 git -C $winpath push
@@ -127,12 +146,12 @@ function sysconf {
         }
         "pull" {
             foreach ($path in $WSLPaths) {
-                Write-Output "Pulling from git: $path ..."
+                Write-ColorOutput green "\n Pulling from git: $path ..."
                 wsl git -C $path pull
             }
 
             foreach ($winpath in $WinPaths) {
-                Write-Output "Pulling from git: $winpath ..."
+                Write-ColorOutput green "Pulling from git: $winpath ..."
                 git -C $winpath pull
             }
         }
