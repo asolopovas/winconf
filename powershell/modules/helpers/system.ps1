@@ -146,7 +146,7 @@ function sysconf {
         }
         "pull" {
             foreach ($path in $WSLPaths) {
-                Write-ColorOutput green "\n Pulling from git: $path ..."
+                Write-ColorOutput green "Pulling from git: $path ..."
                 wsl git -C $path pull
             }
 
