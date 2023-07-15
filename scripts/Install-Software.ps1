@@ -16,7 +16,6 @@ $wingetApps = @(
     "junegunn.fzf",
     "Git.Git",
     "voidtools.Everything",
-    "AutoHotkey.AutoHotkey",
     "Twilio.Authy",
     "ALCPU.CoreTemp",
     "mIRC.mIRC",
