@@ -30,6 +30,7 @@ $wingetApps = @(
     "Microsoft.Sysinternals.ProcessExplorer"
 )
 
+
 foreach($app in $wingetApps) {
     Write-Host "Installing $app"
     winget install --id $app
