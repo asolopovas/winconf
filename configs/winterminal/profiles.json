@@ -33,6 +33,10 @@
             "keys": "alt+q"
         },
         {
+            "command": "closePane",
+            "keys": "ctrl+w"
+        },
+        {
             "command": 
             {
                 "action": "nextTab"
@@ -52,6 +56,10 @@
                 "action": "newTab"
             },
             "keys": "alt+t"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+shift+w"
         }
     ],
     "alwaysOnTop": false,

@@ -9,6 +9,7 @@ $packages = @(
     "*king.com.CandyCrushSodaSaga*",
     "*Microsoft.DrawboardPDF*",
     "*Facebook*",
+    "*Microsoft.OneDriveSync*"
     "*BethesdaSoftworks.FalloutShelter*",
     "*FarmVille2CountryEscape*",
     "*Microsoft.WindowsFeedbackHub*",

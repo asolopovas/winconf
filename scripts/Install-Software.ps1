@@ -10,6 +10,7 @@ $wingetApps = @(
     "Anaconda.Miniconda3",
     "StrawberryPerl.StrawberryPerl",
     "GnuPG.Gpg4win",
+    "NirSoft.ShellExView",
     "Gyan.FFmpeg",
     "sharkdp.fd",
     "junegunn.fzf",
