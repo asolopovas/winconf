@@ -128,7 +128,7 @@
         'Remove-RegistryKeys',
         'sshCopyID',
         'RefreshUserPath',
-        "sysconf"
+        "confsync"
     )
 
 }

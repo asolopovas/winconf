@@ -115,7 +115,7 @@ function RefreshUserPath ($envFilePath = "$env:USERPROFILE\winconf\.sys-env") {
     }
 }
 
-function sysconf {
+function confsync {
     param (
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateSet('push', 'pull')]
@@ -124,10 +124,14 @@ function sysconf {
 
     $wsl_user = wsl whoami
     $win_user = [Environment]::UserName
-    $Paths = @("/home/$wsl_user/dotfiles", "/home/$wsl_user/www/dev", "C:/Users/$win_user/winconf")
+    $Paths = @(
+        "/home/$wsl_user/dotfiles",
+        "/home/$wsl_user/www/dev",
+        "C:/Users/$win_user/winconf"
+    )
 
     function gitAction($action, $path) {
-        $message = "$($action.Substring(0,1).ToUpper() + $action.Substring(1))ing to git: $path ..."
+        $message = "$($action.Substring(0,1).ToUpper() + $action.Substring(1))ing $path ..."
         Write-ColorOutput green $message
         $cmd = if ($path -like "C:*") { "git" } else { "wsl git" }
         if ($action -eq "push") {
