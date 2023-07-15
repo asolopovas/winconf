@@ -129,7 +129,7 @@ function sysconf {
     $message = "Save changes"
 
     switch ($action) {
-        "save" {
+        "push" {
             foreach ($path in $WSLPaths) {
                 Write-ColorOutput green "Saving to git: $path ..."
                 wsl git -C $path add .
