@@ -43,4 +43,3 @@ function Set-AntivirusMode($mode) {
     }
 }
 
-& .\firewall-blocker.ps1

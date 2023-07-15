@@ -223,6 +223,7 @@ function Remove-RegistryKeys {
 . $PSScriptRoot\firewall-blocker.ps1
 . $PSScriptRoot\rm-pattern.ps1
 . $PSScriptRoot\security.ps1
+. $PSScriptRoot\firewall-blocker.ps1
 . $PSScriptRoot\sync-configs.ps1
 . $PSScriptRoot\wsl.ps1
 . $PSScriptRoot\docker-compose

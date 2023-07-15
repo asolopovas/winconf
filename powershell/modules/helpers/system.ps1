@@ -26,7 +26,13 @@ function Test-EnvPath() {
         [switch]$Machine
     )
 
-    $LOC = $Machine ? [EnvironmentVariableTarget]::Machine : [EnvironmentVariableTarget]::User
+    if ($Machine) {
+        $LOC = [EnvironmentVariableTarget]::Machine
+    }
+    else {
+        $LOC = [EnvironmentVariableTarget]::User
+    }
+
     $ENV_PATH = [Environment]::GetEnvironmentVariable("Path", $LOC)
 
     return $ENV_PATH.Contains($Path)
@@ -87,10 +93,24 @@ function Add-ToPath {
         [switch]$Remove
     )
 
-    $LOC = $Machine ? [EnvironmentVariableTarget]::Machine : [EnvironmentVariableTarget]::User
+
+
+    if ($Machine) {
+        $LOC = [EnvironmentVariableTarget]::Machine
+    }
+    else {
+        $LOC = [EnvironmentVariableTarget]::User
+    }
+
     $ENV_PATH = [Environment]::GetEnvironmentVariable("Path", $LOC)
     $PATH = Resolve-Path $Path
-    $LOCATION = $Machine ? "System's" : "User's"
+    if ($Machine) {
+        $LOCATION = "System's"
+    }
+    else {
+        $LOCATION = "User's"
+    }
+
 
     if (!(Test-EnvPath $PATH)) {
         [Environment]::SetEnvironmentVariable("Path", "$ENV_PATH;$PATH", $LOC)
