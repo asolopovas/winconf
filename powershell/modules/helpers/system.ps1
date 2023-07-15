@@ -118,47 +118,30 @@ function RefreshUserPath ($envFilePath = "$env:USERPROFILE\winconf\.sys-env") {
 function sysconf {
     param (
         [Parameter(Mandatory = $true, Position = 0)]
-        [ValidateSet('save', 'pull')]
+        [ValidateSet('push', 'pull')]
         [string]$action
     )
 
     $wsl_user = wsl whoami
     $win_user = [Environment]::UserName
-    $WSLPaths = @("/home/$wsl_user/dotfiles", "/home/$wsl_user/www/dev")
-    $WinPaths = @("C:/Users/$win_user/winconf")
-    $message = "Save changes"
+    $Paths = @(
+        "/home/$wsl_user/dotfiles",
+        "/home/$wsl_user/www/dev",
+        "C:/Users/$win_user/winconf"
+    )
 
-    switch ($action) {
-        "push" {
-            foreach ($path in $WSLPaths) {
-                Write-ColorOutput green "Saving to git: $path ..."
-                wsl git -C $path add .
-                wsl git -C $path commit -m $message
-                wsl git -C $path push
-            }
-
-            foreach ($winpath in $WinPaths) {
-                Write-ColorOutput green "Saving to git: $winpath ..."
-                git -C $winpath add .
-                git -C $winpath commit -m $message
-                git -C $winpath push
-            }
-        }
-        "pull" {
-            foreach ($path in $WSLPaths) {
-                Write-ColorOutput green "Pulling from git: $path ..."
-                wsl git -C $path pull
-            }
-
-            foreach ($winpath in $WinPaths) {
-                Write-ColorOutput green "Pulling from git: $winpath ..."
-                git -C $winpath pull
-            }
+    function gitAction($action, $path) {
+        Write-ColorOutput green "${action^}ing to git: $path ..."
+        $cmd = if ($path -like "C:*") { "git" } else { "wsl git" }
+        & $cmd -C $path $action
+        if ($action -eq "push") {
+            & $cmd -C $path add .
+            & $cmd -C $path commit -m "Save changes"
         }
     }
 
-    # Usage:
-    # Manage-Git save
-    # Manage-Git pull
-
+    foreach ($path in $Paths) {
+        gitAction $action $path
+    }
 }
+
