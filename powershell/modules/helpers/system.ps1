@@ -125,9 +125,9 @@ function confsync {
     $wsl_user = wsl whoami
     $win_user = [Environment]::UserName
     $Paths = @(
+        "C:/Users/$win_user/winconf",
         "/home/$wsl_user/dotfiles",
-        "/home/$wsl_user/www/dev",
-        "C:/Users/$win_user/winconf"
+        "/home/$wsl_user/www/dev"
     )
 
     function gitAction($action, $path) {
