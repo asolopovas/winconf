@@ -103,8 +103,9 @@ function sysConf {
         [string]$action
     )
 
+    $wsl_user = wsl whoami
     $win_user = [Environment]::UserName
-    $WSLPaths = @("/home/$win_user/dotfiles", "/home/$win_user/www/dev")
+    $WSLPaths = @("/home/$wsl_user/dotfiles", "/home/$wsl_user/www/dev")
     $WinPaths = @("C:/Users/$win_user/winconf")
     $message = "Save changes"
 
