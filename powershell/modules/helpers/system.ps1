@@ -122,21 +122,21 @@ function confsync {
         [string]$action
     )
 
-    $win_user = [Environment]::UserName
-    $Paths = @(
+    $paths = @(
         "$env:USERPROFILE/winconf"
     )
 
-    function gitAction($action, $path) {
-        $message = "$($action.Substring(0,1).ToUpper() + $action.Substring(1))ing $path ..."
-        Write-ColorOutput green $message
+    foreach ($path in $paths) {
         if ($action -eq "push") {
+            Write-ColorOutput green "Pushing $path ..."
             git -C $path add .
             git -C $path commit -m 'Save'
             git -C $path push
         }
         else {
+            Write-ColorOutput green  "Pulling $path ..."
             git -C $path pull
         }
     }
+
 }
