@@ -124,19 +124,15 @@ function sysconf {
 
     $wsl_user = wsl whoami
     $win_user = [Environment]::UserName
-    $Paths = @(
-        "/home/$wsl_user/dotfiles",
-        "/home/$wsl_user/www/dev",
-        "C:/Users/$win_user/winconf"
-    )
+    $Paths = @("/home/$wsl_user/dotfiles", "/home/$wsl_user/www/dev", "C:/Users/$win_user/winconf")
 
     function gitAction($action, $path) {
         Write-ColorOutput green "${action^}ing to git: $path ..."
-        $cmd = if ($path -like "C:*") { "git" } else { "wsl git" }
-        & $cmd -C $path $action
+        $cmd = if($path -like "C:*") {"git"} else {"wsl git"}
+        iex "$cmd -C $path $action"
         if ($action -eq "push") {
-            & $cmd -C $path add .
-            & $cmd -C $path commit -m "Save changes"
+            iex "$cmd -C $path add ."
+            iex "$cmd -C $path commit -m 'Save changes'"
         }
     }
 
@@ -144,4 +140,3 @@ function sysconf {
         gitAction $action $path
     }
 }
-
