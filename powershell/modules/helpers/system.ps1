@@ -143,7 +143,7 @@ function confsync {
     )
 
     $paths = @(
-        "$env:USERPROFILE/winconf"
+        "$env:USERPROFILE\winconf"
     )
 
     foreach ($path in $paths) {
