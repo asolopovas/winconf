@@ -135,7 +135,7 @@ function RefreshUserPath ($envFilePath = "$env:USERPROFILE\winconf\.sys-env") {
     }
 }
 
-function confsync {
+function conf {
     param (
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateSet('push', 'pull')]
