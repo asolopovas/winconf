@@ -245,7 +245,6 @@ function DevHostMappings {
     }
 }
 
-
 . $PSScriptRoot\system.ps1
 . $PSScriptRoot\convertions.ps1
 . $PSScriptRoot\files.ps1

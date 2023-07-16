@@ -71,65 +71,65 @@
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
     # FunctionsToExport surounded by single quotes
     FunctionsToExport = @(
-        'Test-Helpers'
-        'Build-WebConfig',
-        'Clear-EnvPath',
-        'Enable-Feature',
-        'Find-LockingProcess',
-        'Get-RootName',
-        'IIf',
-        'New-Passowrd',
-        'New-ShellContextItem',
-        'Remove-Alias',
-        'Repair-Windows',
-        'Restart-Explorer',
-        'Start-AsAdmin',
-        'Sync-Config',
-        'Test-EnvPath',
-        'Test-ScheduledTask',
-        'Test-RegistryValue',
-        'Test-RegistryKeyExist',
-        'tail',
         # add.ps1
-        'Add-ToPath',
         'Add-AdminShortcut',
-        'Add-StartupItem',
-        'Add-ShellContext',
+        'Add-DefenderExclusion',
+        'Add-ProjectToPath',
         'Add-SSHKey',
-        # convertions.ps1
-        'Convert-ToUnixEndings',
+        'Add-ShellContext',
+        'Add-StartupItem',
+        'Add-ToPath',
+        'Build-WebConfig',
+        'Clear-DefenderHistory',
+        'Clear-EnvPath',
         'Convert-ExcelToCsv',
         'Convert-ExcelToCsvDir',
-        'Format-String',
-        # files.ps1
-        'New-SymLink',
-        'New-HardLink',
-        'New-File',
-        'NerdFontInstall',
-        'Test-IsSymLink',
-        'Find-Replace',
-        'Get-File',
-        # rm-patter.ps1
-        'Remove-ByPattern',
-        # security.ps1
-        'FBlocker',
-        'Set-FirewallRule',
-        'Add-DefenderExclusion',
-        'Add-ProjectToPath'
-        'Clear-DefenderHistory',
-        'Set-AntivirusMode',
-        # sync-config.ps1
-        'Sync-Configs',
-        # wsl-helpers.ps1
-        'PortProxy',
+        'Convert-ToUnixEndings',
+        "conf",
+        'Clean-ShellContext',
+        'DevHostMappings'
         'DistroImport',
         'DistroRemove',
-        'gitRmPreviousCommits',
-        'Clean-ShellContext',
-        'sshCopyID',
+        'Enable-Feature',
+        'FBlocker',
+        'Find-LockingProcess',
+        # files.ps1
+        'Find-Replace',
+        'Format-String',
+        'Get-File',
+        'Get-RootName',
+        'IIf',
+        'NerdFontInstall',
+        'New-File',
+        'New-HardLink',
+        'New-Passowrd',
+        'New-ShellContextItem',
+        'New-SymLink',
+        'PortProxy',
+        'Remove-Alias',
+        # rm-patter.ps1
+        'Remove-ByPattern',
+        'Repair-Windows',
+        'Restart-Explorer',
         'RefreshUserPath',
+        'Set-AntivirusMode',
+        'Set-FirewallRule',
         'Set-TaskbarSize',
-        "conf"
+        'Start-AsAdmin',
+        # security.ps1
+        'Sync-Config',
+        # sync-config.ps1
+        'Sync-Configs',
+        'Test-EnvPath',
+        'Test-Helpers',
+        'Test-IsSymLink',
+        'Test-RegistryKeyExist',
+        'Test-RegistryValue',
+        'Test-ScheduledTask',
+        'tail',
+        # wsl-helpers.ps1
+        'gitRmPreviousCommits',
+        'sshCopyID'
     )
 
 }
