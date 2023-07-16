@@ -232,6 +232,20 @@ function Set-TaskbarSize {
     Set-ItemProperty -Path $RegistryPath -Name $RegistryValueName -Value $Size
 }
 
+function DevHostMappings {
+    $hosts= @(
+        "redis",
+        "mariadb",
+        "phpmyadmin.test",
+        "mailhog"
+    )
+
+    foreach ($host in $hosts) {
+        New-HostnameMapping -Hostname $host
+    }
+}
+
+
 . $PSScriptRoot\system.ps1
 . $PSScriptRoot\convertions.ps1
 . $PSScriptRoot\files.ps1
