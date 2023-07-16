@@ -125,7 +125,7 @@
         'DistroImport',
         'DistroRemove',
         'gitRmPreviousCommits',
-        'Remove-RegistryKeys',
+        'Clean-ShellContext',
         'sshCopyID',
         'RefreshUserPath',
         'Set-TaskbarSize',

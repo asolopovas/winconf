@@ -192,7 +192,7 @@ function gitRmPreviousCommits {
     }
 }
 
-function Remove-RegistryKeys {
+function Clean-ShellContext {
     param (
         [Parameter(Mandatory = $false)]
         [string[]] $removeRegistryKeys = @(
