@@ -80,7 +80,7 @@ GetDesktopName(num) {
     utf8_buffer := ""
     utf8_buffer_len := utf8_buffer := Buffer(1024, 0) ; V1toV2: if 'utf8_buffer' is a UTF-16 string, use 'VarSetStrCapacity(&utf8_buffer, 1024)'
     ran := DllCall(GetDesktopNameProc, "Int", num, "Ptr", utf8_buffer, "Ptr", utf8_buffer_len, "Int")
-    name := StrGet(&utf8_buffer, 1024, "UTF-8")
+    name := StrGet(utf8_buffer, 1024, "UTF-8")
     return name
 }
 SetDesktopName(num, name) {
@@ -115,7 +115,7 @@ OnChangeDesktop(wParam, lParam, msg, hwnd) {
     Name := GetDesktopName(NewDesktop - 1)
 
     ; Use Dbgview.exe to checkout the output debug logs
-    OutputDebug("Desktop changed to " Name " from " OldDesktop " to " NewDesktop )
+    OutputDebug("Desktop changed to " Name " from " OldDesktop " to " NewDesktop)
 }
 
 #+1:: MoveCurrentWindowToDesktop(0)
@@ -123,12 +123,17 @@ OnChangeDesktop(wParam, lParam, msg, hwnd) {
 #+3:: MoveCurrentWindowToDesktop(2)
 #+4:: MoveCurrentWindowToDesktop(3)
 #+5:: MoveCurrentWindowToDesktop(4)
+#+6:: MoveCurrentWindowToDesktop(5)
+#+7:: MoveCurrentWindowToDesktop(6)
+#+8:: MoveCurrentWindowToDesktop(7)
+#+9:: MoveCurrentWindowToDesktop(8)
 
 #1:: MoveOrGotoDesktopNumber(0)
 #2:: MoveOrGotoDesktopNumber(1)
 #3:: MoveOrGotoDesktopNumber(2)
 #4:: MoveOrGotoDesktopNumber(3)
 #5:: MoveOrGotoDesktopNumber(4)
-
-F14 UP:: GoToPrevDesktop()
-F15 UP:: GoToNextDesktop()
+#6:: MoveOrGotoDesktopNumber(5)
+#7:: MoveOrGotoDesktopNumber(6)
+#8:: MoveOrGotoDesktopNumber(7)
+#9:: MoveOrGotoDesktopNumber(8)
