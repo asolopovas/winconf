@@ -60,8 +60,4 @@ RunOrActivateTerminal(windowTitle, alwaysNewInstance := false) {
             PostMessage(0x112, 0xF060, , , "ahk_id " . WinActive("A"))
         }
 
-        if (WinExist(windowID)) {
-            WinActivate(windowID)
-        }
-
     }
