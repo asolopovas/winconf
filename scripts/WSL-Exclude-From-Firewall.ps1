@@ -1,32 +1,43 @@
-# Find registered WSL environments
-$wslPaths = (Get-ChildItem HKCU:\Software\Microsoft\Windows\CurrentVersion\Lxss | ForEach-Object { Get-ItemProperty $_.PSPath}).BasePath
+# Define the folders to exclude
+$excludeFolders = @(
+    "C:\Programm Files\Docker",
+    "\\wsl$\Ubuntu\home\andrius\src",
+    "\\wsl$\Ubuntu\home\andrius\www",
+    "\\wsl.localhost\Ubuntu\home\andrius\src"
+)
 
-# Get the current Windows Defender exclusion paths
-$currentExclusions = $(Get-MpPreference).ExclusionPath
-if (!$currentExclusions) {
-  $currentExclusions = ''
+# Define the file types to exclude
+$excludeFileTypes = @(
+    "vhd",
+    "vhdx"
+)
+
+# Define the processes to exclude
+$excludeProcesses = @(
+    "pycharm64.exe",
+    "dataspell64.exe",
+    "fsnotifier.exe",
+    "jcef_helper.exe",
+    "jetbrains-toolbox.exe",
+    "docker.exe",
+    "com.docker.*.*",
+    "Desktop Docker.exe",
+    "wsl.exe",
+    "wslhost.exe",
+    "vmmemWSL"
+)
+
+# Iterate over each folder and exclude
+foreach ($folder in $excludeFolders) {
+    Add-MpPreference -ExclusionPath $folder
 }
 
-# Find the WSL paths that are not excluded
-$exclusionsToAdd = ((Compare-Object $wslPaths $currentExclusions) | Where-Object SideIndicator -eq "<=").InputObject
+# Iterate over each file type and exclude
+foreach ($fileType in $excludeFileTypes) {
+    Add-MpPreference -ExclusionExtension $fileType
+}
 
-# List of paths inside the Linux distro to exclude (https://github.com/Microsoft/WSL/issues/1932#issuecomment-407855346)
-$dirs = @("\bin", "\sbin", "\usr\bin", "\usr\sbin", "\usr\local\bin", "\usr\local\go\bin")
-
-# Add the missing entries to Windows Defender
-if ($exclusionsToAdd.Length -gt 0) {
-  $exclusionsToAdd | ForEach-Object {
-
-    # Exclude paths from the root of the WSL install
-    Add-MpPreference -ExclusionPath $_
-    Write-Output "Added exclusion for $_"
-
-    # Exclude processes contained inside WSL
-    $rootfs = $_ + "\rootfs"
-    $dirs | ForEach-Object {
-        $exclusion = $rootfs + $_ + "\*"
-        Add-MpPreference -ExclusionProcess $exclusion
-        Write-Output "Added exclusion for $exclusion"
-    }
-  }
+# Iterate over each process and exclude
+foreach ($process in $excludeProcesses) {
+    Add-MpPreference -ExclusionProcess $process
 }

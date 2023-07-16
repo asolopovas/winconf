@@ -1,24 +1,16 @@
 function Write-ColorOutput($ForegroundColor) {
-    # save the current color
     $fc = $host.UI.RawUI.ForegroundColor
-
-    # set the new color
     $host.UI.RawUI.ForegroundColor = $ForegroundColor
-
-    # output
     if ($args) {
         Write-Output $args
     }
     else {
         $input | Write-Output
     }
-
-    # restore the original color
     $host.UI.RawUI.ForegroundColor = $fc
 }
 
-function Test-EnvPath() {
-
+function Test-EnvPath {
     param (
         [Parameter(Mandatory = $true)]
         [string]$Path,
@@ -26,13 +18,7 @@ function Test-EnvPath() {
         [switch]$Machine
     )
 
-    if ($Machine) {
-        $LOC = [EnvironmentVariableTarget]::Machine
-    }
-    else {
-        $LOC = [EnvironmentVariableTarget]::User
-    }
-
+    $LOC = if ($Machine) {[EnvironmentVariableTarget]::Machine} else {[EnvironmentVariableTarget]::User}
     $ENV_PATH = [Environment]::GetEnvironmentVariable("Path", $LOC)
 
     return $ENV_PATH.Contains($Path)
@@ -57,6 +43,7 @@ function Add-StartupItem($progValue, $progName) {
     New-ItemProperty -Path $registryPath -Name $name -Value $progValue `
         -PropertyType String -Force | Out-Null
 }
+
 function Add-AdminShortcut($targetPath, $shortcutPath) {
     $targetPath = (Resolve-Path $targetPath).Path
     $shortcutPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($shortcutPath)
@@ -93,24 +80,10 @@ function Add-ToPath {
         [switch]$Remove
     )
 
-
-
-    if ($Machine) {
-        $LOC = [EnvironmentVariableTarget]::Machine
-    }
-    else {
-        $LOC = [EnvironmentVariableTarget]::User
-    }
-
+    $LOC = if ($Machine) {[EnvironmentVariableTarget]::Machine} else {[EnvironmentVariableTarget]::User}
     $ENV_PATH = [Environment]::GetEnvironmentVariable("Path", $LOC)
     $PATH = Resolve-Path $Path
-    if ($Machine) {
-        $LOCATION = "System's"
-    }
-    else {
-        $LOCATION = "User's"
-    }
-
+    $LOCATION = if ($Machine) {"System's"} else {"User's"}
 
     if (!(Test-EnvPath $PATH)) {
         [Environment]::SetEnvironmentVariable("Path", "$ENV_PATH;$PATH", $LOC)
