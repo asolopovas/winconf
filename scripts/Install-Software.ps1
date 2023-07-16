@@ -1,6 +1,5 @@
-
-
 $wingetApps = @(
+    "AutoHotkey.AutoHotkey",
     "Klocman.BulkCrapUninstaller",
     "7zip.7zip",
     "Google.PlatformTools",

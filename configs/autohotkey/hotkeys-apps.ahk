@@ -30,11 +30,11 @@ return
 return
 
 !F12::
-    RunOrActivateTerminal("PowerShell Admin", true)
+    RunOrActivateTerminal("Admin", true)
 return
 
 !+F12::
-    RunOrActivateTerminal("PowerShell Admin", true)
+    RunOrActivateTerminal("Admin", true)
 return
 
 #Enter::
