@@ -216,6 +216,21 @@ function Remove-RegistryKeys {
     }
 }
 
+function Set-TaskbarSize {
+    param (
+        [ValidateSet("0", "1", "2")]
+        [string]$Size
+    )
+
+    $RegistryPath = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
+    $RegistryValueName = "TaskbarSi"
+
+    if (-not (Test-Path -Path $RegistryPath)) {
+        New-Item -Path $RegistryPath -Force | Out-Null
+    }
+
+    Set-ItemProperty -Path $RegistryPath -Name $RegistryValueName -Value $Size
+}
 
 . $PSScriptRoot\system.ps1
 . $PSScriptRoot\convertions.ps1

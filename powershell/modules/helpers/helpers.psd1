@@ -128,6 +128,7 @@
         'Remove-RegistryKeys',
         'sshCopyID',
         'RefreshUserPath',
+        'Set-TaskbarSize',
         "conf"
     )
 
