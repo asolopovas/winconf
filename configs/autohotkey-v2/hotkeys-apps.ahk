@@ -24,25 +24,21 @@ RunOrActivateTerminal(windowTitle, alwaysNewInstance := false) {
 #F12::
     {
         RunOrActivateTerminal("PowerShell")
-        return
     }
 
 #+F12::
     {
         RunOrActivateTerminal("Admin", true)
-        return
     }
 
 #Enter::
     {
         RunOrActivateTerminal("Ubuntu")
-        return
     }
 
 #+Enter::
     {
         RunOrActivateTerminal("Ubuntu", true)
-        return
     }
 
 #c::
@@ -50,7 +46,6 @@ RunOrActivateTerminal(windowTitle, alwaysNewInstance := false) {
         windowID := "ahk_class Chrome_WidgetWin_1 ahk_exe chrome.exe"
         exePath := "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
         RunOrActivate(windowId, exePath, "")
-        Return
     }
 
 #m::
@@ -58,24 +53,15 @@ RunOrActivateTerminal(windowTitle, alwaysNewInstance := false) {
         windowID := "ahk_class Chrome_WidgetWin_0 ahk_exe Spotify.exe"
         exePath := A_AppData . "\\Spotify\\Spotify.exe"
 
-        if !FileExist(exePath) {
-            RunAsUser("winget install --id Spotify.Spotify")
-            WinWait("ahk_exe winget.exe")
-            WinWaitClose("ahk_exe winget.exe")
-        }
-
         if (!WinExist(windowID)) {
             RunAsUser(exePath)
-            WinWait(windowID)  ; Wait for the Spotify window to exist before proceeding
+            WinWait(windowID)
         } else if (WinActive(windowID)) {
             PostMessage(0x112, 0xF060, , , "ahk_id " . WinActive("A"))
         }
 
         if (WinExist(windowID)) {
-            ; Only activate the window if it exists
             WinActivate(windowID)
         }
 
-        Return
     }
-

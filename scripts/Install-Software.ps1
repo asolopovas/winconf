@@ -26,7 +26,8 @@ $wingetApps = @(
     "MiKTeX.MiKTeX",
     "Rufus.Rufus",
     "Microsoft.Sysinternals.ProcessMonitor",
-    "Microsoft.Sysinternals.ProcessExplorer"
+    "Microsoft.Sysinternals.ProcessExplorer",
+    "Spotify.Spotify"
 )
 
 
