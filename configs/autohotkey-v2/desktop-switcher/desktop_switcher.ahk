@@ -22,17 +22,27 @@ RemoveDesktopProc := DllCall("GetProcAddress", "Ptr", hVirtualDesktopAccessor, "
 RegisterPostMessageHookProc := DllCall("GetProcAddress", "Ptr", hVirtualDesktopAccessor, "AStr", "RegisterPostMessageHook", "Ptr")
 UnregisterPostMessageHookProc := DllCall("GetProcAddress", "Ptr", hVirtualDesktopAccessor, "AStr", "UnregisterPostMessageHook", "Ptr")
 
-GetDesktopCount() {
-    global GetDesktopCountProc
-    count := DllCall(GetDesktopCountProc, "Int")
-    return count
-}
-
 MoveCurrentWindowToDesktop(desktopNumber) {
     global MoveWindowToDesktopNumberProc, GoToDesktopNumberProc
     activeHwnd := WinGetID("A")
     DllCall(MoveWindowToDesktopNumberProc, "Ptr", activeHwnd, "Int", desktopNumber, "Int")
     DllCall(GoToDesktopNumberProc, "Int", desktopNumber)
+}
+
+MoveOrGotoDesktopNumber(num) {
+    ; If user is holding down Mouse left button, move the current window also
+    if (GetKeyState("LButton")) {
+        MoveCurrentWindowToDesktop(num)
+    } else {
+        GoToDesktopNumber(num)
+    }
+    return
+}
+
+GetDesktopCount() {
+    global GetDesktopCountProc
+    count := DllCall(GetDesktopCountProc, "Int")
+    return count
 }
 
 GoToPrevDesktop() {
@@ -66,15 +76,7 @@ GoToDesktopNumber(num) {
     DllCall(GoToDesktopNumberProc, "Int", num, "Int")
     return
 }
-MoveOrGotoDesktopNumber(num) {
-    ; If user is holding down Mouse left button, move the current window also
-    if (GetKeyState("LButton")) {
-        MoveCurrentWindowToDesktop(num)
-    } else {
-        GoToDesktopNumber(num)
-    }
-    return
-}
+
 GetDesktopName(num) {
     global GetDesktopNameProc
     utf8_buffer := ""
@@ -83,6 +85,7 @@ GetDesktopName(num) {
     name := StrGet(utf8_buffer, 1024, "UTF-8")
     return name
 }
+
 SetDesktopName(num, name) {
     ; NOTICE! For UTF-8 to work AHK file must be saved with UTF-8 with BOM
 
@@ -92,22 +95,18 @@ SetDesktopName(num, name) {
     ran := DllCall(SetDesktopNameProc, "Int", num, "Ptr", name_utf8, "Int")
     return ran
 }
+
 CreateDesktop() {
     global CreateDesktopProc
     ran := DllCall(CreateDesktopProc)
     return ran
 }
-RemoveDesktop(remove_desktop_number, fallback_desktop_number) {
-    global RemoveDesktopProc
-    ran := DllCall(RemoveDesktopProc, "Int", remove_desktop_number, "Int", fallback_desktop_number, "Int")
-    return ran
-}
 
 ; SetDesktopName(0, "It works! 🐱")
-
 ; How to listen to desktop changes
 DllCall(RegisterPostMessageHookProc, "Ptr", A_ScriptHwnd, "Int", 0x1400 + 30, "Int")
 OnMessage(0x1400 + 30, OnChangeDesktop)
+
 OnChangeDesktop(wParam, lParam, msg, hwnd) {
     Critical(100)
     OldDesktop := wParam + 1
@@ -118,22 +117,8 @@ OnChangeDesktop(wParam, lParam, msg, hwnd) {
     OutputDebug("Desktop changed to " Name " from " OldDesktop " to " NewDesktop)
 }
 
-#+1:: MoveCurrentWindowToDesktop(0)
-#+2:: MoveCurrentWindowToDesktop(1)
-#+3:: MoveCurrentWindowToDesktop(2)
-#+4:: MoveCurrentWindowToDesktop(3)
-#+5:: MoveCurrentWindowToDesktop(4)
-#+6:: MoveCurrentWindowToDesktop(5)
-#+7:: MoveCurrentWindowToDesktop(6)
-#+8:: MoveCurrentWindowToDesktop(7)
-#+9:: MoveCurrentWindowToDesktop(8)
-
-#1:: MoveOrGotoDesktopNumber(0)
-#2:: MoveOrGotoDesktopNumber(1)
-#3:: MoveOrGotoDesktopNumber(2)
-#4:: MoveOrGotoDesktopNumber(3)
-#5:: MoveOrGotoDesktopNumber(4)
-#6:: MoveOrGotoDesktopNumber(5)
-#7:: MoveOrGotoDesktopNumber(6)
-#8:: MoveOrGotoDesktopNumber(7)
-#9:: MoveOrGotoDesktopNumber(8)
+RemoveDesktop(remove_desktop_number, fallback_desktop_number) {
+    global RemoveDesktopProc
+    ran := DllCall(RemoveDesktopProc, "Int", remove_desktop_number, "Int", fallback_desktop_number, "Int")
+    return ran
+}
