@@ -141,7 +141,7 @@ function ExecutablesStore($action = "list", $item = $null, $status = "Blocked", 
 }
 
 
-function FBlocker([string]$action, [string]$target = "*", [int]$depth = 0, [int]$id = 0) {
+function firewallBlocker([string]$action, [string]$target = "*", [int]$depth = 0, [int]$id = 0) {
     $prefix = Format-String snakecase ([io.path]::GetFileNameWithoutExtension((Get-Location).Path))
 
     if ($action -eq "block") {

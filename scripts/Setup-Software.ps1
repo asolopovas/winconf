@@ -27,6 +27,7 @@ $wingetApps = @(
     "Rufus.Rufus",
     "Microsoft.Sysinternals.ProcessMonitor",
     "Microsoft.Sysinternals.ProcessExplorer",
+    "NirSoft.ShellExView",
     "Spotify.Spotify"
 )
 

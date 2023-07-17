@@ -1,49 +1,3 @@
-function Write-ColorOutput($ForegroundColor) {
-    $fc = $host.UI.RawUI.ForegroundColor
-    $host.UI.RawUI.ForegroundColor = $ForegroundColor
-    if ($args) {
-        Write-Output $args
-    }
-    else {
-        $input | Write-Output
-    }
-    $host.UI.RawUI.ForegroundColor = $fc
-}
-
-function Test-EnvPath {
-    param (
-        [Parameter(Mandatory = $true)]
-        [string]$Path,
-        [Parameter(Mandatory = $false)]
-        [switch]$Machine
-    )
-
-    $LOC = if ($Machine) {[EnvironmentVariableTarget]::Machine} else {[EnvironmentVariableTarget]::User}
-    $ENV_PATH = [Environment]::GetEnvironmentVariable("Path", $LOC)
-
-    return $ENV_PATH.Contains($Path)
-}
-
-function Add-ShellContext($name, $exe, $context = 'dir') {
-    New-PSDrive -PSProvider registry -Root HKEY_CLASSES_ROOT -Name HKCR | Out-Null
-    $direReg = "HKCR:\Directory\Background\shell"
-    $fileReg = "HKCR:\``*\shell"
-    if ($context -eq 'dir') {
-        New-ShellContextItem $name $direReg $exe
-    }
-    else {
-        New-ShellContextItem $name $fileReg $exe
-    }
-}
-
-function Add-StartupItem($progValue, $progName) {
-    $name = Get-RootName $progName
-    $registryPath = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run"
-
-    New-ItemProperty -Path $registryPath -Name $name -Value $progValue `
-        -PropertyType String -Force | Out-Null
-}
-
 function Add-AdminShortcut($targetPath, $shortcutPath) {
     $targetPath = (Resolve-Path $targetPath).Path
     $shortcutPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($shortcutPath)
@@ -58,16 +12,13 @@ function Add-AdminShortcut($targetPath, $shortcutPath) {
     [System.IO.File]::WriteAllBytes($shortcutPath, $bytes)
 }
 
-function Add-ToPath {
-    $currentPath = [Environment]::GetEnvironmentVariable("Path", "Machine")
 
-    if ($currentPath -notlike "*$Path*") {
-        $newPath = $currentPath + ";" + $Path
-        [Environment]::SetEnvironmentVariable("Path", $newPath, "user")
-    }
-    else {
-        Write-Host "Path already exists in system path."
-    }
+function Add-StartupItem($progValue, $progName) {
+    $name = Get-RootName $progName
+    $registryPath = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run"
+
+    New-ItemProperty -Path $registryPath -Name $name -Value $progValue `
+        -PropertyType String -Force | Out-Null
 }
 
 function Add-ToPath {
@@ -80,10 +31,10 @@ function Add-ToPath {
         [switch]$Remove
     )
 
-    $LOC = if ($Machine) {[EnvironmentVariableTarget]::Machine} else {[EnvironmentVariableTarget]::User}
+    $LOC = if ($Machine) { [EnvironmentVariableTarget]::Machine } else { [EnvironmentVariableTarget]::User }
     $ENV_PATH = [Environment]::GetEnvironmentVariable("Path", $LOC)
     $PATH = Resolve-Path $Path
-    $LOCATION = if ($Machine) {"System's"} else {"User's"}
+    $LOCATION = if ($Machine) { "System's" } else { "User's" }
 
     if (!(Test-EnvPath $PATH)) {
         [Environment]::SetEnvironmentVariable("Path", "$ENV_PATH;$PATH", $LOC)
@@ -94,6 +45,45 @@ function Add-ToPath {
     }
 }
 
+function Clear-EventLogs {
+    wevtutil el | Foreach-Object { wevtutil cl "$_" }
+}
+
+function Enable-Feature($features) {
+    if ($features -is [system.array]) {
+        foreach ($featureName in $features) {
+            Write-Output "Enabling $featureName ..."
+            $feature = Get-WindowsOptionalFeature -Online -FeatureName $featureName
+            if ($feature.State -eq "Disabled") {
+                Write-Output "Enabling $feature`n"
+                Enable-WindowsOptionalFeature -Online -FeatureName $featureName
+            }
+        }
+    }
+    else {
+        $feature = Get-WindowsOptionalFeature -Online -FeatureName $features
+        if ($feature.State -eq "Disabled") {
+            Write-Output "Enabling $features ...`n"
+            Enable-WindowsOptionalFeature -Online -FeatureName $features
+        }
+    }
+}
+
+function Find-LockingProcess {
+    Param
+    (
+        [Parameter(Mandatory = $true)]
+        [String] $FileOrFolderPath
+    )
+    If ((Test-Path -Path $FileOrFolderPath) -eq $false) {
+        Write-Warning "File or directory does not exist."
+    }
+    Else {
+        $LockingProcess = CMD /C "openfiles /query /fo table | find /I ""$FileOrFolderPath"""
+        Write-Host $LockingProcess
+    }
+
+}
 function RefreshUserPath ($envFilePath = "$env:USERPROFILE\winconf\.sys-env") {
     $paths = Get-Content $envFilePath
     $currentPaths = $env:Path -split ';' | ForEach-Object { $_.TrimEnd('\').ToLower() }
@@ -108,27 +98,117 @@ function RefreshUserPath ($envFilePath = "$env:USERPROFILE\winconf\.sys-env") {
     }
 }
 
-function conf {
-    param (
-        [Parameter(Mandatory = $true, Position = 0)]
-        [ValidateSet('push', 'pull')]
-        [string]$action
-    )
+function Repair-Windows() {
+    sfc /scannow
+    Dism /Online /Cleanup-Image /RestoreHealth
+    sfc /scannow
+}
 
-    $paths = @(
-        "$env:USERPROFILE\winconf"
-    )
+function Restart-Explorer {
+    taskkill.exe /f /im explorer.exe
+    Start-Process explorer.exe
+}
 
-    foreach ($path in $paths) {
-        if ($action -eq "push") {
-            Write-ColorOutput green "Pushing $path ..."
-            git -C $path add .
-            git -C $path commit -m 'Save'
-            git -C $path push
-        }
-        else {
-            Write-ColorOutput green  "Pulling $path ..."
-            git -C $path pull
-        }
+function Start-AsAdmin($path) {
+    if ($path) {
+        Start-Process powershell -verb runas -ArgumentList ("-file " + (Get-ChildItem $path).fullname)
     }
+}
+
+
+function Test-EnvPath {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$Path,
+        [Parameter(Mandatory = $false)]
+        [switch]$Machine
+    )
+
+    $LOC = if ($Machine) { [EnvironmentVariableTarget]::Machine } else { [EnvironmentVariableTarget]::User }
+    $ENV_PATH = [Environment]::GetEnvironmentVariable("Path", $LOC)
+
+    return $ENV_PATH.Contains($Path)
+}
+
+function Test-RegistryValue {
+
+    param (
+        [parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]$Path,
+        [parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]$Value
+    )
+
+    try {
+        Get-ItemProperty -Path $Path | Select-Object -ExpandProperty $Value -ErrorAction Stop | Out-Null
+        return $true
+    }
+
+    catch {
+        return $false
+    }
+
+}
+function Test-ScheduledTask($name) {
+    $tasks = @()
+    foreach ($task in Get-ScheduledTask) {
+        $tasks += @($task.TaskName)
+    }
+    if ($tasks.Contains($name)) {
+        return $true
+    }
+    else {
+        return $false
+    }
+}
+
+function Update-UserPassword {
+    [CmdletBinding()]
+    param (
+    )
+
+    dynamicparam {
+        $ParameterName = 'User'
+        $ParameterValue = (Get-LocalUser).Name
+
+        $Attributes = New-Object -Type `
+            System.Management.Automation.ParameterAttribute
+        $Attributes.ParameterSetName = 'User'
+        $Attributes.Mandatory = $true
+        $Attributes.Position = 0
+
+        $ValidateSet = New-Object -Type `
+            System.Management.Automation.ValidateSetAttribute -ArgumentList `
+            $ParameterValue
+
+        $Collection = New-Object -Type `
+            System.Management.Automation.RuntimeDefinedParameter -ArgumentList `
+            $ParameterName, [string], $Attributes
+
+        $Collection.Attributes.Add($ValidateSet)
+
+        $Parameter = New-Object -Type `
+            System.Management.Automation.RuntimeDefinedParameterDictionary
+        $Parameter.Add($ParameterName, $Collection)
+        return $Parameter
+    }
+
+    process {
+        $User = $PsBoundParameters[$ParameterName]
+        $Password = Read-Host -Prompt "Provide your new account password" -AsSecureString
+        Set-LocalUser -Name $User -Password $Password
+        Clear-Variable "Password"
+    }
+}
+
+function Write-ColorOutput($ForegroundColor) {
+    $fc = $host.UI.RawUI.ForegroundColor
+    $host.UI.RawUI.ForegroundColor = $ForegroundColor
+    if ($args) {
+        Write-Output $args
+    }
+    else {
+        $input | Write-Output
+    }
+    $host.UI.RawUI.ForegroundColor = $fc
 }
