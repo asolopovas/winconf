@@ -30,8 +30,6 @@
         # helpers.psm1
         'Get-RootName',
         'IIf',
-        'ExtractFunctions',
-        'ExtractFunctionsInDirectory',
         'UpdateModuleManifest',
         # rm-pattern.ps1
         'Remove-ByPattern',

@@ -9,37 +9,6 @@ function IIf($If, $Then, $Else) {
     Else { If ($Else -is "ScriptBlock") { &$Else } Else { $Else } }
 }
 
-function ExtractFunctions($filePath) {
-    $outputDirectory = Split-Path -Path $filePath
-    $fileName = Split-Path -Path $filePath -Leaf
-    $outputFileName = [System.IO.Path]::ChangeExtension($fileName, ".txt")
-    $outputPath = Join-Path -Path $outputDirectory -ChildPath $outputFileName
-
-    $functionNames = Select-String -Path $filePath -Pattern 'function (\w+)' | ForEach-Object {
-        "'" + $_.Matches[0].Groups[1].Value + "',"
-    }
-    Set-Content -Path $outputPath -Value ("# " + $fileName)
-    Add-Content -Path $outputPath -Value $functionNames
-}
-
-function ExtractFunctionsInDirectory($directoryPath = $(Get-Location)) {
-    $outputPath = Join-Path -Path $directoryPath -ChildPath "functions.txt"
-    if (Test-Path $outputPath) {
-        Remove-Item -Path $outputPath
-    }
-
-    $files = Get-ChildItem -Path $directoryPath -Recurse | Where-Object { $_.Extension -eq '.ps1' -or $_.Extension -eq '.psm1' }
-
-    foreach ($file in $files) {
-        $fileName = $file.Name
-        $functionNames = Select-String -Path $file.FullName -Pattern 'function (\w+)' | ForEach-Object {
-            "'" + $_.Matches[0].Groups[1].Value + "',"
-        }
-        Add-Content -Path $outputPath -Value ("# " + $fileName)
-        Add-Content -Path $outputPath -Value $functionNames
-    }
-}
-
 function UpdateModuleManifest {
     [CmdletBinding()]
     param (
@@ -79,8 +48,6 @@ function UpdateModuleManifest {
 
     $moduleManifest | Set-Content -Path $moduleManifestPath
 }
-
-. $PSScriptRoot\system.ps1
 
 . $PSScriptRoot\convertions.ps1
 . $PSScriptRoot\docker-compose.ps1
