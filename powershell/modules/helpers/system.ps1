@@ -115,6 +115,20 @@ function Start-AsAdmin($path) {
     }
 }
 
+function SortEnvPaths {
+    param (
+        [switch]$Machine
+    )
+
+    $target = if ($Machine) { "Machine" } else { "User" }
+
+    $envPaths = [Environment]::GetEnvironmentVariable("PATH", $target)
+
+    $sortedEnvPaths = ($envPaths -split ";" | Sort-Object) -join ";"
+
+    [Environment]::SetEnvironmentVariable("PATH", $sortedEnvPaths, $target)
+}
+
 
 function Test-EnvPath {
     param (

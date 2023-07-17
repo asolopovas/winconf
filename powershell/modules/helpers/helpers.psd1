@@ -50,6 +50,7 @@
         'Repair-Windows',
         'Restart-Explorer',
         'Start-AsAdmin',
+        'SortEnvPaths',
         'Test-EnvPath',
         'Test-RegistryValue',
         'Test-ScheduledTask',
