@@ -28,6 +28,11 @@ RunOrActivateTerminal(windowTitle, alwaysNewInstance := false) {
 
 #+F12::
     {
+        RunOrActivateTerminal("PowerShell", true)
+    }
+
+!F12::
+    {
         RunOrActivateTerminal("Admin", true)
     }
 
