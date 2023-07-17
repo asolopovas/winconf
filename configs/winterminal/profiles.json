@@ -1,9 +1,11 @@
 {
     "$help": "https://aka.ms/terminal-documentation",
     "$schema": "https://aka.ms/terminal-profiles-schema",
-    "actions": [
+    "actions": 
+    [
         {
-            "command": {
+            "command": 
+            {
                 "action": "copy"
             },
             "keys": "ctrl+shift+c"
@@ -13,13 +15,19 @@
             "keys": "shift+insert"
         },
         {
-            "command": {
+            "command": 
+            {
                 "action": "closeOtherTabs"
             },
             "keys": "alt+shift+o"
         },
         {
-            "command": {
+            "command": "closePane",
+            "keys": "ctrl+w"
+        },
+        {
+            "command": 
+            {
                 "action": "prevTab"
             },
             "keys": "alt+j"
@@ -29,23 +37,22 @@
             "keys": "alt+q"
         },
         {
-            "command": "closePane",
-            "keys": "ctrl+w"
-        },
-        {
-            "command": {
+            "command": 
+            {
                 "action": "nextTab"
             },
             "keys": "alt+k"
         },
         {
-            "command": {
+            "command": 
+            {
                 "action": "newTab"
             },
             "keys": "ctrl+enter"
         },
         {
-            "command": {
+            "command": 
+            {
                 "action": "newTab"
             },
             "keys": "alt+t"
@@ -60,29 +67,39 @@
     "centerOnLaunch": true,
     "copyOnSelect": true,
     "defaultProfile": "{05b9d966-86e5-4a1f-a9df-d87cef4d716e}",
-    "disabledProfileSources": ["Windows.Terminal.Azure", "Windows.Terminal.PowershellCore"],
+    "disabledProfileSources": 
+    [
+        "Windows.Terminal.Azure",
+        "Windows.Terminal.PowershellCore"
+    ],
     "firstWindowPreference": "defaultProfile",
     "initialCols": 100,
     "initialRows": 25,
     "launchMode": "default",
-    "newTabMenu": [
+    "newTabMenu": 
+    [
         {
             "type": "remainingProfiles"
         }
     ],
-    "profiles": {
-        "defaults": {
+    "profiles": 
+    {
+        "defaults": 
+        {
             "colorScheme": "Legacy",
-            "font": {
+            "font": 
+            {
                 "face": "FiraMono Nerd Font Mono",
                 "size": 13.0
             },
             "startingDirectory": null
         },
-        "list": [
+        "list": 
+        [
             {
                 "commandline": "C:\\Program Files\\PowerShell\\7\\pwsh.exe -nologo",
-                "font": {
+                "font": 
+                {
                     "face": "FiraMono Nerd Font Mono",
                     "size": 14.0,
                     "weight": "normal"
@@ -97,7 +114,8 @@
                 "useAcrylic": false
             },
             {
-                "font": {
+                "font": 
+                {
                     "face": "FiraMono Nerd Font Mono",
                     "size": 14.0,
                     "weight": "normal"
@@ -109,7 +127,8 @@
             },
             {
                 "elevate": true,
-                "font": {
+                "font": 
+                {
                     "face": "FiraMono Nerd Font Mono",
                     "size": 14.0,
                     "weight": "normal"
@@ -122,10 +141,29 @@
                 "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
                 "hidden": false,
                 "name": "Command Prompt"
+            },
+            {
+                "commandline": "C:\\Program Files\\PowerShell\\7\\pwsh.exe -nologo",
+                "elevate": true,
+                "font": 
+                {
+                    "face": "FiraMono Nerd Font Mono",
+                    "size": 14.0,
+                    "weight": "normal"
+                },
+                "guid": "{17c1be6f-7263-44bc-8945-97d7535b77fe}",
+                "hidden": false,
+                "icon": "ms-appx:///ProfileIcons/{61c54bbd-c2c6-5271-96e7-009a87ff44bf}.png",
+                "name": "PS7Admin",
+                "opacity": 95,
+                "startingDirectory": "%USERPROFILE%",
+                "suppressApplicationTitle": true,
+                "useAcrylic": false
             }
         ]
     },
-    "schemes": [
+    "schemes": 
+    [
         {
             "background": "#0C0C0C",
             "black": "#0C0C0C",
@@ -382,39 +420,46 @@
     ],
     "tabWidthMode": "compact",
     "theme": "dark",
-    "themes": [
+    "themes": 
+    [
         {
             "name": "legacyDark",
-            "tab": {
+            "tab": 
+            {
                 "background": null,
                 "showCloseButton": "always",
                 "unfocusedBackground": null
             },
-            "window": {
+            "window": 
+            {
                 "applicationTheme": "dark",
                 "useMica": false
             }
         },
         {
             "name": "legacyLight",
-            "tab": {
+            "tab": 
+            {
                 "background": null,
                 "showCloseButton": "always",
                 "unfocusedBackground": null
             },
-            "window": {
+            "window": 
+            {
                 "applicationTheme": "light",
                 "useMica": false
             }
         },
         {
             "name": "legacySystem",
-            "tab": {
+            "tab": 
+            {
                 "background": null,
                 "showCloseButton": "always",
                 "unfocusedBackground": null
             },
-            "window": {
+            "window": 
+            {
                 "applicationTheme": "system",
                 "useMica": false
             }
