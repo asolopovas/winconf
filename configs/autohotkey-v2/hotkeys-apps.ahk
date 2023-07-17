@@ -21,17 +21,17 @@ RunOrActivateTerminal(windowTitle, alwaysNewInstance := false) {
     RunOrActivate(windowID, terminalPath, args, alwaysNewInstance)
 }
 
-#F12::
+<^>!Enter::
     {
         RunOrActivateTerminal("PowerShell")
     }
 
-#+F12::
+<^>!+Enter::
     {
         RunOrActivateTerminal("PowerShell", true)
     }
 
-!F12::
+#F12::
     {
         RunOrActivateTerminal("Admin", true)
     }
@@ -52,6 +52,7 @@ RunOrActivateTerminal(windowTitle, alwaysNewInstance := false) {
         exePath := "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
         RunOrActivate(windowId, exePath, "")
     }
+
 
 #m::
     {
