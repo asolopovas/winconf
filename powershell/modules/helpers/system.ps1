@@ -124,10 +124,14 @@ function SortEnvPaths {
 
     $envPaths = [Environment]::GetEnvironmentVariable("PATH", $target)
 
-    $sortedEnvPaths = ($envPaths -split ";" | Sort-Object) -join ";"
+    $sortedEnvPaths = $envPaths -split ";" | Where-Object { $_ } | Sort-Object
+
+    $sortedEnvPaths = $sortedEnvPaths -join ";"
 
     [Environment]::SetEnvironmentVariable("PATH", $sortedEnvPaths, $target)
 }
+
+
 
 
 function Test-EnvPath {
