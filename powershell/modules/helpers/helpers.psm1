@@ -81,11 +81,13 @@ function UpdateModuleManifest {
 }
 
 . $PSScriptRoot\system.ps1
+
 . $PSScriptRoot\convertions.ps1
+. $PSScriptRoot\docker-compose.ps1
 . $PSScriptRoot\files.ps1
 . $PSScriptRoot\firewall-blocker.ps1
 . $PSScriptRoot\rm-pattern.ps1
 . $PSScriptRoot\security.ps1
-. $PSScriptRoot\firewall-blocker.ps1
+. $PSScriptRoot\system.ps1
+. $PSScriptRoot\tools.ps1
 . $PSScriptRoot\wsl.ps1
-. $PSScriptRoot\docker-compose

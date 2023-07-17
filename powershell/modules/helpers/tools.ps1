@@ -62,7 +62,7 @@ function conf {
 }
 
 function devHostMappings {
-    $hosts= @(
+    $hosts = @(
         "redis",
         "mariadb",
         "phpmyadmin.test",
