@@ -5,5 +5,7 @@ $removeAliases = @(
 )
 
 foreach ($alias in $removeAliases) {
-    Remove-Item -Force Alias:$alias
+    if (Get-Alias -Name $alias -ErrorAction SilentlyContinue) {
+        Remove-Item -Force Alias:$alias
+    }
 }
