@@ -12,7 +12,6 @@ function Add-AdminShortcut($targetPath, $shortcutPath) {
     [System.IO.File]::WriteAllBytes($shortcutPath, $bytes)
 }
 
-
 function Add-StartupItem($progValue, $progName) {
     $name = Get-RootName $progName
     $registryPath = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run"
@@ -84,7 +83,7 @@ function Find-LockingProcess {
     }
 
 }
-function RefreshUserPath ($envFilePath = "$env:USERPROFILE\winconf\.sys-env") {
+function RefreshUserPath ($envFilePath = "$env:USERPROFILE\winconf\.user-paths") {
     $paths = Get-Content $envFilePath
     $currentPaths = $env:Path -split ';' | ForEach-Object { $_.TrimEnd('\').ToLower() }
 

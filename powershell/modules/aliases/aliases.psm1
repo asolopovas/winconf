@@ -30,4 +30,16 @@ New-Alias -Name l       -Scope Global -Value Get-ChildItem
 New-Alias -Name grep    -Scope Global -Value Select-String
 New-Alias -Name dk      -Scope Global -Value docker.exe
 
+function CD1 { Set-Location .. }
+function CD2 { Set-Location ../.. }
+function CD3 { Set-Location ../../.. }
+function CD4 { Set-Location ../../../.. }
+function CD5 { Set-Location ../../../../.. }
+
+New-Alias -Name '..' -Value CD1
+New-Alias -Name '..2' -Value CD2
+New-Alias -Name '..3' -Value CD3
+New-Alias -Name '..4' -Value CD4
+New-Alias -Name '..5' -Value CD5
+
 
