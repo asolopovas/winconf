@@ -32,12 +32,15 @@ function Add-ToPath {
 
     $LOC = if ($Machine) { [EnvironmentVariableTarget]::Machine } else { [EnvironmentVariableTarget]::User }
     $ENV_PATH = [Environment]::GetEnvironmentVariable("Path", $LOC)
-    $PATH = Resolve-Path $Path
+    $PATH = Resolve-Path $Path -ErrorAction SilentlyContinue
     $LOCATION = if ($Machine) { "System's" } else { "User's" }
 
+
     if (!(Test-EnvPath $PATH)) {
-        [Environment]::SetEnvironmentVariable("Path", "$ENV_PATH;$PATH", $LOC)
-        Write-Host "Added '$PATH' to $LOCATION path."
+        if ($PATH) {
+            [Environment]::SetEnvironmentVariable("Path", "$ENV_PATH;$PATH", $LOC)
+            Write-Host "Added '$PATH' to $LOCATION path."
+        }
     }
     else {
         Write-Host "Already '$PATH' in $LOCATION Path variable."
@@ -91,9 +94,7 @@ function RefreshUserPath ($envFilePath = "$env:USERPROFILE\winconf\.user-paths")
         $expandedPath = $ExecutionContext.InvokeCommand.ExpandString($path)
         $normalizedPath = $expandedPath.TrimEnd('\').ToLower()
 
-        if ((Test-Path -Path $expandedPath) -and ($currentPaths -notcontains $normalizedPath)) {
-            Add-ToPath -Path $expandedPath
-        }
+        Add-ToPath -Path $expandedPath
     }
 }
 
@@ -117,11 +118,15 @@ function Start-AsAdmin($path) {
 
 function Test-EnvPath {
     param (
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $false)]
         [string]$Path,
         [Parameter(Mandatory = $false)]
         [switch]$Machine
     )
+
+    if (!$Path) {
+        return $false
+    }
 
     $LOC = if ($Machine) { [EnvironmentVariableTarget]::Machine } else { [EnvironmentVariableTarget]::User }
     $ENV_PATH = [Environment]::GetEnvironmentVariable("Path", $LOC)
