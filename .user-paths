@@ -7,3 +7,4 @@ $env:USERPROFILE\src\redlined-pdf
 $env:USERPROFILE\src\news-search
 $env:USERPROFILE\src\excel-to-pdf
 $env:USERPROFILE\winconf
+$env:USERPROFILE\winconf\scripts
