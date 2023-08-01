@@ -25,7 +25,7 @@ function Clear-DefenderHistory() {
     Remove-Item -Recurse "C:\ProgramData\Microsoft\Windows Defender\Scans\History\Service"
 }
 
-function Set-AntivirusMode($mode) {
+function Disable-AntivirusMode($mode) {
     if ($mode -eq 'off') {
         Set-MpPreference -DisableRealtimeMonitoring $true
         Set-MpPreference -DisableBehaviorMonitoring $true

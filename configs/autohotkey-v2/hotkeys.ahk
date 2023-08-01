@@ -47,7 +47,6 @@ LWin & ,::ShiftAltTab
 }
 
 
-
 #q::
     {
         Title := WinGetTitle("A")

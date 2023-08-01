@@ -38,7 +38,7 @@
         'Remove-FirewallRule',
         'Add-DefenderExclusion',
         'Clear-DefenderHistory',
-        'Set-AntivirusMode',
+        'Disable-AntivirusMode',
         # system.ps1
         'Add-AdminShortcut',
         'Add-StartupItem',
