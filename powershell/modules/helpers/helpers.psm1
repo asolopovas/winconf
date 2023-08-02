@@ -49,6 +49,14 @@ function UpdateModuleManifest {
     $moduleManifest | Set-Content -Path $moduleManifestPath
 }
 
+function keyboardLayoutSetup {
+    Set-ItemProperty -Path "HKCU:\Keyboard Layout\Preload" -Name "1" -Value "00000809"
+    Set-ItemProperty -Path "HKCU:\Keyboard Layout\Preload" -Name "2" -Value "00000419"
+    Set-ItemProperty -Path "HKCU:\Keyboard Layout\ShowToast" -Name "Show" -Value 1 -Type DWord
+    Set-ItemProperty -Path "HKCU:\Keyboard Layout\Substitutes" -Name "00000409" -Value "00000809"
+}
+
+
 . $PSScriptRoot\convertions.ps1
 . $PSScriptRoot\docker-compose.ps1
 . $PSScriptRoot\files.ps1
