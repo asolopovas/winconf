@@ -7,3 +7,4 @@ $env:USERPROFILE\src\redlined-pdf
 $env:USERPROFILE\src\news-search
 $env:USERPROFILE\src\excel-to-pdf
 $env:USERPROFILE\winconf\scripts
+$env:USERPROFILE\toc-gen
