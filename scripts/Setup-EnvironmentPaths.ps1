@@ -1,7 +1,7 @@
 # Get the .sys-env file content
 # check if exist "../.sys-env"
 $path = "../.sys-env"
-if (Test-Path -Path $path) {
+if (-not (Test-Path -Path $path)) { # Fixed this line
     New-Item -Path $path -ItemType File
 }
 $paths = Get-Content $path
