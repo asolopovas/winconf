@@ -10,7 +10,7 @@ if (-Not(Test-RegistryValue -Path $explorerPolicies -Value "NoWinKeys")) {
 Import-Module -DisableNameChecking "$modules\helpers\helpers.psm1" -WarningAction SilentlyContinue
 
 . "$scripts\Setup-PowerShell.ps1"
-. "$scripts\Set-EnvironmentPaths.ps1"
+. "$scripts\Setup-EnvironmentPaths.ps1"
 . "$scripts\wsl-exclusions.ps1"
 
 Write-Host "Do you want to install apps? (y/n)" -ForegroundColor Green
