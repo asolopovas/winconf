@@ -1,5 +1,10 @@
 # Get the .sys-env file content
-$paths = Get-Content "../.sys-env"
+# check if exist "../.sys-env"
+$path = "../.sys-env"
+if (Test-Path -Path $path) {
+    New-Item -Path $path -ItemType File
+}
+$paths = Get-Content $path
 
 # Convert PATH to an array for easier manipulation and normalize paths
 $currentPaths = $env:Path -split ';' | ForEach-Object { $_.TrimEnd('\').ToLower() }
