@@ -18,25 +18,30 @@ function DistroRemove($name) {
 
 function DistroImport ($name, $path) {
     try {
-        $mydocs = [Environment]::GetFolderPath("MyDocuments")
-        $wslDataDir = Join-Path -Path $mydocs -ChildPath 'WSLDATA'
+        $wslDataDir = "C:\WSL"
+
         if (-Not (Test-Path $wslDataDir)) {
-            New-Item -Path $mydocs -Name "WSLDATA" -ItemType "directory"
+            New-Item -Path $wslDataDir -ItemType "directory"
         }
+
         $distroDir = Join-Path -Path $wslDataDir -ChildPath $name
         if (-Not (Test-Path $distroDir)) {
             New-Item -Path $wslDataDir -Name $name -ItemType "directory"
         }
+
         wsl.exe --import $name $distroDir $path
         if ($LASTEXITCODE -ne 0) {
             Write-Error "Failed to import distro $name"
-        } else {
+        }
+        else {
             Write-Output "Distro $name imported successfully"
         }
-    } catch {
+    }
+    catch {
         Write-Error $_.Exception.Message
     }
 }
+
 
 function DistroExport($name, $path) {
     try {
