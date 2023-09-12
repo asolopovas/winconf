@@ -7,7 +7,16 @@ function gd { git diff $args }
 function gk { git checkout $args }
 function gp { git push }
 function gl { git pull }
-function gw { git add -A; git commit -m 'save' }
+function gw {
+    git add -A
+    $commitMessage = Read-Host "Enter commit message"
+    if (-not [string]::IsNullOrWhiteSpace($commitMessage)) {
+        git commit -m "$commitMessage"
+    }
+    else {
+        Write-Warning "Commit cancelled due to empty commit message."
+    }
+}
 # Docker
 function nah { git reset --hard; git clean -fd }
 
