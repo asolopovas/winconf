@@ -65,8 +65,8 @@
         'sshCopyID',
         'tail',
         # wsl.ps1
-        'DistroRemove',
-        'DistroImport',
-        'DistroExport'
+        'WslRemove',
+        'WslImport',
+        'WslExport'
     )
 }
