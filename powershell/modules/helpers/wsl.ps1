@@ -6,8 +6,7 @@ function RenameWithTimestamp($path) {
     $filenameWithoutExtension = [System.IO.Path]::GetFileNameWithoutExtension($path)
     $newFilename = "$timestamp - $filenameWithoutExtension$extension"
     $newPath = Join-Path -Path $directory -ChildPath $newFilename
-    Rename-Item -Path $path -NewName $newPath
-    return $newPath
+    Rename-Item -Path $path -NewName $newPath | Out-Null
 }
 
 
