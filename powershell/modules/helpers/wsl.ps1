@@ -19,7 +19,7 @@ function EnsureWSLDir {
     return $wslDataDir
 }
 
-function DistroRemove($name) {
+function WslRemove($name) {
     try {
         wsl.exe -t $name
         if ($LASTEXITCODE -ne 0) {
@@ -39,7 +39,7 @@ function DistroRemove($name) {
     }
 }
 
-function DistroImport($name) {
+function WslImport($name) {
     try {
         $wslDataDir = EnsureWSLDir
         $backupDir = Join-Path -Path $wslDataDir -ChildPath "backups"
@@ -81,7 +81,7 @@ function DistroImport($name) {
     }
 }
 
-function DistroExport($name) {
+function WslExport($name) {
     try {
         $wslDataDir = EnsureWSLDir
         $backupDir = Join-Path -Path $wslDataDir -ChildPath "backups"
