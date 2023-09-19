@@ -1,6 +1,5 @@
 #Include "desktop_switcher.ahk"
 
-
 #+1:: MoveCurrentWindowToDesktop(0)
 #+2:: MoveCurrentWindowToDesktop(1)
 #+3:: MoveCurrentWindowToDesktop(2)
