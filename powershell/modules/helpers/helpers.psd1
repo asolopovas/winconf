@@ -27,6 +27,7 @@
         'Write-ObjectStore',
         'ExecutablesStore',
         'firewallBlocker',
+        'LinuxDriveMounter',
         # helpers.psm1
         'Get-RootName',
         'IIf',

@@ -56,6 +56,33 @@ function keyboardLayoutSetup {
     Set-ItemProperty -Path "HKCU:\Keyboard Layout\Substitutes" -Name "00000409" -Value "00000809"
 }
 
+function LinuxDriveMounter {
+    if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+        Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
+        exit
+    }
+
+    $driveIsMounted = $false
+
+    powershell -Command "wsl --mount \\.\PHYSICALDRIVE2 --bare" 2>&1
+
+    if (-not $driveIsMounted) {
+        $password = Read-Host "Enter password" -AsSecureString
+        $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($password)
+        $plainPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
+
+        $cmd = "echo '$plainPassword' | cryptsetup luksOpen /dev/sdd3 cryptdata"
+        wsl -u root -e bash -c "$cmd"
+
+        wsl -u root -e bash -c "mount -a"
+
+        [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($BSTR)
+        $plainPassword = $null
+    }
+}
+
+
+
 
 . $PSScriptRoot\convertions.ps1
 . $PSScriptRoot\docker-compose.ps1
