@@ -71,7 +71,7 @@ function LinuxDriveMounter {
         $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($password)
         $plainPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
 
-        $cmd = "echo '$plainPassword' | cryptsetup luksOpen /dev/sdd3 cryptdata"
+        $cmd = "echo '$plainPassword' | cryptsetup luksOpen /dev/sdf3 cryptdata"
         wsl -u root -e bash -c "$cmd"
 
         wsl -u root -e bash -c "mount -a"
@@ -80,6 +80,50 @@ function LinuxDriveMounter {
         $plainPassword = $null
     }
 }
+
+function Test-Sha {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$ShaOrFilePath,
+
+        [Parameter(Mandatory = $false)]
+        [string]$FileToCheck
+    )
+
+    if (-not $FileToCheck) {
+        if (Test-Path $ShaOrFilePath) {
+            $content = Get-Content $ShaOrFilePath -Raw
+            $providedHash, $relativeFilePath = $content -split '\s+', 2
+
+            $relativeFilePath = $relativeFilePath.Trim()
+
+            $FileToCheck = Join-Path (Get-Item $ShaOrFilePath).DirectoryName $relativeFilePath
+        }
+        else {
+            throw "File $ShaOrFilePath does not exist."
+        }
+    }
+    else {
+        $providedHash = if (Test-Path $ShaOrFilePath) { Get-Content $ShaOrFilePath -Raw } else { $ShaOrFilePath }
+    }
+
+    if (-not (Test-Path $FileToCheck)) {
+        throw "File $FileToCheck does not exist."
+    }
+
+    $sha256 = [System.Security.Cryptography.SHA256]::Create()
+    $bytes = [System.IO.File]::ReadAllBytes($FileToCheck)
+    $hash = -join ($sha256.ComputeHash($bytes) | ForEach-Object { $_.ToString("X2") })
+
+    if ($hash -eq $providedHash) {
+        "Hash matches!"
+    }
+    else {
+        "Hash doesn't match!"
+    }
+}
+
+
 
 
 . $PSScriptRoot\convertions.ps1

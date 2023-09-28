@@ -9,37 +9,38 @@
 
     FunctionsToExport = @(
         # convertions.ps1
-        'Convert-ToUnixEndings',
         'Convert-ExcelToCsv',
+        'Convert-ToUnixEndings',
         'Format-String',
         # docker-compose.ps1
         'Dc',
         # files.ps1
-        'New-SymLink',
-        'New-HardLink',
-        'New-File',
-        'Test-IsSymLink',
         'Find-Replace',
         'Get-File',
+        'New-File',
+        'New-HardLink',
+        'New-SymLink',
+        'Test-IsSymLink',
         # firewall-blocker.ps1
+        'ExecutablesStore',
+        'LinuxDriveMounter',
         'ObjectStore',
         'Read-ObjectStore',
         'Write-ObjectStore',
-        'ExecutablesStore',
         'firewallBlocker',
-        'LinuxDriveMounter',
         # helpers.psm1
         'Get-RootName',
         'IIf',
+        'Test-Sha',
         'UpdateModuleManifest',
         # rm-pattern.ps1
         'Remove-ByPattern',
         # security.ps1
-        'Add-FirewallRule',
-        'Remove-FirewallRule',
         'Add-DefenderExclusion',
+        'Add-FirewallRule',
         'Clear-DefenderHistory',
         'Disable-AntivirusMode',
+        'Remove-FirewallRule',
         # system.ps1
         'Add-AdminShortcut',
         'Add-StartupItem',
@@ -50,8 +51,8 @@
         'RefreshUserPath',
         'Repair-Windows',
         'Restart-Explorer',
-        'Start-AsAdmin',
         'SortEnvPaths',
+        'Start-AsAdmin',
         'Test-EnvPath',
         'Test-RegistryValue',
         'Test-ScheduledTask',
@@ -66,8 +67,9 @@
         'sshCopyID',
         'tail',
         # wsl.ps1
-        'WslRemove',
+        'WslExport',
         'WslImport',
-        'WslExport'
+        'WslRemove'
+
     )
 }
