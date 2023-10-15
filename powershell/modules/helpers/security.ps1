@@ -25,21 +25,41 @@ function Clear-DefenderHistory() {
     Remove-Item -Recurse "C:\ProgramData\Microsoft\Windows Defender\Scans\History\Service"
 }
 
-function Disable-AntivirusMode($mode) {
-    if ($mode -eq 'off') {
-        Set-MpPreference -DisableRealtimeMonitoring $true
-        Set-MpPreference -DisableBehaviorMonitoring $true
-        Set-MpPreference -DisableArchiveScanning $true
-        Set-MpPreference -DisableCatchupFullScan $true
-        Set-MpPreference -DisableCatchupQuickScan $true
+function DefenderMode {
+    param (
+        [switch]$on,
+        [switch]$off
+    )
+
+    $settingsToToggle = @(
+        'DisableRealtimeMonitoring',
+        'DisableBehaviorMonitoring',
+        'DisableBlockAtFirstSeen',
+        'DisableIOAVProtection',
+        'DisablePrivacyMode',
+        'DisableArchiveScanning',
+        'DisableScriptScanning',
+        'DisableIntrusionPreventionSystem',
+        'DisableAutoExclusion',
+        'DisableNetworkProtection'
+    )
+
+    $status = (Get-MpPreference).DisableRealtimeMonitoring
+    $targetValue = if ($on -or $status) { $false } else { $true }
+    $message = if ($targetValue) { "Windows Defender Settings Disabled." } else { "Windows Defender Settings Enabled." }
+
+    foreach ($setting in $settingsToToggle) {
+        $params = @{
+            $setting = $targetValue
+        }
+        try {
+            Set-MpPreference @params
+        } catch {
+            Write-Warning "Failed to set $setting due to: $_"
+        }
     }
 
-    if ($mode -eq 'on') {
-        Set-MpPreference -DisableRealtimeMonitoring $false
-        Set-MpPreference -DisableBehaviorMonitoring $false
-        Set-MpPreference -DisableArchiveScanning $false
-        Set-MpPreference -DisableCatchupFullScan $false
-        Set-MpPreference -DisableCatchupQuickScan $false
-    }
+    Write-Output $message
 }
+
 

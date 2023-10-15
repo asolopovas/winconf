@@ -72,7 +72,7 @@ function ObjectStore {
 
     if ($Exist) {
         $foundObject = $global:ObjectStore | Where-Object { $_.$PropertyName -eq $PropertyValue }
-        return ($foundObject -ne $null)
+        return ($null -ne $foundObject)
     }
 
     if ($Print) {

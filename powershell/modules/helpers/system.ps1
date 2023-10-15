@@ -131,9 +131,6 @@ function SortEnvPaths {
     [Environment]::SetEnvironmentVariable("PATH", $sortedEnvPaths, $target)
 }
 
-
-
-
 function Test-EnvPath {
     param (
         [Parameter(Mandatory = $false)]

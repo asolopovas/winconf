@@ -39,7 +39,7 @@
         'Add-DefenderExclusion',
         'Add-FirewallRule',
         'Clear-DefenderHistory',
-        'Disable-AntivirusMode',
+        'DefenderMode',
         'Remove-FirewallRule',
         # system.ps1
         'Add-AdminShortcut',
