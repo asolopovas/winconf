@@ -4,15 +4,15 @@
     "actions": 
     [
         {
+            "command": "unbound",
+            "keys": "ctrl+shift+w"
+        },
+        {
             "command": 
             {
                 "action": "copy"
             },
             "keys": "ctrl+shift+c"
-        },
-        {
-            "command": "unbound",
-            "keys": "ctrl+shift+w"
         },
         {
             "command": "paste",
@@ -33,15 +33,15 @@
             "keys": "alt+t"
         },
         {
-            "command": "closeWindow",
-            "keys": "alt+q"
-        },
-        {
             "command": 
             {
                 "action": "closeOtherTabs"
             },
             "keys": "alt+shift+o"
+        },
+        {
+            "command": "closeWindow",
+            "keys": "alt+q"
         },
         {
             "command": "closePane",
@@ -83,7 +83,7 @@
             "colorScheme": "Legacy",
             "font": 
             {
-                "face": "Consolas",
+                "face": "FiraMono Nerd Font Mono",
                 "size": 13
             },
             "startingDirectory": null
@@ -94,7 +94,7 @@
                 "commandline": "C:\\Program Files\\PowerShell\\7\\pwsh.exe -nologo",
                 "font": 
                 {
-                    "face": "Consolas",
+                    "face": "FiraMono Nerd Font Mono",
                     "size": 14,
                     "weight": "normal"
                 },
@@ -119,6 +119,10 @@
                 "name": "Admin"
             },
             {
+                "font": 
+                {
+                    "face": "FiraMono Nerd Font Mono"
+                },
                 "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
                 "hidden": false,
                 "name": "Command Prompt"
@@ -139,6 +143,18 @@
                 "startingDirectory": "%USERPROFILE%",
                 "suppressApplicationTitle": true,
                 "useAcrylic": false
+            },
+            {
+                "guid": "{51855cb2-8cce-5362-8f54-464b92b32386}",
+                "hidden": false,
+                "name": "Ubuntu",
+                "source": "CanonicalGroupLimited.Ubuntu_79rhkp1fndgsc"
+            },
+            {
+                "guid": "{2c4de342-38b7-51cf-b940-2309a097f518}",
+                "hidden": true,
+                "name": "Ubuntu",
+                "source": "Windows.Terminal.Wsl"
             }
         ]
     },
