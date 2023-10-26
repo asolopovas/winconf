@@ -9,6 +9,7 @@ $essential_software = @(
     'voidtools.Everything'
     'junegunn.fzf'
     'Git.Git'
+    'Starship.Starship'
     'AutoHotkey.AutoHotkey'
 )
 $source_files = @(
