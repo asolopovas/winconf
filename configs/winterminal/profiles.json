@@ -11,8 +11,30 @@
             "keys": "ctrl+shift+c"
         },
         {
+            "command": "unbound",
+            "keys": "ctrl+shift+w"
+        },
+        {
             "command": "paste",
             "keys": "shift+insert"
+        },
+        {
+            "command": 
+            {
+                "action": "newTab"
+            },
+            "keys": "ctrl+enter"
+        },
+        {
+            "command": 
+            {
+                "action": "newTab"
+            },
+            "keys": "alt+t"
+        },
+        {
+            "command": "closeWindow",
+            "keys": "alt+q"
         },
         {
             "command": 
@@ -33,33 +55,11 @@
             "keys": "alt+j"
         },
         {
-            "command": "closeWindow",
-            "keys": "alt+q"
-        },
-        {
             "command": 
             {
                 "action": "nextTab"
             },
             "keys": "alt+k"
-        },
-        {
-            "command": 
-            {
-                "action": "newTab"
-            },
-            "keys": "ctrl+enter"
-        },
-        {
-            "command": 
-            {
-                "action": "newTab"
-            },
-            "keys": "alt+t"
-        },
-        {
-            "command": "unbound",
-            "keys": "ctrl+shift+w"
         }
     ],
     "alwaysOnTop": false,
@@ -76,12 +76,6 @@
     "initialCols": 100,
     "initialRows": 25,
     "launchMode": "default",
-    "newTabMenu": 
-    [
-        {
-            "type": "remainingProfiles"
-        }
-    ],
     "profiles": 
     {
         "defaults": 
@@ -89,8 +83,8 @@
             "colorScheme": "Legacy",
             "font": 
             {
-                "face": "FiraMono Nerd Font Mono",
-                "size": 13.0
+                "face": "Consolas",
+                "size": 13
             },
             "startingDirectory": null
         },
@@ -100,8 +94,8 @@
                 "commandline": "C:\\Program Files\\PowerShell\\7\\pwsh.exe -nologo",
                 "font": 
                 {
-                    "face": "FiraMono Nerd Font Mono",
-                    "size": 14.0,
+                    "face": "Consolas",
+                    "size": 14,
                     "weight": "normal"
                 },
                 "guid": "{05b9d966-86e5-4a1f-a9df-d87cef4d716e}",
@@ -117,20 +111,7 @@
                 "font": 
                 {
                     "face": "FiraMono Nerd Font Mono",
-                    "size": 14.0,
-                    "weight": "normal"
-                },
-                "guid": "{51855cb2-8cce-5362-8f54-464b92b32386}",
-                "hidden": false,
-                "name": "Ubuntu",
-                "source": "CanonicalGroupLimited.Ubuntu_79rhkp1fndgsc"
-            },
-            {
-                "elevate": true,
-                "font": 
-                {
-                    "face": "FiraMono Nerd Font Mono",
-                    "size": 14.0,
+                    "size": 14,
                     "weight": "normal"
                 },
                 "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
@@ -144,11 +125,10 @@
             },
             {
                 "commandline": "C:\\Program Files\\PowerShell\\7\\pwsh.exe -nologo",
-                "elevate": true,
                 "font": 
                 {
                     "face": "FiraMono Nerd Font Mono",
-                    "size": 14.0,
+                    "size": 14,
                     "weight": "normal"
                 },
                 "guid": "{17c1be6f-7263-44bc-8945-97d7535b77fe}",
@@ -420,51 +400,6 @@
     ],
     "tabWidthMode": "compact",
     "theme": "dark",
-    "themes": 
-    [
-        {
-            "name": "legacyDark",
-            "tab": 
-            {
-                "background": null,
-                "showCloseButton": "always",
-                "unfocusedBackground": null
-            },
-            "window": 
-            {
-                "applicationTheme": "dark",
-                "useMica": false
-            }
-        },
-        {
-            "name": "legacyLight",
-            "tab": 
-            {
-                "background": null,
-                "showCloseButton": "always",
-                "unfocusedBackground": null
-            },
-            "window": 
-            {
-                "applicationTheme": "light",
-                "useMica": false
-            }
-        },
-        {
-            "name": "legacySystem",
-            "tab": 
-            {
-                "background": null,
-                "showCloseButton": "always",
-                "unfocusedBackground": null
-            },
-            "window": 
-            {
-                "applicationTheme": "system",
-                "useMica": false
-            }
-        }
-    ],
     "trimBlockSelection": true,
     "windowingBehavior": "useNew"
 }
