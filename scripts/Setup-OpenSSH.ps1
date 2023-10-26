@@ -3,18 +3,17 @@
 Add-Capability "OpenSSH.Client~~~~0.0.1.0"
 Add-Capability "OpenSSH.Server~~~~0.0.1.0"
 
-# Function to start the sshd service and set its startup type
 Function ConfigureSSHDService {
-    # Start the sshd service
+    Write-Host "Configuring SSHD service ..." -ForegroundColor DarkGray
     Start-Service sshd
 
-    # Set sshd service to start up automatically
     Set-Service -Name sshd -StartupType 'Automatic'
 }
 
 ConfigureSSHDService
 
 # Set the default shell for OpenSSH
+Write-Host "Setting Default Shell  for OpenSSH ..." -ForegroundColor DarkGray
 New-ItemProperty -Path "HKLM:\SOFTWARE\OpenSSH" -Name DefaultShell -Value "C:\Program Files\PowerShell\7\pwsh.exe" -PropertyType String -Force
 
 # Function to configure the Firewall rule for OpenSSH
@@ -29,4 +28,5 @@ Function ConfigureFirewallRule {
     }
 }
 
+Write-Host "Setting Firewall Rules ..." -ForegroundColor DarkGray
 ConfigureFirewallRule

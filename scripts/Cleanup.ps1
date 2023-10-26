@@ -7,8 +7,8 @@ $removeRegistryKeys = @(
     "HKCR:\Directory\Background\shell\git_gui"
     "HKCR:\Directory\shell\git_shell"
     "HKCR:\Directory\shell\git_gui"
-    "HKCR:\Directory\shell\PlayWithVLC"
-    "HKCR:\Directory\shell\AddToPlaylistVLC"
+    # "HKCR:\Directory\shell\PlayWithVLC"
+    # "HKCR:\Directory\shell\AddToPlaylistVLC"
     "HKCR:\Directory\shell\ShareX"
     "HKCR:\Directory\shell\CaptureOne"
 )

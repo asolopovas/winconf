@@ -13,8 +13,6 @@ $wingetApps = @(
     "Gyan.FFmpeg",
     "sharkdp.fd",
     "junegunn.fzf",
-    "Git.Git",
-    "voidtools.Everything",
     "Twilio.Authy",
     "ALCPU.CoreTemp",
     "mIRC.mIRC",

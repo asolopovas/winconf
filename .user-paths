@@ -1,4 +1,3 @@
-C:\Program Files\starship\bin
 $env:LOCALAPPDATA\Microsoft\WinGet\Links
 $env:USERPROFILE\winconf\bin
 $env:USERPROFILE\gdrive\bin
@@ -8,3 +7,5 @@ $env:USERPROFILE\src\news-search
 $env:USERPROFILE\src\excel-to-pdf
 $env:USERPROFILE\winconf\scripts
 $env:USERPROFILE\toc-gen
+$env:ProgramFiles\Git\cmd
+$env:ProgramFiles\starship\bin
