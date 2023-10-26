@@ -1,32 +1,22 @@
-# Get the .sys-env file content
-# check if exist "../.sys-env"
-$path = "../.sys-env"
-if (-not (Test-Path -Path $path)) { # Fixed this line
-    New-Item -Path $path -ItemType File
-}
-$paths = Get-Content $path
 
-# Convert PATH to an array for easier manipulation and normalize paths
-$currentPaths = $env:Path -split ';' | ForEach-Object { $_.TrimEnd('\').ToLower() }
+$userPathsFile = "$env:USERPROFILE\winconf\.user-paths"
 
-# Iterate over the paths from the .sys-env file
-foreach ($path in $paths) {
-    # Expand environment variables in the path
-    $expandedPath = $ExecutionContext.InvokeCommand.ExpandString($path)
+if (!(Test-Path $userPathsFile)) { return }
 
-    # Normalize expanded path
-    $normalizedPath = $expandedPath.TrimEnd('\').ToLower()
+$additionalPaths = Get-Content $userPathsFile | ForEach-Object { $ExecutionContext.InvokeCommand.ExpandString($_) }
+$currentPaths = ($env:Path -split ';' | ForEach-Object { $_.TrimEnd('\') })
 
-    if ((Test-Path -Path $expandedPath) -and ($currentPaths -notcontains $normalizedPath)) {
-        # Add path to local array
-        $currentPaths += $expandedPath
-        Write-Host "Adding $expandedPath to System PATH ..."
-    }
-    else {
-        Write-Host "$expandedPath does not exist or is already in PATH..."
-    }
+Write-Host "`nCurrent Paths:" -ForegroundColor Cyan
+$currentPaths | ForEach-Object { Write-Host $_ -ForegroundColor Cyan }
+
+
+$newPaths = $additionalPaths | Where-Object { $_.TrimEnd('\') -notin $currentPaths } | ForEach-Object { $_ }
+
+foreach ($path in $newPaths) {
+    Write-Host "`Adding Path - $path" -ForegroundColor Green
 }
 
-# Join the array back into a single string and update PATH
-$newPath = $currentPaths -join ';'
-[Environment]::SetEnvironmentVariable("Path", $newPath, "User")
+if ($newPaths) {
+    $updatedPath = ($currentPaths + $newPaths) -join ';'
+    [Environment]::SetEnvironmentVariable("Path", $updatedPath, "User")
+}

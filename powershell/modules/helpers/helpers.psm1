@@ -123,8 +123,37 @@ function Test-Sha {
     }
 }
 
+function Update-UserPath {
+    param (
+        [Parameter(Mandatory = $true)]
+        [System.Collections.Hashtable]$Replacements
+    )
 
+    # Get the current user PATH
+    $userPath = [Environment]::GetEnvironmentVariable("PATH", "User")
+    $paths = $userPath -split ';'
 
+    # Perform search and replace for each section of each path
+    $updatedPaths = $paths | ForEach-Object {
+        $pathSections = $_ -split '\\'
+        $updatedSections = $pathSections | ForEach-Object {
+            $currentSection = $_
+            foreach ($key in $Replacements.Keys) {
+                if ($currentSection -eq $key) {
+                    $currentSection = $Replacements[$key]
+                }
+            }
+            $currentSection
+        }
+        $updatedSections -join '\'
+    }
+
+    # Update the user PATH
+    $updatedUserPath = ($updatedPaths -join ';')
+    [Environment]::SetEnvironmentVariable("PATH", $updatedUserPath, "User")
+
+    Write-Host "User PATH has been updated."
+}
 
 . $PSScriptRoot\convertions.ps1
 . $PSScriptRoot\docker-compose.ps1

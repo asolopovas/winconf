@@ -9,6 +9,7 @@ $essential_software = @(
     'voidtools.Everything'
     'junegunn.fzf'
     'Git.Git'
+    'AutoHotkey.AutoHotkey'
 )
 $source_files = @(
     'Bloatware-Removal'
@@ -21,17 +22,6 @@ $source_files = @(
     'Setup-DirectoryOpus'
     'Setup-OpenSSH'
 )
-
-if ($args[0] -eq '--software') {
-    $source_files += 'Install-Software'
-}
-
-foreach ($file in $source_files) {
-    SourceFile $file
-}
-
-$gitPath = "$env:ProgramFiles\Git\cmd"
-$env:PATH += ";$gitPath"
 
 function Test-CommandExists {
     Param ($command)
@@ -54,13 +44,21 @@ function SourceFile {
     }
 }
 
-foreach ($software in $essential_software) {
-    if (!(Test-CommandExists $software)) {
-        Write-Host "`nInstalling $software..." -ForegroundColor DarkGray
-        winget install --id $software
-    }
+foreach ($soft in $essential_software) {
+    Write-Host "Installing $soft... " -ForegroundColor DarkGray
+    winget install --id $soft -h --disable-interactivity
 }
 
+if ($args[0] -eq '--software') {
+    $source_files += 'Install-Software'
+}
+foreach ($file in $source_files) {
+
+    SourceFile $file
+}
+
+$gitPath = "$env:ProgramFiles\Git\cmd"
+$env:PATH += ";$gitPath"
 
 if (!(Test-Path -Path $root)) {
     Write-Host "Cloning repository into $root..." -ForegroundColor DarkGray
@@ -71,4 +69,3 @@ else {
     Set-Location -Path $root
     git pull
 }
-

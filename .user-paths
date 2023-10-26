@@ -1,4 +1,5 @@
 $env:LOCALAPPDATA\Microsoft\WinGet\Links
+$env:LOCALAPPDATA\Microsoft\WindowsApps
 $env:USERPROFILE\winconf\bin
 $env:USERPROFILE\gdrive\bin
 $env:USERPROFILE\miniconda3
@@ -9,3 +10,4 @@ $env:USERPROFILE\winconf\scripts
 $env:USERPROFILE\toc-gen
 $env:ProgramFiles\Git\cmd
 $env:ProgramFiles\starship\bin
+$env:ProgramFiles\AutoHotkey\v2

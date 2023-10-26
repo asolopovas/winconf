@@ -33,6 +33,7 @@
         'IIf',
         'Test-Sha',
         'UpdateModuleManifest',
+        "Update-UserPath",
         # rm-pattern.ps1
         'Remove-ByPattern',
         # security.ps1
