@@ -10,17 +10,6 @@
         {
             "command": 
             {
-                "action": "copy"
-            },
-            "keys": "ctrl+shift+c"
-        },
-        {
-            "command": "paste",
-            "keys": "shift+insert"
-        },
-        {
-            "command": 
-            {
                 "action": "newTab"
             },
             "keys": "ctrl+enter"
@@ -35,9 +24,27 @@
         {
             "command": 
             {
+                "action": "copy"
+            },
+            "keys": "ctrl+shift+c"
+        },
+        {
+            "command": "paste",
+            "keys": "shift+insert"
+        },
+        {
+            "command": 
+            {
                 "action": "closeOtherTabs"
             },
             "keys": "alt+shift+o"
+        },
+        {
+            "command": 
+            {
+                "action": "prevTab"
+            },
+            "keys": "alt+j"
         },
         {
             "command": "closeWindow",
@@ -46,13 +53,6 @@
         {
             "command": "closePane",
             "keys": "ctrl+w"
-        },
-        {
-            "command": 
-            {
-                "action": "prevTab"
-            },
-            "keys": "alt+j"
         },
         {
             "command": 
@@ -76,6 +76,12 @@
     "initialCols": 100,
     "initialRows": 25,
     "launchMode": "default",
+    "newTabMenu": 
+    [
+        {
+            "type": "remainingProfiles"
+        }
+    ],
     "profiles": 
     {
         "defaults": 
@@ -84,7 +90,7 @@
             "font": 
             {
                 "face": "FiraMono Nerd Font Mono",
-                "size": 13
+                "size": 13.0
             },
             "startingDirectory": null
         },
@@ -95,7 +101,7 @@
                 "font": 
                 {
                     "face": "FiraMono Nerd Font Mono",
-                    "size": 14,
+                    "size": 14.0,
                     "weight": "normal"
                 },
                 "guid": "{05b9d966-86e5-4a1f-a9df-d87cef4d716e}",
@@ -108,15 +114,17 @@
                 "useAcrylic": false
             },
             {
+                "elevate": true,
                 "font": 
                 {
                     "face": "FiraMono Nerd Font Mono",
-                    "size": 14,
+                    "size": 14.0,
                     "weight": "normal"
                 },
                 "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
                 "hidden": false,
-                "name": "Admin"
+                "name": "Admin",
+                "startingDirectory": "%USERPROFILE%"
             },
             {
                 "font": 
@@ -129,10 +137,11 @@
             },
             {
                 "commandline": "C:\\Program Files\\PowerShell\\7\\pwsh.exe -nologo",
+                "elevate": true,
                 "font": 
                 {
                     "face": "FiraMono Nerd Font Mono",
-                    "size": 14,
+                    "size": 14.0,
                     "weight": "normal"
                 },
                 "guid": "{17c1be6f-7263-44bc-8945-97d7535b77fe}",
@@ -149,12 +158,6 @@
                 "hidden": false,
                 "name": "Ubuntu",
                 "source": "CanonicalGroupLimited.Ubuntu_79rhkp1fndgsc"
-            },
-            {
-                "guid": "{2c4de342-38b7-51cf-b940-2309a097f518}",
-                "hidden": true,
-                "name": "Ubuntu",
-                "source": "Windows.Terminal.Wsl"
             }
         ]
     },
@@ -416,6 +419,7 @@
     ],
     "tabWidthMode": "compact",
     "theme": "dark",
+    "themes": [],
     "trimBlockSelection": true,
     "windowingBehavior": "useNew"
 }

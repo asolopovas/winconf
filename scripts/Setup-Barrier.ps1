@@ -17,6 +17,11 @@ $KeyBase64
 $CertBase64
 -----END CERTIFICATE-----
 "@
+$dirPath = "$env:LOCALAPPDATA\Barrier\SSL"
 
+
+if (-not (Test-Path -Path $dirPath -PathType Container)) {
+    New-Item -Path $dirPath -ItemType Directory
+}
 # Output to file
-$Pem | Out-File -FilePath C:\Users\Andrius\AppData\Local\Barrier\SSL\Barrier.pem -Encoding Ascii
+$Pem | Out-File -FilePath $dirPath\Barrier.pem -Encoding Ascii
