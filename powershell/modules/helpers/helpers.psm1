@@ -140,9 +140,6 @@ function Test-Sha {
 }
 
 
-
-
-
 function Update-UserPath {
     param (
         [Parameter(Mandatory = $true)]
