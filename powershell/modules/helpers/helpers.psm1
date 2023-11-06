@@ -90,32 +90,48 @@ function Test-Sha {
         [string]$FileToCheck
     )
 
+    $IsUrl = $ShaOrFilePath -match '^https?://'
+
     if (-not $FileToCheck) {
-        if (Test-Path $ShaOrFilePath) {
+        if ($IsUrl) {
+            $content = Invoke-WebRequest -Uri $ShaOrFilePath -UseBasicParsing | Select-Object -ExpandProperty Content
+        }
+        elseif (Test-Path $ShaOrFilePath) {
             $content = Get-Content $ShaOrFilePath -Raw
-            $providedHash, $relativeFilePath = $content -split '\s+', 2
-
-            $relativeFilePath = $relativeFilePath.Trim()
-
-            $FileToCheck = Join-Path (Get-Item $ShaOrFilePath).DirectoryName $relativeFilePath
         }
         else {
-            throw "File $ShaOrFilePath does not exist."
+            throw "File or URL $ShaOrFilePath does not exist."
         }
+
+        $providedHash, $relativeFilePath = $content -split '\s+', 2
+        $relativeFilePath = $relativeFilePath.Trim()
+        $FileToCheck = Resolve-Path $relativeFilePath
     }
     else {
-        $providedHash = if (Test-Path $ShaOrFilePath) { Get-Content $ShaOrFilePath -Raw } else { $ShaOrFilePath }
+        if ($IsUrl) {
+            $content = Invoke-WebRequest -Uri $ShaOrFilePath -UseBasicParsing | Select-Object -ExpandProperty Content
+            $providedHash, $_ = $content -split '\s+', 2
+        }
+        else {
+            $providedHash = if (Test-Path $ShaOrFilePath) { Get-Content $ShaOrFilePath -Raw } else { $ShaOrFilePath }
+            $FileToCheck = Resolve-Path $FileToCheck
+        }
     }
 
     if (-not (Test-Path $FileToCheck)) {
         throw "File $FileToCheck does not exist."
     }
 
+    Write-Host "Checking hash for file: $FileToCheck"
+    Write-Host "Provided hash: $providedHash"
+
     $sha256 = [System.Security.Cryptography.SHA256]::Create()
     $bytes = [System.IO.File]::ReadAllBytes($FileToCheck)
-    $hash = -join ($sha256.ComputeHash($bytes) | ForEach-Object { $_.ToString("X2") })
+    $calculatedHash = -join ($sha256.ComputeHash($bytes) | ForEach-Object { $_.ToString("X2") })
 
-    if ($hash -eq $providedHash) {
+    Write-Host "Calculated hash: $calculatedHash"
+
+    if ($calculatedHash -eq $providedHash.ToUpper()) {
         "Hash matches!"
     }
     else {

@@ -76,14 +76,14 @@ LWin & ,::ShiftAltTab
         return
     }
 
-!F11::
-    {
-        RegWrite(0, "REG_DWORD", "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\System", "DisableLockWorkstation")
-        DllCall("LockWorkStation")
-        Sleep(1000)
-        RegWrite(1, "REG_DWORD", "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\System", "DisableLockWorkstation")
-        return
-    }
+; !F11::
+;     {
+;         RegWrite(0, "REG_DWORD", "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\System", "DisableLockWorkstation")
+;         DllCall("LockWorkStation")
+;         Sleep(1000)
+;         RegWrite(1, "REG_DWORD", "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\System", "DisableLockWorkstation")
+;         return
+;     }
 
 !+F11::
     {
