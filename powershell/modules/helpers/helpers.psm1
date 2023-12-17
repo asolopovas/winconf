@@ -118,26 +118,35 @@ function Test-Sha {
         }
     }
 
+    $providedHash = $providedHash.Trim().Split(' ')[0] # Extract only the hash part
+
     if (-not (Test-Path $FileToCheck)) {
         throw "File $FileToCheck does not exist."
     }
 
-    Write-Host "Checking hash for file: $FileToCheck"
-    Write-Host "Provided hash: $providedHash"
 
     $sha256 = [System.Security.Cryptography.SHA256]::Create()
     $bytes = [System.IO.File]::ReadAllBytes($FileToCheck)
     $calculatedHash = -join ($sha256.ComputeHash($bytes) | ForEach-Object { $_.ToString("X2") })
 
-    Write-Host "Calculated hash: $calculatedHash"
+    $calculatedHash = $calculatedHash.ToUpper()
+    $providedHash = $providedHash.ToUpper()
+    Write-Host "------------------------------------------------------------------------------------"
+    Write-Host "$FileToCheck  - File Hash Check"
+    Write-Host "$providedHash"
+    Write-Host "$ShaOrFilePath - Comparison"
+    Write-Host "$calculatedHash"
+    Write-Host "------------------------------------------------------------------------------------"
 
-    if ($calculatedHash -eq $providedHash.ToUpper()) {
+    if ($calculatedHash -eq $providedHash) {
         "Hash matches!"
     }
     else {
         "Hash doesn't match!"
     }
 }
+
+
 
 function Update-UserPath {
     param (
