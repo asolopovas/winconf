@@ -62,8 +62,15 @@ RunOrActivateTerminal(windowTitle, alwaysNewInstance := false) {
         if (!WinExist(windowID)) {
             RunAsUser(exePath)
             WinWait(windowID)
-        } else if (WinActive(windowID)) {
-            PostMessage(0x112, 0xF060, , , "ahk_id " . WinActive("A"))
         }
+
+        if (WinActive(windowID)) {
+            WinMinimize
+        } else {
+            WinActivate
+        }
+        ; if (WinActive(windowID)) {
+        ;     PostMessage(0x112, 0xF060, , , "ahk_id " . WinActive("A"))
+        ; }
 
     }
