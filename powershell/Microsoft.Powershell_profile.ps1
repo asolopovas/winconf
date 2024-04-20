@@ -19,11 +19,16 @@ if (-not (Get-Module -Name $moduleName)) {
 . $power_shell_dir\starship.ps1
 
 
+# get powershell version and if its more than or equals to 7.4 execute the following
+$ps_major = $PSVersionTable.PSVersion.Major
+$ps_minor = $PSVersionTable.PSVersion.Minor
 
-$power_toys_module = "$env:LOCALAPPDATA\PowerToys\WinGetCommandNotFound.psd1"
-# test if file exists import if it does
-if (Test-Path $power_toys_module) {
-    Import-Module $power_toys_module
+if ($ps_major -ge 7 -And $ps_minor -ge 4) {
+    $power_toys_module = "$env:LOCALAPPDATA\PowerToys\WinGetCommandNotFound.psd1"
+    # test if file exists import if it does
+    if (Test-Path $power_toys_module) {
+        Import-Module $power_toys_module
+    }
+
 }
-
 

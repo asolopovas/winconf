@@ -14,7 +14,7 @@ function gw {
         git commit -m "$commitMessage"
     }
     else {
-        Write-Warning "Commit cancelled due to empty commit message."
+        git commit -m "save"
     }
 }
 # Docker
@@ -50,5 +50,5 @@ New-Alias -Name '..2' -Value CD2
 New-Alias -Name '..3' -Value CD3
 New-Alias -Name '..4' -Value CD4
 New-Alias -Name '..5' -Value CD5
-
+New-Alias -Name "pt" -Value poetry.exe
 

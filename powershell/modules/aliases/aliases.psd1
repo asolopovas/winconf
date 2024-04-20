@@ -37,6 +37,7 @@
         'which',
         'get',
         'tail',
+        'pt',
         'touch',
         'ln',
         'grep',
