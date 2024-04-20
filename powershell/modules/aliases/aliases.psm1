@@ -3,6 +3,8 @@ function gs { git status }
 function ga { git add $args }
 function gb { git branch $args }
 function gc { git add -A; git commit -m $args }
+
+function pr { poetry run $args }
 function gd { git diff $args }
 function gk { git checkout $args }
 function gp { git push }

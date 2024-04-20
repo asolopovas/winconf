@@ -23,6 +23,7 @@
         'gl',
         'gk',
         'gw',
+        'pr',
         'dc',
         'nah',
         'lsChoco',
