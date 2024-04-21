@@ -56,21 +56,19 @@ RunOrActivateTerminal(windowTitle, alwaysNewInstance := false) {
 
 #m::
     {
-        windowID := "ahk_class Chrome_WidgetWin_0 ahk_exe Spotify.exe"
+        windowID := "ahk_exe Spotify.exe"
         exePath := A_AppData . "\\Spotify\\Spotify.exe"
 
         if (!WinExist(windowID)) {
             RunAsUser(exePath)
             WinWait(windowID)
+        } else {
+            if (WinActive(windowID)) {
+                PostMessage(0x112, 0xF060, , , "ahk_id " . WinActive("A"))
+            } else {
+                WinActivate
+            }
         }
 
-        if (WinActive(windowID)) {
-            WinMinimize
-        } else {
-            WinActivate
-        }
-        ; if (WinActive(windowID)) {
-        ;     PostMessage(0x112, 0xF060, , , "ahk_id " . WinActive("A"))
-        ; }
 
     }
