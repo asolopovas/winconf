@@ -70,5 +70,4 @@ RunOrActivateTerminal(windowTitle, alwaysNewInstance := false) {
             }
         }
 
-
     }
