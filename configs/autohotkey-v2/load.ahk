@@ -100,7 +100,7 @@ global targetWindows := Map() ; A map to store window handles
 GetTargetKey(val) {
    Return SubStr(val, StrLen(val), 1)
 }
-; Function to bind a window
+
 BindWindow(hotKey) {
     targetKey := GetTargetKey(hotKey)
     winID := WinGetID("A")
@@ -110,7 +110,6 @@ BindWindow(hotKey) {
     ToolTip("")
 }
 
-; Function to activate a window
 ActivateWindow(hotKey) {
     targetKey := GetTargetKey(hotKey)
     if (targetWindows.Has(targetKey)) {
@@ -126,4 +125,56 @@ Loop 9 {
     currentKey := A_Index
     Hotkey "<^>!F" . currentKey, BindWindow
     Hotkey '!F' . currentKey, ActivateWindow
+}
+
+!j::
+ {
+    CycleWindows(-1)
+ }
+!k::
+{
+    CycleWindows(+1)
+}
+
+CycleWindows(Direction)
+{
+	static total, hWnds, last := ""
+
+	a := WinExist("A")
+	wClass := WinGetClass()
+	exe := WinGetProcessName()
+
+	if (exe != last) {
+		last := exe
+		hWnds := []
+		DetectHiddenWindows(false)
+		owList := WinGetList("ahk_exe" exe " ahk_class" wClass,,,)
+		awList := Array()
+		wList := owList.Length
+		For v in owList
+		{   awList.Push(v)
+		}
+		Loop awList.Length {
+			hWnd := awList[A_Index]
+			hWnds.Push(hWnd)
+		}
+
+		total := hWnds.Length
+	}
+
+	for hWnd in hWnds {
+		if (a = hWnd)
+            key := A_Index
+	}
+
+    target := key + Direction
+
+    if (target = 0) {
+        target := total
+    }
+    if (target > total ) {
+        target := 1
+    }
+
+	WinActivate("ahk_id" hWnds[target])
 }
