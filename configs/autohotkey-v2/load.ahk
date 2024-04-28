@@ -176,5 +176,7 @@ CycleWindows(Direction)
         target := 1
     }
 
-	WinActivate("ahk_id" hWnds[target])
+    if (WinExist("ahk_id" hWnds[target])) {
+	    WinActivate("ahk_id" hWnds[target])
+    }
 }
