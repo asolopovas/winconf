@@ -125,5 +125,5 @@ ActivateWindow(hotKey) {
 Loop 9 {
     currentKey := A_Index
     Hotkey "<^>!F" . currentKey, BindWindow
-    Hotkey 'F' . currentKey, ActivateWindow
+    Hotkey '!F' . currentKey, ActivateWindow
 }
