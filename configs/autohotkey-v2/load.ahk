@@ -129,14 +129,14 @@ Loop 9 {
 
 !j::
  {
-    CycleWindows(-1)
+    CycleWindowsWithinSameClass(-1)
  }
 !k::
 {
-    CycleWindows(+1)
+    CycleWindowsWithinSameClass(+1)
 }
 
-CycleWindows(Direction)
+CycleWindowsWithinSameClass(Direction)
 {
 	static total, hWnds, last := ""
 
