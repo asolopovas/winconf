@@ -138,49 +138,54 @@ Loop 9 {
 
 CycleWindowsWithinSameClass(Direction)
 {
-	; DetectHiddenWindows(false)
-	activeWindow := WinExist("A")
-	exe := WinGetProcessName()
-	total := windowObjects.Length
-    current := 0
+	static total, hWnds, last := ""
 
-	for win in windowObjects {
-		if (activeWindow = win)
-            current := A_Index
+	a := WinExist("A")
+	wClass := WinGetClass()
+	exe := WinGetProcessName()
+
+	if (exe != last) {
+		last := exe
+		hWnds := []
+		DetectHiddenWindows(false)
+		owList := WinGetList("ahk_exe" exe " ahk_class" wClass,,,)
+		awList := Array()
+		wList := owList.Length
+		For v in owList
+		{   awList.Push(v)
+		}
+		Loop awList.Length {
+			hWnd := awList[A_Index]
+			hWnds.Push(hWnd)
+		}
+
+		total := hWnds.Length
 	}
 
-    target := current + Direction
+	for hWnd in hWnds {
+		if (a = hWnd)
+            key := A_Index
+	}
 
-    if (target < 1) {
+    target := key + Direction
+
+    if (target = 0) {
         target := total
     }
-
-    if (target > total) {
+    if (target > total ) {
         target := 1
     }
 
-    if (WinGetClass(windowObjects[target]) = "Shell_TrayWnd") {
-        target += Direction
+    if (WinExist("ahk_id" hWnds[target])) {
+	    WinActivate("ahk_id" hWnds[target])
     }
-
-    if (target < 1) {
-        target := total
-    }
-
-    if (target > total) {
-        target := 1
-    }
-
-    if (WinExist(windowObjects[target])) {
-        targetWindow  := windowObjects[target]
-        WinActivate("ahk_id" targetWindow)
-    }
-
 }
 
-CycleAllWindows(Direction)
+
+CycleWindows(Direction)
 {
-	; DetectHiddenWindows(false)
+	DetectHiddenWindows(false)
+    global windowObjects := WinGetList(,,"Program Manager")
 	activeWindow := WinExist("A")
 	exe := WinGetProcessName()
 	total := windowObjects.Length
