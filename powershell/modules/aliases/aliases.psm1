@@ -1,4 +1,9 @@
 # Github
+
+function ci { composer install }
+function cr { composer require $args }
+function pi { pnpm install $args }
+function pu { pnpm update $args}
 function gs { git status }
 function ga { git add $args }
 function gb { git branch $args }
