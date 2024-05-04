@@ -4,7 +4,6 @@ SetKeyDelay(0, 50)
 #Include "hotkeys-apps.ahk"
 #Include "desktop-switcher/user_config.ahk"
 
-
 RestartExplorer(delay:=-1) {
     If (A_OSVersion != "WIN_XP") {
         PID := WinGetPID("ahk_class Shell_TrayWnd")
@@ -124,14 +123,14 @@ ActivateWindow(hotKey) {
 Loop 9 {
     currentKey := A_Index
     Hotkey "<^>!F" . currentKey, BindWindow
-    Hotkey '!F' . currentKey, ActivateWindow
+    Hotkey '+F' . currentKey, ActivateWindow
 }
 
-!j::
+!.::
  {
     CycleWindowsWithinSameClass(-1)
  }
-!k::
+!,::
 {
     CycleWindowsWithinSameClass(+1)
 }
