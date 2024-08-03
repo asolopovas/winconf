@@ -2,7 +2,6 @@
 
 $winconf = "$env:USERPROFILE\winconf"
 
-
 $mydocs = [Environment]::GetFolderPath("MyDocuments")
 $target = "$winconf\powershell"
 $src_1 = "$mydocs\WindowsPowerShell"
