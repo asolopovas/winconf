@@ -55,14 +55,24 @@ Function Set-HostnameMapping {
     }
 }
 
+
 Function Remove-HostnameMapping {
     Param(
-        [String][Parameter(Mandatory = $True)][ValidateScript({Get-HostnameValidation -Hostname $_})] $Hostname
+        [String][Parameter(Mandatory = $True)][ValidateScript({ Get-HostnameValidation -Hostname $_ })] $Hostname
     )
     If (([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-        $Content = Get-Content -Path $PathFile | Where-Object { $_ -NotMatch "^\s*[\d\.:]+\s+$Hostname\s*$" }
-        Set-Content -Path $PathFile -Value $Content
-    } Else {
-        Start-Process -FilePath PowerShell -WindowStyle Hidden  -Verb RunAs -ArgumentList "-Command Remove-HostnameMapping -Hostname $Hostname"
+        try {
+            $Content = Get-Content -Path $PathFile
+            $FilteredContent = $Content | Where-Object { $_ -NotMatch "^\s*[\d\.:]+\s+$Hostname\s*$" }
+            Set-Content -Path $PathFile -Value $FilteredContent
+            Write-Output "Hostname '$Hostname' removed successfully."
+        }
+        catch {
+            Write-Error "Failed to remove hostname mapping. Error: $_"
+        }
+    }
+    Else {
+        Start-Process -FilePath PowerShell -WindowStyle Hidden -Verb RunAs -ArgumentList "-Command Remove-HostnameMapping -Hostname $Hostname"
     }
 }
+

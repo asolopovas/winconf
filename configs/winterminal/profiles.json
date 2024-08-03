@@ -4,8 +4,19 @@
     "actions": 
     [
         {
+            "command": 
+            {
+                "action": "copy"
+            },
+            "keys": "ctrl+shift+c"
+        },
+        {
             "command": "unbound",
             "keys": "ctrl+shift+w"
+        },
+        {
+            "command": "paste",
+            "keys": "shift+insert"
         },
         {
             "command": 
@@ -22,22 +33,12 @@
             "keys": "alt+t"
         },
         {
-            "command": 
-            {
-                "action": "copy"
-            },
-            "keys": "ctrl+shift+c"
+            "command": "closePane",
+            "keys": "ctrl+w"
         },
         {
-            "command": "paste",
-            "keys": "shift+insert"
-        },
-        {
-            "command": 
-            {
-                "action": "closeOtherTabs"
-            },
-            "keys": "alt+shift+o"
+            "command": "closeWindow",
+            "keys": "alt+q"
         },
         {
             "command": 
@@ -47,12 +48,11 @@
             "keys": "alt+j"
         },
         {
-            "command": "closeWindow",
-            "keys": "alt+q"
-        },
-        {
-            "command": "closePane",
-            "keys": "ctrl+w"
+            "command": 
+            {
+                "action": "closeOtherTabs"
+            },
+            "keys": "alt+shift+o"
         },
         {
             "command": 
@@ -137,7 +137,6 @@
             },
             {
                 "commandline": "C:\\Program Files\\PowerShell\\7\\pwsh.exe -nologo",
-                "elevate": true,
                 "font": 
                 {
                     "face": "FiraMono Nerd Font Mono",
@@ -158,6 +157,12 @@
                 "hidden": false,
                 "name": "Ubuntu",
                 "source": "CanonicalGroupLimited.Ubuntu_79rhkp1fndgsc"
+            },
+            {
+                "guid": "{2c4de342-38b7-51cf-b940-2309a097f518}",
+                "hidden": true,
+                "name": "Ubuntu",
+                "source": "Windows.Terminal.Wsl"
             }
         ]
     },
