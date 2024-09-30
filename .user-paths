@@ -1,0 +1,15 @@
+$env:LOCALAPPDATA\Microsoft\WinGet\Links
+$env:LOCALAPPDATA\Microsoft\WindowsApps
+$env:USERPROFILE\winconf\bin
+$env:USERPROFILE\gdrive\bin
+$env:USERPROFILE\miniconda3
+$env:USERPROFILE\src\redlined-pdf
+$env:USERPROFILE\src\news-search
+$env:USERPROFILE\src\excel-to-pdf
+$env:USERPROFILE\winconf\scripts
+$env:USERPROFILE\toc-gen
+$env:ProgramFiles\Git\cmd
+$env:ProgramFiles\starship\bin
+$env:ProgramFiles\AutoHotkey\v2
+$env:ProgramFiles\MiKTeX\miktex\bin\x64
+$env:USERPROFILE\src\toc-gen
