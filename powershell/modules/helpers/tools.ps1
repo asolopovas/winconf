@@ -107,3 +107,19 @@ function tail($path, [Boolean]$f = $false, [string]$n = 10) {
         Get-Content -Path $path -Tail $n
     }
 }
+
+function Show-EnvironmentPaths {
+    $userEnvPaths = [System.Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::User) -split ';'
+    $systemEnvPaths = [System.Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::Machine) -split ';'
+
+    Write-Host "User Environment Paths:`n" -ForegroundColor Cyan
+    foreach ($path in $userEnvPaths) {
+        Write-Host " - $path"
+    }
+
+    Write-Host "`nSystem Environment Paths:`n" -ForegroundColor Yellow
+    foreach ($path in $systemEnvPaths) {
+        Write-Host " - $path"
+    }
+}
+

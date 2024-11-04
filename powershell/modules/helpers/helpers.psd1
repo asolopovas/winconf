@@ -66,6 +66,7 @@
         'devHostMappings',
         'gitRmPreviousCommits',
         'sshCopyID',
+        'Show-EnvironmentPaths',
         'tail',
         # wsl.ps1
         'WslExport',
