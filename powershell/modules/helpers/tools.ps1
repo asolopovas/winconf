@@ -112,6 +112,8 @@ function Show-EnvironmentPaths {
     $userEnvPaths = [System.Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::User) -split ';'
     $systemEnvPaths = [System.Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::Machine) -split ';'
 
+    Write-Host "Hi Andrew!"
+
     Write-Host "User Environment Paths:`n" -ForegroundColor Cyan
     foreach ($path in $userEnvPaths) {
         Write-Host " - $path"

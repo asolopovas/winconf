@@ -44,3 +44,9 @@ if (Test-Path($ChocolateyProfile)) {
 }
 
 fnm env --use-on-cd | Out-String | Invoke-Expression
+
+if ($PSVersionTable.PSVersion -ge [Version]"7.4") {
+    Import-Module -Name Microsoft.WinGet.CommandNotFound
+} else {
+    Write-Host "Skipping module import: PowerShell version is too low."
+}
