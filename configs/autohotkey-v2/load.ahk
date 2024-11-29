@@ -127,9 +127,9 @@ Loop 9 {
 }
 
 !.::
- {
+{
     CycleWindowsWithinSameClass(-1)
- }
+}
 !,::
 {
     CycleWindowsWithinSameClass(+1)
@@ -137,45 +137,31 @@ Loop 9 {
 
 CycleWindowsWithinSameClass(Direction)
 {
-    static total, hWnds, last := ""
     a := WinExist("A")
     wClass := WinGetClass()
     exe := WinGetProcessName()
-    if (exe != last) {
-        last := exe
-        hWnds := []
-        DetectHiddenWindows(false)
-        owList := WinGetList("ahk_exe" exe " ahk_class" wClass,,,)
-        awList := Array()
-        wList := owList.Length
-        For v in owList
-        {   awList.Push(v)
-        }
-        Loop awList.Length {
-            hWnd := awList[A_Index]
-            hWnds.Push(hWnd)
-        }
-        total := hWnds.Length
-    }
-    key := 0  ; Initialize key with a default value
-    for hWnd in hWnds {
+    DetectHiddenWindows(false)
+    hWnds := WinGetList("ahk_exe " exe " ahk_class " wClass)
+    total := hWnds.Length
+    key := 0
+    for index, hWnd in hWnds {
         if (a = hWnd) {
-            key := A_Index
-            break  ; Exit the loop once a match is found
+            key := index
+            break
         }
     }
-    if (key = 0) {  ; If no match was found, set key to the last window
+    if (key = 0) {
         key := total
     }
     target := key + Direction
-    if (target = 0) {
+    if (target < 1) {
         target := total
     }
     if (target > total) {
         target := 1
     }
-    if (WinExist("ahk_id" hWnds[target])) {
-        WinActivate("ahk_id" hWnds[target])
+    if (WinExist("ahk_id " hWnds[target])) {
+        WinActivate("ahk_id " hWnds[target])
     }
 }
 
