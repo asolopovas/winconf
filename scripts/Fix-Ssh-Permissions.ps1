@@ -1,4 +1,3 @@
-# Function to check if running as Administrator
 function Test-RunAsAdmin {
     if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
         Write-Host "Script is not running as Administrator. Attempting to relaunch..." -ForegroundColor Yellow
@@ -7,27 +6,22 @@ function Test-RunAsAdmin {
     }
 }
 
-# Function to pause before exit
 function Wait-BeforeExit {
     Write-Host "Press any key to close this window..." -ForegroundColor Cyan
     $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 }
 
-# Ensure the script is running as Administrator
 Test-RunAsAdmin
 
-# Get the current user's .ssh directory
 $sshDir = "$env:USERPROFILE\.ssh"
 $userName = (whoami)
 
-# Check if the .ssh directory exists
 if (-Not (Test-Path $sshDir)) {
     Write-Host "The .ssh directory does not exist at $sshDir" -ForegroundColor Red
     Wait-BeforeExit
     exit 1
 }
 
-# Take ownership of the .ssh directory
 Write-Host "Taking ownership of $sshDir..." -ForegroundColor Green
 try {
     Start-Process -FilePath "icacls" -ArgumentList "`"$sshDir`" /setowner `"$userName`" /T /C" -NoNewWindow -Wait
@@ -38,7 +32,6 @@ try {
     exit 1
 }
 
-# Fix permissions for the .ssh directory
 Write-Host "Fixing permissions for $sshDir..." -ForegroundColor Green
 try {
     icacls $sshDir /inheritance:r | Out-Null
@@ -51,7 +44,6 @@ try {
     exit 1
 }
 
-# Fix permissions for all files in the .ssh directory
 Write-Host "Fixing permissions for files in $sshDir..." -ForegroundColor Green
 try {
     Get-ChildItem -Path $sshDir -Recurse -ErrorAction Stop | ForEach-Object {
