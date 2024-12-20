@@ -1,5 +1,5 @@
 # Function to check if running as Administrator
-function Ensure-RunAsAdmin {
+function Test-RunAsAdmin {
     if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
         Write-Host "Script is not running as Administrator. Attempting to relaunch..." -ForegroundColor Yellow
         Start-Process powershell "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
@@ -8,13 +8,13 @@ function Ensure-RunAsAdmin {
 }
 
 # Function to pause before exit
-function Pause-BeforeExit {
+function Wait-BeforeExit {
     Write-Host "Press any key to close this window..." -ForegroundColor Cyan
     $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 }
 
 # Ensure the script is running as Administrator
-Ensure-RunAsAdmin
+Test-RunAsAdmin
 
 # Get the current user's .ssh directory
 $sshDir = "$env:USERPROFILE\.ssh"
@@ -23,7 +23,7 @@ $userName = (whoami)
 # Check if the .ssh directory exists
 if (-Not (Test-Path $sshDir)) {
     Write-Host "The .ssh directory does not exist at $sshDir" -ForegroundColor Red
-    Pause-BeforeExit
+    Wait-BeforeExit
     exit 1
 }
 
@@ -47,7 +47,7 @@ try {
     icacls $sshDir /remove:g "Users" | Out-Null
 } catch {
     Write-Host "Failed to fix permissions for the .ssh directory: $($_.Exception.Message)" -ForegroundColor Red
-    Pause-BeforeExit
+    Wait-BeforeExit
     exit 1
 }
 
@@ -62,9 +62,9 @@ try {
     }
 } catch {
     Write-Host "Failed to fix permissions for files in the .ssh directory: $($_.Exception.Message)" -ForegroundColor Red
-    Pause-BeforeExit
+    Wait-BeforeExit
     exit 1
 }
 
 Write-Host "Permissions for $sshDir and its contents have been successfully fixed." -ForegroundColor Green
-Pause-BeforeExit
+Wait-BeforeExit
