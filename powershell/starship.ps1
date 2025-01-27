@@ -1,4 +1,4 @@
 
-if ( Test-CommandExists starship) {
+if (Test-CommandExists starship) {
     Invoke-Expression (&starship init powershell)
 }

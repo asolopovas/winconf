@@ -6,15 +6,16 @@ $mydocs = [Environment]::GetFolderPath("MyDocuments")
 $dir_1 = "$mydocs\WindowsPowerShell"
 $dir_2 = "$mydocs\PowerShell"
 $profile_src = "$winconf\powershell\Microsoft.PowerShell_profile.ps1"
-$src_1 = $dir_1
-$src_2 = $dir_2
 
-if (-not (Test-Path $src_1)) {
-    New-Item -ItemType Directory -Path $src_1
+$currentPath = [System.Environment]::GetEnvironmentVariable("PSModulePath", "User")
+[System.Environment]::SetEnvironmentVariable("PSModulePath", "$currentPath;$winconf\powershell\modules", "User")
+
+if (-not (Test-Path $dir_1)) {
+    New-Item -ItemType Directory -Path $dir_1
 }
 
-if (-not (Test-Path $src_2)) {
-    New-Item -ItemType Directory -Path $src_2
+if (-not (Test-Path $dir_2)) {
+    New-Item -ItemType Directory -Path $dir_2
 }
 
 CreateSymLink "$dir_1\Microsoft.Powershell_profile" $profile_src
