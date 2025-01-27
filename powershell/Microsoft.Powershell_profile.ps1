@@ -18,7 +18,6 @@ if (-not (Get-Module -Name $moduleName)) {
 
 . $power_shell_dir\starship.ps1
 
-
 # get powershell version and if its more than or equals to 7.4 execute the following
 $ps_major = $PSVersionTable.PSVersion.Major
 $ps_minor = $PSVersionTable.PSVersion.Minor
@@ -32,26 +31,4 @@ if ($ps_major -ge 7 -And $ps_minor -ge 4) {
 
 }
 
-
-# Import the Chocolatey Profile that contains the necessary code to enable
-# tab-completions to function for `choco`.
-# Be aware that if you are missing these lines from your profile, tab completion
-# for `choco` will not function.
-# See https://ch0.co/tab-completion for details.
-$ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
-if (Test-Path($ChocolateyProfile)) {
-  Import-Module "$ChocolateyProfile"
-}
-
 fnm env --use-on-cd | Out-String | Invoke-Expression
-
-if ($PSVersionTable.PSVersion -ge [Version]"7.4") {
-    Import-Module -Name Microsoft.WinGet.CommandNotFound
-} else {
-    Write-Host "Skipping module import: PowerShell version is too low."
-}
-
-#f45873b3-b655-43a6-b217-97c00aa0db58 PowerToys CommandNotFound module
-
-Import-Module -Name Microsoft.WinGet.CommandNotFound
-#f45873b3-b655-43a6-b217-97c00aa0db58
