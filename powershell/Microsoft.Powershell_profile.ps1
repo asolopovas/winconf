@@ -23,7 +23,6 @@ if (Test-Path $condaHook) {
     }
 }
 
-
 $moduleName = 'PSReadLine'
 if (-not (Get-Module -Name $moduleName -ListAvailable)) {
     Import-Module $moduleName -ErrorAction SilentlyContinue
