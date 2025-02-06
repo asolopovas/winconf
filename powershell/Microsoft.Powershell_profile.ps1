@@ -1,34 +1,56 @@
-$root = "$env:USERPROFILE\winconf"
-$power_shell_dir = "$root\powershell"
-$ENV:STARSHIP_CONFIG = "$power_shell_dir\starship.toml"
-
-. $env:USERPROFILE\miniconda3\shell\condabin\conda-hook.ps1
-conda activate $env:USERPROFILE\miniconda3
+$root = Join-Path $env:USERPROFILE 'winconf'
+$power_shell_dir = Join-Path $root 'powershell'
 
 . $root\functions.ps1
 . $power_shell_dir\completions\git-cli.ps1
 . $power_shell_dir\remove-aliases.ps1
 . $power_shell_dir\shortcuts.ps1
 
-$moduleName = "PSReadLine"
 
-if (-not (Get-Module -Name $moduleName)) {
-    Import-Module $moduleName
+$starshipConfigPath = Join-Path $power_shell_dir 'starship.toml'
+if (Test-Path $starshipConfigPath) {
+    $ENV:STARSHIP_CONFIG = $starshipConfigPath
 }
 
-. $power_shell_dir\starship.ps1
+$condaHook = Join-Path $env:USERPROFILE 'miniconda3\shell\condabin\conda-hook.ps1'
+if (Test-Path $condaHook) {
+    try {
+        . $condaHook
+        conda activate (Join-Path $env:USERPROFILE 'miniconda3')
+    }
+    catch {
+        Write-Verbose "Could not activate conda environment. Error: $($_.Exception.Message)"
+    }
+}
 
-# get powershell version and if its more than or equals to 7.4 execute the following
+
+$moduleName = 'PSReadLine'
+if (-not (Get-Module -Name $moduleName -ListAvailable)) {
+    Import-Module $moduleName -ErrorAction SilentlyContinue
+}
+
+$starshipPs1 = Join-Path $power_shell_dir 'starship.ps1'
+if (Test-Path $starshipPs1) {
+    . $starshipPs1
+}
+
 $ps_major = $PSVersionTable.PSVersion.Major
 $ps_minor = $PSVersionTable.PSVersion.Minor
 
-if ($ps_major -ge 7 -And $ps_minor -ge 4) {
-    $power_toys_module = "$env:LOCALAPPDATA\PowerToys\WinGetCommandNotFound.psd1"
-    # test if file exists import if it does
-    if (Test-Path $power_toys_module) {
-        Import-Module $power_toys_module
+if (($ps_major -gt 7) -or ($ps_major -eq 7 -and $ps_minor -ge 4)) {
+    $powerToysModulePath = Join-Path $env:LOCALAPPDATA 'PowerToys\WinGetCommandNotFound.psd1'
+    if (Test-Path $powerToysModulePath) {
+        try {
+            Import-Module $powerToysModulePath
+        }
+        catch {
+            Write-Verbose "Could not import PowerToys CommandNotFound module: $($_.Exception.Message)"
+        }
     }
-
+    else {
+        Write-Verbose "PowerToys CommandNotFound module not found at: $powerToysModulePath"
+    }
 }
-
-fnm env --use-on-cd | Out-String | Invoke-Expression
+if (Get-Command fnm -ErrorAction SilentlyContinue) {
+    fnm env --use-on-cd | Out-String | Invoke-Expression
+}
