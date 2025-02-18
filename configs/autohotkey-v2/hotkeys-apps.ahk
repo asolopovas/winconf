@@ -56,10 +56,11 @@ RunOrActivateTerminal(windowTitle, alwaysNewInstance := false) {
     }
 
 
+
 #m::
     {
         windowID := "ahk_exe Spotify.exe"
-        exePath := A_AppData . "\\Spotify\\Spotify.exe"
+        exePath := "C:\\Program Files\\AIMP\\AIMP.exe"
 
         if (!WinExist(windowID)) {
             RunAsUser(exePath)
@@ -73,6 +74,25 @@ RunOrActivateTerminal(windowTitle, alwaysNewInstance := false) {
         }
 
     }
+
+; #m::
+;     {
+;         windowID := "ahk_exe Spotify.exe"
+;         exePath := A_AppData . "\\Spotify\\Spotify.exe"
+
+;         if (!WinExist(windowID)) {
+;             RunAsUser(exePath)
+;             WinWait(windowID)
+;         } else {
+;             if (WinActive(windowID)) {
+;                 PostMessage(0x112, 0xF060, , , "ahk_id " . WinActive("A"))
+;             } else {
+;                 WinActivate
+;             }
+;         }
+
+;     }
+
 
 ; AutoHotkey v2 script to find the default web browser's executable path
 
