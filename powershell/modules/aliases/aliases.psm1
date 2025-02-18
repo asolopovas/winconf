@@ -41,16 +41,17 @@ function lsModules {
   (Get-Module -ListAvailable | Select-Object -ExpandProperty Name)
 }
 
-New-Alias -Name which   -Scope Global -Value Get-Command
-New-Alias -Name l       -Scope Global -Value Get-ChildItem
-New-Alias -Name grep    -Scope Global -Value Select-String
-New-Alias -Name dk      -Scope Global -Value docker.exe
-
 function CD1 { Set-Location .. }
 function CD2 { Set-Location ../.. }
 function CD3 { Set-Location ../../.. }
 function CD4 { Set-Location ../../../.. }
 function CD5 { Set-Location ../../../../.. }
+
+New-Alias -Name which   -Scope Global -Value Get-Command
+New-Alias -Name l       -Scope Global -Value Get-ChildItem
+New-Alias -Name grep    -Scope Global -Value Select-String
+New-Alias -Name dk      -Scope Global -Value docker.exe
+New-Alias -Name pbpaste -Scope Global -Value Get-Clipboard
 
 New-Alias -Name '..' -Value CD1
 New-Alias -Name '..2' -Value CD2

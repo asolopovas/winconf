@@ -31,6 +31,8 @@
         'cr',
         'dc',
         'nah',
+        'pbpaste',
+        'pbcopy',
         'lsChoco',
         'lsModules'
     )
