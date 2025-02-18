@@ -52,9 +52,9 @@ New-Alias -Name l       -Scope Global -Value Get-ChildItem
 New-Alias -Name grep    -Scope Global -Value Select-String
 New-Alias -Name dk      -Scope Global -Value docker.exe
 New-Alias -Name pbpaste -Scope Global -Value Get-Clipboard
-New-Alias -Name pp      -Scope Global -Value Get-Clipboard
+New-Alias -Name ppaste -Scope Global -Value Get-Clipboard
 New-Alias -Name pbcopy  -Scope Global -Value Set-Clipboard
-New-Alias -Name pcp     -Scope Global -Value Set-Clipboard
+New-Alias -Name pcopy  -Scope Global -Value Set-Clipboard
 
 New-Alias -Name '..' -Value CD1
 New-Alias -Name '..2' -Value CD2
