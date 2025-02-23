@@ -1,11 +1,9 @@
 {
     "$help": "https://aka.ms/terminal-documentation",
     "$schema": "https://aka.ms/terminal-profiles-schema",
-    "actions": 
-    [
+    "actions": [
         {
-            "command": 
-            {
+            "command": {
                 "action": "copy"
             },
             "id": "User.copy.644BA8F2",
@@ -21,16 +19,14 @@
             "keys": "shift+insert"
         },
         {
-            "command": 
-            {
+            "command": {
                 "action": "newTab"
             },
             "id": "User.newTab.5DEADB41",
             "keys": "ctrl+enter"
         },
         {
-            "command": 
-            {
+            "command": {
                 "action": "newTab"
             },
             "keys": "alt+t"
@@ -46,24 +42,21 @@
             "keys": "alt+q"
         },
         {
-            "command": 
-            {
+            "command": {
                 "action": "prevTab"
             },
             "id": "User.prevTab.0",
             "keys": "alt+j"
         },
         {
-            "command": 
-            {
+            "command": {
                 "action": "closeOtherTabs"
             },
             "id": "User.closeOtherTabs.0",
             "keys": "alt+shift+o"
         },
         {
-            "command": 
-            {
+            "command": {
                 "action": "nextTab"
             },
             "id": "User.nextTab.0",
@@ -75,8 +68,7 @@
     "centerOnLaunch": true,
     "copyOnSelect": true,
     "defaultProfile": "{05b9d966-86e5-4a1f-a9df-d87cef4d716e}",
-    "disabledProfileSources": 
-    [
+    "disabledProfileSources": [
         "Windows.Terminal.Azure",
         "Windows.Terminal.PowershellCore"
     ],
@@ -84,30 +76,24 @@
     "initialCols": 100,
     "initialRows": 25,
     "launchMode": "default",
-    "newTabMenu": 
-    [
+    "newTabMenu": [
         {
             "type": "remainingProfiles"
         }
     ],
-    "profiles": 
-    {
-        "defaults": 
-        {
+    "profiles": {
+        "defaults": {
             "colorScheme": "Legacy",
-            "font": 
-            {
+            "font": {
                 "face": "FiraMono Nerd Font Mono",
                 "size": 13
             },
             "startingDirectory": null
         },
-        "list": 
-        [
+        "list": [
             {
                 "commandline": "C:\\Program Files\\PowerShell\\7\\pwsh.exe -nologo",
-                "font": 
-                {
+                "font": {
                     "face": "FiraMono Nerd Font Mono",
                     "size": 14,
                     "weight": "normal"
@@ -123,8 +109,7 @@
             },
             {
                 "elevate": true,
-                "font": 
-                {
+                "font": {
                     "face": "FiraMono Nerd Font Mono",
                     "size": 14,
                     "weight": "normal"
@@ -135,8 +120,7 @@
                 "startingDirectory": "%USERPROFILE%"
             },
             {
-                "font": 
-                {
+                "font": {
                     "face": "FiraMono Nerd Font Mono"
                 },
                 "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
@@ -145,8 +129,7 @@
             },
             {
                 "commandline": "C:\\Program Files\\PowerShell\\7\\pwsh.exe -nologo",
-                "font": 
-                {
+                "font": {
                     "face": "FiraMono Nerd Font Mono",
                     "size": 14,
                     "weight": "normal"
@@ -196,11 +179,22 @@
                 "hidden": false,
                 "name": "Git Bash",
                 "source": "Git"
+            },
+            {
+                "commandline": "%WINDIR%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -ExecutionPolicy ByPass -NoExit -Command \"& 'C:\\Users\\asolo\\miniconda3\\shell\\condabin\\conda-hook.ps1' ; conda activate 'C:\\Users\\asolo\\miniconda3' \"",
+                "name": "Anaconda PowerShell Prompt (miniconda3)",
+                "icon": "C:\\Users\\asolo\\miniconda3\\Menu\\anaconda_powershell_prompt.ico",
+                "startingDirectory": "C:\\Users\\asolo"
+            },
+            {
+                "commandline": "%WINDIR%\\System32\\cmd.exe \"/K\" C:\\Users\\asolo\\miniconda3\\Scripts\\activate.bat C:\\Users\\asolo\\miniconda3",
+                "name": "Anaconda Prompt (miniconda3)",
+                "icon": "C:\\Users\\asolo\\miniconda3\\Menu\\anaconda_prompt.ico",
+                "startingDirectory": "C:\\Users\\asolo"
             }
         ]
     },
-    "schemes": 
-    [
+    "schemes": [
         {
             "background": "#14191F",
             "black": "#000000",

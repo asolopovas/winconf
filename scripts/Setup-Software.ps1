@@ -3,7 +3,6 @@ $wingetApps = @(
     "Klocman.BulkCrapUninstaller",
     "7zip.7zip",
     "Google.PlatformTools",
-    "OpenJS.NodeJS.LTS",
     "VideoLAN.VLC",
     "Microsoft.PowerToys",
     "Anaconda.Miniconda3",
@@ -18,15 +17,13 @@ $wingetApps = @(
     "mIRC.mIRC",
     "qBittorrent.qBittorrent",
     "ShareX.ShareX",
-    "youtube-dl.youtube-dl",
     "Calibre.calibre",
     "Starship.Starship",
     "MiKTeX.MiKTeX",
     "Rufus.Rufus",
     "Microsoft.Sysinternals.ProcessMonitor",
     "Microsoft.Sysinternals.ProcessExplorer",
-    "NirSoft.ShellExView",
-    "Spotify.Spotify"
+    "NirSoft.ShellExView"
 )
 
 
