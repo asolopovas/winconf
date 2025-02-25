@@ -1,6 +1,6 @@
 Start-Transcript -Path "$ENV:TEMP\winconf.log" -Append
 
-param(
+param (
     [switch]$Software
 )
 
@@ -44,7 +44,7 @@ function Test-CommandExists {
 }
 
 function SourceFile {
-    param($file)
+    param ($file)
     Write-Host "`nSourcing $file ..." -ForegroundColor DarkCyan
     if ($file -eq 'Setup-Autohotkey') {
         & "$SCRIPTS_DIR\$file.ps1" -version $AUTOHOTKEYVERSION
@@ -71,13 +71,12 @@ if (!(Test-CommandExists git)) {
         [System.Environment]::SetEnvironmentVariable("Path", $env:Path + ";$gitPath", [System.EnvironmentVariableTarget]::Machine)
         $env:PATH += ";$gitPath"
         Write-Host "Git added to PATH." -ForegroundColor Green
-
     } else {
         Write-Host "Git still not found. Please install Git manually." -ForegroundColor Red
         exit 1
     }
-
 }
+
 git config --global --add safe.directory "$DOTFILES"
 if (!(Test-Path -Path $DOTFILES)) {
     Write-Host "Cloning repository into $DOTFILES..." -ForegroundColor DarkGray
@@ -90,19 +89,6 @@ if (!(Test-Path -Path $DOTFILES)) {
     Write-Host "Fixing repository ownership for $USER..." -ForegroundColor Yellow
     takeown /F $DOTFILES /R /D Y
     icacls $DOTFILES /grant "${USER}:(OI)(CI)F" /T /C
-} else {
-    Write-Host "$DOTFILES already exists. Pulling the latest changes..." -ForegroundColor DarkGray
-    Set-Location -Path $DOTFILES
-    git pull
-}
-
-if (!(Test-Path -Path $DOTFILES)) {
-    Write-Host "Cloning repository into $DOTFILES..." -ForegroundColor DarkGray
-    git clone $REPO_URL $DOTFILES
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host "Failed to clone the repository. Exiting..." -ForegroundColor Red
-        exit 1
-    }
 } else {
     Write-Host "$DOTFILES already exists. Pulling the latest changes..." -ForegroundColor DarkGray
     Set-Location -Path $DOTFILES
