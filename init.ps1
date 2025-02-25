@@ -15,6 +15,7 @@ $ESSENTIAL_SOFTWARE = @(
     'Microsoft.PowerShell'
     'voidtools.Everything'
     'Starship.Starship'
+    "sharkdp.fd"
     "VideoLAN.VLC"
 )
 

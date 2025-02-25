@@ -12,7 +12,6 @@ $wingetApps = @(
     "qBittorrent.qBittorrent"
     "Rufus.Rufus"
     "ShareX.ShareX"
-    "sharkdp.fd"
     "StrawberryPerl.StrawberryPerl"
 )
 
