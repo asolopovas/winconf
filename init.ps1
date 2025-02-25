@@ -1,5 +1,9 @@
 Start-Transcript -Path "$ENV:TEMP\winconf.log" -Append
 
+param(
+    [switch]$Software
+)
+
 $DOTFILES = "$env:userprofile\winconf"
 $SCRIPTS_DIR = "$DOTFILES\scripts"
 $REPO_URL = 'https://github.com/asolopovas/winconf.git'
@@ -26,7 +30,7 @@ $SOURCE_FILES = @(
     'Setup-Autohotkey'
 )
 
-if ($args[0] -eq '--software') {
+if ($Software) {
     $SOURCE_FILES += 'Setup-Software'
 }
 
