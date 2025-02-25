@@ -1,0 +1,21 @@
+let colors =    {
+    "name": "Legacy",
+    "background": "#14191f",
+    "black": "#000000",
+    "blue": "#2258ff",
+    "brightBlack": "#555555",
+    "brightBlue": "#4565AD",
+    "brightCyan": "#8BE9FD",
+    "brightGreen": "#50FA7B",
+    "brightPurple": "#FF79C6",
+    "brightRed": "#FF5555",
+    "brightWhite": "#ffffff",
+    "brightYellow": "#FFF361",
+    "cyan": "#6272A4",
+    "foreground": "#F8F8F2",
+    "green": "#005CCB",
+    "purple": "#6272A4",
+    "red": "#FF5555",
+    "white": "#aec2e0",
+    "yellow": "#FFB86C"
+}
