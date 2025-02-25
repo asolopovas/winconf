@@ -57,7 +57,7 @@ RunOrActivateTerminal(windowTitle, alwaysNewInstance := false) {
 
 #m::
     {
-        windowID := "ahk_exe AIMP.exe"
+        windowID := "ahk_class TAIMPMainForm ahk_exe AIMP.exe"
         exePath := "C:\\Program Files\\AIMP\\AIMP.exe"
         RunOrActivate(windowID, exePath, "")
     }
