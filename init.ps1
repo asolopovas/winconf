@@ -1,8 +1,6 @@
-Start-Transcript -Path "$ENV:TEMP\winconf.log" -Append
+param([switch]$Software)
 
-param (
-    [switch]$Software
-)
+Start-Transcript -Path "$ENV:TEMP\winconf.log" -Append
 
 $DOTFILES = "$env:userprofile\winconf"
 $SCRIPTS_DIR = "$DOTFILES\scripts"
