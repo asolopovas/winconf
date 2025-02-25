@@ -6,12 +6,14 @@ $REPO_URL = 'https://github.com/asolopovas/winconf.git'
 $AUTOHOTKEYVERSION = 2
 $USER = $env:USERNAME
 $ESSENTIAL_SOFTWARE = @(
+    'AutoHotkey.AutoHotkey'
+    'Git.Git'
+    'junegunn.fzf'
+    "Microsoft.PowerToys"
     'Microsoft.PowerShell'
     'voidtools.Everything'
-    'junegunn.fzf'
-    'Git.Git'
     'Starship.Starship'
-    'AutoHotkey.AutoHotkey'
+    "VideoLAN.VLC"
 )
 
 $SOURCE_FILES = @(
@@ -23,6 +25,10 @@ $SOURCE_FILES = @(
     'Setup-Terminal'
     'Setup-Autohotkey'
 )
+
+if ($args[0] -eq '--software') {
+    $SOURCE_FILES += 'Setup-Software'
+}
 
 Write-Host "Setting execution policy to RemoteSigned..." -ForegroundColor Yellow
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process -Force
@@ -108,10 +114,6 @@ if (Test-Path $modulePath) {
 if (!(Test-Path -Path $SCRIPTS_DIR)) {
     Write-Host "Scripts directory not found. Cloning might have failed." -ForegroundColor Red
     exit 1
-}
-
-if ($args[0] -eq '--software') {
-    $SOURCE_FILES += 'Install-Software'
 }
 
 foreach ($file in $SOURCE_FILES) {
