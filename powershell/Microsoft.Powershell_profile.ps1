@@ -16,12 +16,11 @@ $condaHook = Join-Path $env:USERPROFILE 'miniconda3\shell\condabin\conda-hook.ps
 if (Test-Path $condaHook) {
     try {
         . $condaHook
-        conda activate (Join-Path $env:USERPROFILE 'miniconda3')
+        conda activate base 2>$null  # Redirect errors to null (silent failure)
     }
-    catch {
-        Write-Verbose "Could not activate conda environment. Error: $($_.Exception.Message)"
-    }
+    catch { }
 }
+
 
 $moduleName = 'PSReadLine'
 if (-not (Get-Module -Name $moduleName -ListAvailable)) {
