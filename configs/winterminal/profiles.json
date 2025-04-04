@@ -60,28 +60,24 @@
     "keybindings": 
     [
         {
-            "id": "User.copy.644BA8F2",
-            "keys": "ctrl+shift+c"
+            "id": "User.closePane",
+            "keys": "ctrl+w"
         },
         {
             "id": "User.paste",
             "keys": "shift+insert"
         },
         {
-            "id": "User.closePane",
-            "keys": "ctrl+w"
-        },
-        {
-            "id": null,
-            "keys": "ctrl+shift+w"
+            "id": "User.copy.644BA8F2",
+            "keys": "ctrl+shift+c"
         },
         {
             "id": "Terminal.OpenNewTab",
             "keys": "ctrl+enter"
         },
         {
-            "id": "User.closeWindow",
-            "keys": "alt+q"
+            "id": null,
+            "keys": "ctrl+shift+w"
         },
         {
             "id": "User.prevTab.0",
