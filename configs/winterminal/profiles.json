@@ -68,28 +68,116 @@
             "keys": "shift+insert"
         },
         {
+            "id": null,
+            "keys": "ctrl+alt+5"
+        },
+        {
             "id": "User.copy.644BA8F2",
             "keys": "ctrl+shift+c"
         },
         {
-            "id": "Terminal.OpenNewTab",
-            "keys": "ctrl+enter"
+            "id": null,
+            "keys": "win+sc(41)"
         },
         {
             "id": null,
             "keys": "ctrl+shift+w"
         },
         {
-            "id": "User.prevTab.0",
-            "keys": "alt+j"
+            "id": null,
+            "keys": "ctrl+alt+1"
         },
         {
-            "id": "User.closeOtherTabs.0",
-            "keys": "alt+shift+o"
+            "id": null,
+            "keys": "ctrl+alt+9"
         },
         {
-            "id": "User.nextTab.0",
-            "keys": "alt+k"
+            "id": null,
+            "keys": "ctrl+alt+2"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+alt+3"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+n"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+alt+7"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+alt+4"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+alt+6"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+alt+8"
+        },
+        {
+            "id": null,
+            "keys": "alt+enter"
+        },
+        {
+            "id": null,
+            "keys": "f11"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+p"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+m"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+1"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+5"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+2"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+3"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+t"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+4"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+6"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+7"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+8"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+9"
+        },
+        {
+            "id": null,
+            "keys": "alt+up"
         }
     ],
     "launchMode": "default",
