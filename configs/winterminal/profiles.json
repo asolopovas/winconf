@@ -1,66 +1,47 @@
 {
     "$help": "https://aka.ms/terminal-documentation",
     "$schema": "https://aka.ms/terminal-profiles-schema",
-    "actions": [
+    "actions": 
+    [
         {
-            "command": {
-                "action": "copy"
-            },
-            "id": "User.copy.644BA8F2",
-            "keys": "ctrl+shift+c"
+            "command": "closeWindow",
+            "id": "User.closeWindow"
         },
         {
-            "command": "unbound",
-            "keys": "ctrl+shift+w"
+            "command": 
+            {
+                "action": "copy"
+            },
+            "id": "User.copy.644BA8F2"
         },
         {
             "command": "paste",
-            "id": "User.paste",
-            "keys": "shift+insert"
-        },
-        {
-            "command": {
-                "action": "newTab"
-            },
-            "id": "User.newTab.5DEADB41",
-            "keys": "ctrl+enter"
-        },
-        {
-            "command": {
-                "action": "newTab"
-            },
-            "keys": "alt+t"
+            "id": "User.paste"
         },
         {
             "command": "closePane",
-            "id": "User.closePane",
-            "keys": "ctrl+w"
+            "id": "User.closePane"
         },
         {
-            "command": "closeWindow",
-            "id": "User.closeWindow",
-            "keys": "alt+q"
-        },
-        {
-            "command": {
-                "action": "prevTab"
-            },
-            "id": "User.prevTab.0",
-            "keys": "alt+j"
-        },
-        {
-            "command": {
+            "command": 
+            {
                 "action": "closeOtherTabs"
             },
-            "id": "User.closeOtherTabs.0",
-            "keys": "alt+shift+o"
+            "id": "User.closeOtherTabs.0"
         },
         {
-            "command": {
+            "command": 
+            {
+                "action": "prevTab"
+            },
+            "id": "User.prevTab.0"
+        },
+        {
+            "command": 
+            {
                 "action": "nextTab"
             },
-            "id": "User.nextTab.0",
-            "keys": "alt+k"
+            "id": "User.nextTab.0"
         }
     ],
     "alwaysOnTop": false,
@@ -68,32 +49,78 @@
     "centerOnLaunch": true,
     "copyOnSelect": true,
     "defaultProfile": "{05b9d966-86e5-4a1f-a9df-d87cef4d716e}",
-    "disabledProfileSources": [
+    "disabledProfileSources": 
+    [
         "Windows.Terminal.Azure",
         "Windows.Terminal.PowershellCore"
     ],
     "firstWindowPreference": "defaultProfile",
     "initialCols": 100,
     "initialRows": 25,
+    "keybindings": 
+    [
+        {
+            "id": "User.copy.644BA8F2",
+            "keys": "ctrl+shift+c"
+        },
+        {
+            "id": "User.paste",
+            "keys": "shift+insert"
+        },
+        {
+            "id": "User.closePane",
+            "keys": "ctrl+w"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+w"
+        },
+        {
+            "id": "Terminal.OpenNewTab",
+            "keys": "ctrl+enter"
+        },
+        {
+            "id": "User.closeWindow",
+            "keys": "alt+q"
+        },
+        {
+            "id": "User.prevTab.0",
+            "keys": "alt+j"
+        },
+        {
+            "id": "User.closeOtherTabs.0",
+            "keys": "alt+shift+o"
+        },
+        {
+            "id": "User.nextTab.0",
+            "keys": "alt+k"
+        }
+    ],
     "launchMode": "default",
-    "newTabMenu": [
+    "newTabMenu": 
+    [
         {
             "type": "remainingProfiles"
         }
     ],
-    "profiles": {
-        "defaults": {
+    "profiles": 
+    {
+        "defaults": 
+        {
             "colorScheme": "Legacy",
-            "font": {
+            "font": 
+            {
                 "face": "FiraMono Nerd Font Mono",
                 "size": 13
             },
             "startingDirectory": null
         },
-        "list": [
+        "list": 
+        [
             {
                 "commandline": "%LOCALAPPDATA%\\Microsoft\\WinGet\\Links\\pwsh.exe -nologo",
-                "font": {
+                "font": 
+                {
                     "face": "FiraMono Nerd Font Mono",
                     "size": 14,
                     "weight": "normal"
@@ -109,7 +136,8 @@
             },
             {
                 "elevate": true,
-                "font": {
+                "font": 
+                {
                     "face": "FiraMono Nerd Font Mono",
                     "size": 14,
                     "weight": "normal"
@@ -120,7 +148,8 @@
                 "startingDirectory": "%USERPROFILE%"
             },
             {
-                "font": {
+                "font": 
+                {
                     "face": "FiraMono Nerd Font Mono"
                 },
                 "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
@@ -129,7 +158,8 @@
             },
             {
                 "commandline": "%LOCALAPPDATA%\\Microsoft\\WinGet\\Links\\pwsh.exe -nologo",
-                "font": {
+                "font": 
+                {
                     "face": "FiraMono Nerd Font Mono",
                     "size": 14,
                     "weight": "normal"
@@ -155,10 +185,25 @@
                 "hidden": true,
                 "name": "Ubuntu",
                 "source": "Windows.Terminal.Wsl"
+            },
+            {
+                "commandline": "%WINDIR%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -ExecutionPolicy ByPass -NoExit -Command \"& 'C:\\Users\\asolo\\miniconda3\\shell\\condabin\\conda-hook.ps1' ; conda activate 'C:\\Users\\asolo\\miniconda3' \"",
+                "guid": "{baef6041-a2f3-5472-b295-a7d7fb0ed62f}",
+                "icon": "C:\\Users\\asolo\\miniconda3\\Menu\\anaconda_powershell_prompt.ico",
+                "name": "Anaconda PowerShell Prompt (miniconda3)",
+                "startingDirectory": "C:\\Users\\asolo"
+            },
+            {
+                "commandline": "%WINDIR%\\System32\\cmd.exe \"/K\" C:\\Users\\asolo\\miniconda3\\Scripts\\activate.bat C:\\Users\\asolo\\miniconda3",
+                "guid": "{35427e1d-45ad-517a-8692-8d5e4093f90f}",
+                "icon": "C:\\Users\\asolo\\miniconda3\\Menu\\anaconda_prompt.ico",
+                "name": "Anaconda Prompt (miniconda3)",
+                "startingDirectory": "C:\\Users\\asolo"
             }
         ]
     },
-    "schemes": [
+    "schemes": 
+    [
         {
             "background": "#14191F",
             "black": "#000000",
