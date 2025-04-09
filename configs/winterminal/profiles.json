@@ -1,25 +1,18 @@
 {
     "$help": "https://aka.ms/terminal-documentation",
     "$schema": "https://aka.ms/terminal-profiles-schema",
-    "actions": 
+    "actions":
     [
         {
             "command": "closeWindow",
             "id": "User.closeWindow"
         },
         {
-            "command": 
+            "command":
             {
                 "action": "copy"
             },
             "id": "User.copy.644BA8F2"
-        },
-        {
-            "command": 
-            {
-                "action": "newTab"
-            },
-            "id": "User.newTab.5DEADB41"
         },
         {
             "command": "paste",
@@ -30,21 +23,21 @@
             "id": "User.closePane"
         },
         {
-            "command": 
+            "command":
             {
                 "action": "closeOtherTabs"
             },
             "id": "User.closeOtherTabs.0"
         },
         {
-            "command": 
+            "command":
             {
                 "action": "prevTab"
             },
             "id": "User.prevTab.0"
         },
         {
-            "command": 
+            "command":
             {
                 "action": "nextTab"
             },
@@ -56,7 +49,7 @@
     "centerOnLaunch": true,
     "copyOnSelect": true,
     "defaultProfile": "{05b9d966-86e5-4a1f-a9df-d87cef4d716e}",
-    "disabledProfileSources": 
+    "disabledProfileSources":
     [
         "Windows.Terminal.Azure",
         "Windows.Terminal.PowershellCore"
@@ -64,7 +57,7 @@
     "firstWindowPreference": "defaultProfile",
     "initialCols": 100,
     "initialRows": 25,
-    "keybindings": 
+    "keybindings":
     [
         {
             "id": "User.closePane",
@@ -75,12 +68,16 @@
             "keys": "shift+insert"
         },
         {
+            "id": null,
+            "keys": "ctrl+alt+5"
+        },
+        {
             "id": "User.copy.644BA8F2",
             "keys": "ctrl+shift+c"
         },
         {
-            "id": "User.newTab.5DEADB41",
-            "keys": "ctrl+enter"
+            "id": null,
+            "keys": "win+sc(41)"
         },
         {
             "id": null,
@@ -88,41 +85,125 @@
         },
         {
             "id": null,
-            "keys": "alt+q"
+            "keys": "ctrl+alt+1"
         },
         {
             "id": null,
-            "keys": "alt+t"
+            "keys": "ctrl+alt+9"
         },
         {
-            "id": "User.closeOtherTabs.0",
-            "keys": "alt+shift+o"
+            "id": null,
+            "keys": "ctrl+alt+2"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+alt+3"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+n"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+alt+7"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+alt+4"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+alt+6"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+alt+8"
+        },
+        {
+            "id": null,
+            "keys": "alt+enter"
+        },
+        {
+            "id": null,
+            "keys": "f11"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+p"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+m"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+1"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+5"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+2"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+3"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+t"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+4"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+6"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+7"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+8"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+9"
+        },
+        {
+            "id": null,
+            "keys": "alt+up"
         }
     ],
     "launchMode": "default",
-    "newTabMenu": 
+    "newTabMenu":
     [
         {
             "type": "remainingProfiles"
         }
     ],
-    "profiles": 
+    "profiles":
     {
-        "defaults": 
+        "defaults":
         {
             "colorScheme": "Legacy",
-            "font": 
+            "font":
             {
                 "face": "FiraMono Nerd Font Mono",
                 "size": 13
             },
             "startingDirectory": null
         },
-        "list": 
+        "list":
         [
             {
                 "commandline": "%LOCALAPPDATA%\\Microsoft\\WinGet\\Links\\pwsh.exe -nologo",
-                "font": 
+                "font":
                 {
                     "face": "FiraMono Nerd Font Mono",
                     "size": 14,
@@ -139,7 +220,7 @@
             },
             {
                 "elevate": true,
-                "font": 
+                "font":
                 {
                     "face": "FiraMono Nerd Font Mono",
                     "size": 14,
@@ -151,7 +232,7 @@
                 "startingDirectory": "%USERPROFILE%"
             },
             {
-                "font": 
+                "font":
                 {
                     "face": "FiraMono Nerd Font Mono"
                 },
@@ -161,7 +242,7 @@
             },
             {
                 "commandline": "%LOCALAPPDATA%\\Microsoft\\WinGet\\Links\\pwsh.exe -nologo",
-                "font": 
+                "font":
                 {
                     "face": "FiraMono Nerd Font Mono",
                     "size": 14,
@@ -188,10 +269,24 @@
                 "hidden": true,
                 "name": "Ubuntu",
                 "source": "Windows.Terminal.Wsl"
+            },
+            {
+                "commandline": "%WINDIR%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -ExecutionPolicy ByPass -NoExit -Command \"& 'C:\\Users\\asolo\\miniconda3\\shell\\condabin\\conda-hook.ps1' ; conda activate 'C:\\Users\\asolo\\miniconda3' \"",
+                "guid": "{baef6041-a2f3-5472-b295-a7d7fb0ed62f}",
+                "icon": "C:\\Users\\asolo\\miniconda3\\Menu\\anaconda_powershell_prompt.ico",
+                "name": "Anaconda PowerShell Prompt (miniconda3)",
+                "startingDirectory": "C:\\Users\\asolo"
+            },
+            {
+                "commandline": "%WINDIR%\\System32\\cmd.exe \"/K\" C:\\Users\\asolo\\miniconda3\\Scripts\\activate.bat C:\\Users\\asolo\\miniconda3",
+                "guid": "{35427e1d-45ad-517a-8692-8d5e4093f90f}",
+                "icon": "C:\\Users\\asolo\\miniconda3\\Menu\\anaconda_prompt.ico",
+                "name": "Anaconda Prompt (miniconda3)",
+                "startingDirectory": "C:\\Users\\asolo"
             }
         ]
     },
-    "schemes": 
+    "schemes":
     [
         {
             "background": "#14191F",
