@@ -1,66 +1,54 @@
 {
     "$help": "https://aka.ms/terminal-documentation",
     "$schema": "https://aka.ms/terminal-profiles-schema",
-    "actions": [
+    "actions": 
+    [
         {
-            "command": {
-                "action": "copy"
-            },
-            "id": "User.copy.644BA8F2",
-            "keys": "ctrl+shift+c"
+            "command": "closeWindow",
+            "id": "User.closeWindow"
         },
         {
-            "command": "unbound",
-            "keys": "ctrl+shift+w"
+            "command": 
+            {
+                "action": "copy"
+            },
+            "id": "User.copy.644BA8F2"
+        },
+        {
+            "command": 
+            {
+                "action": "newTab"
+            },
+            "id": "User.newTab.5DEADB41"
         },
         {
             "command": "paste",
-            "id": "User.paste",
-            "keys": "shift+insert"
-        },
-        {
-            "command": {
-                "action": "newTab"
-            },
-            "id": "User.newTab.5DEADB41",
-            "keys": "ctrl+enter"
-        },
-        {
-            "command": {
-                "action": "newTab"
-            },
-            "keys": "alt+t"
+            "id": "User.paste"
         },
         {
             "command": "closePane",
-            "id": "User.closePane",
-            "keys": "ctrl+w"
+            "id": "User.closePane"
         },
         {
-            "command": "closeWindow",
-            "id": "User.closeWindow",
-            "keys": "alt+q"
-        },
-        {
-            "command": {
-                "action": "prevTab"
-            },
-            "id": "User.prevTab.0",
-            "keys": "alt+j"
-        },
-        {
-            "command": {
+            "command": 
+            {
                 "action": "closeOtherTabs"
             },
-            "id": "User.closeOtherTabs.0",
-            "keys": "alt+shift+o"
+            "id": "User.closeOtherTabs.0"
         },
         {
-            "command": {
+            "command": 
+            {
+                "action": "prevTab"
+            },
+            "id": "User.prevTab.0"
+        },
+        {
+            "command": 
+            {
                 "action": "nextTab"
             },
-            "id": "User.nextTab.0",
-            "keys": "alt+k"
+            "id": "User.nextTab.0"
         }
     ],
     "alwaysOnTop": false,
@@ -68,32 +56,74 @@
     "centerOnLaunch": true,
     "copyOnSelect": true,
     "defaultProfile": "{05b9d966-86e5-4a1f-a9df-d87cef4d716e}",
-    "disabledProfileSources": [
+    "disabledProfileSources": 
+    [
         "Windows.Terminal.Azure",
         "Windows.Terminal.PowershellCore"
     ],
     "firstWindowPreference": "defaultProfile",
     "initialCols": 100,
     "initialRows": 25,
+    "keybindings": 
+    [
+        {
+            "id": "User.closePane",
+            "keys": "ctrl+w"
+        },
+        {
+            "id": "User.paste",
+            "keys": "shift+insert"
+        },
+        {
+            "id": "User.copy.644BA8F2",
+            "keys": "ctrl+shift+c"
+        },
+        {
+            "id": "User.newTab.5DEADB41",
+            "keys": "ctrl+enter"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+w"
+        },
+        {
+            "id": null,
+            "keys": "alt+q"
+        },
+        {
+            "id": null,
+            "keys": "alt+t"
+        },
+        {
+            "id": "User.closeOtherTabs.0",
+            "keys": "alt+shift+o"
+        }
+    ],
     "launchMode": "default",
-    "newTabMenu": [
+    "newTabMenu": 
+    [
         {
             "type": "remainingProfiles"
         }
     ],
-    "profiles": {
-        "defaults": {
+    "profiles": 
+    {
+        "defaults": 
+        {
             "colorScheme": "Legacy",
-            "font": {
+            "font": 
+            {
                 "face": "FiraMono Nerd Font Mono",
                 "size": 13
             },
             "startingDirectory": null
         },
-        "list": [
+        "list": 
+        [
             {
                 "commandline": "%LOCALAPPDATA%\\Microsoft\\WinGet\\Links\\pwsh.exe -nologo",
-                "font": {
+                "font": 
+                {
                     "face": "FiraMono Nerd Font Mono",
                     "size": 14,
                     "weight": "normal"
@@ -109,7 +139,8 @@
             },
             {
                 "elevate": true,
-                "font": {
+                "font": 
+                {
                     "face": "FiraMono Nerd Font Mono",
                     "size": 14,
                     "weight": "normal"
@@ -120,7 +151,8 @@
                 "startingDirectory": "%USERPROFILE%"
             },
             {
-                "font": {
+                "font": 
+                {
                     "face": "FiraMono Nerd Font Mono"
                 },
                 "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
@@ -129,7 +161,8 @@
             },
             {
                 "commandline": "%LOCALAPPDATA%\\Microsoft\\WinGet\\Links\\pwsh.exe -nologo",
-                "font": {
+                "font": 
+                {
                     "face": "FiraMono Nerd Font Mono",
                     "size": 14,
                     "weight": "normal"
@@ -158,7 +191,8 @@
             }
         ]
     },
-    "schemes": [
+    "schemes": 
+    [
         {
             "background": "#14191F",
             "black": "#000000",
