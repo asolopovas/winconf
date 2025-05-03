@@ -37,8 +37,8 @@ LWin & ,::ShiftAltTab
     {
         defaultBrowserPath := GetDefaultBrowserPath()
         exeName := StrSplit(defaultBrowserPath, "\").Pop()
+        windowId := "ahk_exe " exeName
 
-        windowID := "ahk_class Chrome_WidgetWin_1 ahk_exe" . exeName
         RunOrActivate(windowId, defaultBrowserPath, "")
     }
 
