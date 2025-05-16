@@ -183,6 +183,7 @@ function Update-UserPath {
 . $PSScriptRoot\devtools-custom-devices.ps1
 . $PSScriptRoot\convertions.ps1
 . $PSScriptRoot\docker-compose.ps1
+. $PSScriptRoot\edit-hosts.ps1
 . $PSScriptRoot\files.ps1
 . $PSScriptRoot\firewall-blocker.ps1
 . $PSScriptRoot\rm-pattern.ps1

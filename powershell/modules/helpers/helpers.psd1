@@ -7,6 +7,7 @@
     Copyright         = '(c) Andrius Solopovas. All rights reserved.'
     Description       = 'A collection of powershell utilities to help with daily tasks.'
 
+    AliasesToExport   = @('ehosts')
     FunctionsToExport = @(
         # convertions.ps1
         'Convert-ExcelToCsv',
@@ -64,6 +65,7 @@
         'clearShellContextMenu',
         'conf',
         'devHostMappings',
+        'Edit-HostsWithVSCode',
         'gitRmPreviousCommits',
         'sshCopyID',
         'Show-EnvironmentPaths',
