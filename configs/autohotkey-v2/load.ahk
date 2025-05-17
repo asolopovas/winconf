@@ -2,6 +2,12 @@
 SetKeyDelay(0, 50)
 #Include "helpers/runasuser.ahk"
 
+; Special Keys: https://autohotkey.com/docs/Hotkeys.htm
+; ! = alt
+; + = shift
+; ^ = ctrl
+; # = win
+
 global targetWindows := Map() ; A map to store window handles
 Loop 9 {
     currentKey := A_Index
@@ -133,6 +139,7 @@ GetDefaultBrowserPath() {
 GetTargetKey(val) {
    Return SubStr(val, StrLen(val), 1)
 }
+
 RestartExplorer(delay:=-1) {
     If (A_OSVersion != "WIN_XP") {
         PID := WinGetPID("ahk_class Shell_TrayWnd")
@@ -181,5 +188,5 @@ RunOrActivateTerminal(windowTitle, alwaysNewInstance := false) {
 }
 
 
-
+#Include "./fast-scroll.ahk"
 #Include "../../hotkeys.ahk"

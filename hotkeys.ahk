@@ -108,6 +108,7 @@ LWin & ,::ShiftAltTab
     CycleWindowsWithinSameClass(+1)
 }
 
+
 ; #m::
 ;     {
 ;         windowID := "ahk_exe Spotify.exe"
