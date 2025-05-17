@@ -1,30 +1,23 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Force
 
-; Array of windows to ignore
-ignoredWindows := ["ahk_exe code.exe"]
+ignoredWindows := ["ahk_exe Code.exe"]
 
 ; Function to check if any of the specified windows is active
 IsIgnoredWindowActive() {
     for window in ignoredWindows {
-        if (WinActive(window))
+        if WinActive(window)
             return true
     }
     return false
 }
 
-$!WheelUp::
-{
-    if (!IsIgnoredWindowActive()) {
-        Send("{WheelUp 4}")
-    }
-    return
+; Function to check if the current window is NOT in the ignore list
+ShouldScrollHotkeyBeActive(*) {
+    return !IsIgnoredWindowActive()
 }
 
-$!WheelDown::
-{
-    if (!IsIgnoredWindowActive()) {
-        Send("{WheelDown 4}")
-    }
-    return
-}
+HotIf ShouldScrollHotkeyBeActive
+$!WheelUp::Send("{WheelUp 4}")
+$!WheelDown::Send("{WheelDown 4}")
+HotIf  ; Reset to default
