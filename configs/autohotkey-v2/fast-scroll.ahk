@@ -13,11 +13,6 @@ IsIgnoredWindowActive() {
     return false
 }
 
-; Special Keys: https://autohotkey.com/docs/Hotkeys.htm
-; ! = alt
-; + = shift
-; ^ = ctrl
-; # = win
 $!WheelUp::
 {
     if (!IsIgnoredWindowActive()) {
