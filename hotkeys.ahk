@@ -113,10 +113,8 @@ LWin & ,::ShiftAltTab
     exePath := "C:\\Program Files\\AIMP\\AIMP.exe"
     RunOrActivate(windowID, exePath, "")
 
-    ; Wait for the AIMP window to become active
     WinWaitActive(windowID, , 2)
 
-    ; Send Alt+Delete and then Enter
     Send("!{Del}")
     Send("{Enter}")
     Send("#m")
