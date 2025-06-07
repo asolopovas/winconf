@@ -1,5 +1,11 @@
 #Include "./hotkey-desktop-switcher.ahk"
 
+; Special Keys: https://autohotkey.com/docs/Hotkeys.htm
+; ! = alt
+; + = shift
+; ^ = ctrl
+; # = win
+
 #h::#Left
 #j::#Down
 #k::#Up
@@ -107,6 +113,7 @@ LWin & ,::ShiftAltTab
 {
     CycleWindowsWithinSameClass(+1)
 }
+
 
 
 ; #m::
