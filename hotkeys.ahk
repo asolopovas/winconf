@@ -48,6 +48,13 @@ LWin & ,::ShiftAltTab
     RunOrActivate(windowId, defaultBrowserPath, "")
 }
 
+#b::
+{
+    windowID := "ahk_class SWT_Window0 ahk_exe dbeaver.exe"
+    exePath := "C:\\Users\\asolo\\AppData\\Local\\DBeaver\dbeaver.exe"
+    RunOrActivate(windowID, exePath, "")
+}
+
 #m::
 {
     windowID := "ahk_class TAIMPMainForm ahk_exe AIMP.exe"
