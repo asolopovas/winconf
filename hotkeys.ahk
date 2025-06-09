@@ -145,3 +145,13 @@ LWin & ,::ShiftAltTab
 ;         }
 
 ;     }
+
+^+F11:: {
+    Send("{F2}")
+    Sleep(100)
+    Send("{Right}")
+    Sleep(50)
+    SendText("->toArray()")
+    Sleep(100)
+    Send("{Enter}")
+}
