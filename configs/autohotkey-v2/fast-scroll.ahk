@@ -18,6 +18,6 @@ ShouldScrollHotkeyBeActive(*) {
 }
 
 HotIf ShouldScrollHotkeyBeActive
-$!WheelUp::Send("{WheelUp 4}")
-$!WheelDown::Send("{WheelDown 4}")
+$!WheelUp::Send("{WheelUp 6}")
+$!WheelDown::Send("{WheelDown 6}")
 HotIf  ; Reset to default
