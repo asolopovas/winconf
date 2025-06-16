@@ -114,6 +114,37 @@ function Remove-CertByName {
     $store.Close()
 }
 
+function Register-Cert {
+    param(
+        [Parameter(Mandatory)][string]$Path,
+        [ValidateSet("LocalMachine", "CurrentUser")][string]$Scope = "LocalMachine",
+        [ValidateSet("Root", "My", "CA", "AuthRoot")][string]$StoreName = "Root"  # Trusted Root by default
+    )
+
+    if (-not (Test-Path $Path)) {
+        Write-Error "Certificate file not found at path: $Path"
+        return
+    }
+
+    try {
+        $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
+        $cert.Import($Path)
+
+        $store = New-Object System.Security.Cryptography.X509Certificates.X509Store($StoreName, $Scope)
+        $store.Open("ReadWrite")
+        $store.Add($cert)
+        Write-Host "Certificate imported successfully:"
+        Write-Host "  Subject    : $($cert.Subject)"
+        Write-Host "  Thumbprint : $($cert.Thumbprint)"
+        Write-Host "  Expires    : $($cert.NotAfter)"
+        $store.Close()
+    }
+    catch {
+        Write-Error "Failed to import certificate: $_"
+    }
+}
+
+
 function Test-Sha {
     param (
         [Parameter(Mandatory = $true)]

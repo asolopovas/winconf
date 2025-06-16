@@ -33,6 +33,7 @@
         'Get-RootName',
         'IIf',
         'Remove-CertByName',
+        'Register-Cert',
         'Test-Sha',
         'UpdateModuleManifest',
         "Update-UserPath",
