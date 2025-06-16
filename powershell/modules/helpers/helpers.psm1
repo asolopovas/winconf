@@ -81,6 +81,39 @@ function LinuxDriveMounter {
     }
 }
 
+function Remove-CertByName {
+    param(
+        [Parameter(Mandatory)][string]$Name,
+        [ValidateSet("LocalMachine", "CurrentUser")][string]$Scope = "LocalMachine"
+    )
+
+    $store = New-Object System.Security.Cryptography.X509Certificates.X509Store "Root", $Scope
+    $store.Open("ReadWrite")
+    $found = $store.Certificates | Where-Object { $_.Subject -match $Name -or $_.Issuer -match $Name }
+
+    if (-not $found) { Write-Host "No matching certs found."; $store.Close(); return }
+
+    $found | ForEach-Object -Begin { $i=1 } -Process {
+        Write-Host "[$i] $($_.Subject)`n    Thumbprint: $($_.Thumbprint)`n    Expires: $($_.NotAfter)`n"
+        $i++
+    }
+
+    $sel = Read-Host "Enter number to delete (Enter to cancel)"
+    if ($sel -as [int] -and $sel -gt 0 -and $sel -le $found.Count) {
+        $cert = $found[$sel - 1]
+        if ((Read-Host "Delete '$($cert.Subject)'? (Y/N)") -match '^y$') {
+            $store.Remove($cert)
+            Write-Host "Deleted."
+        } else {
+            Write-Host "Cancelled."
+        }
+    } else {
+        Write-Host "Cancelled or invalid selection."
+    }
+
+    $store.Close()
+}
+
 function Test-Sha {
     param (
         [Parameter(Mandatory = $true)]
@@ -145,8 +178,6 @@ function Test-Sha {
         "Hash doesn't match!"
     }
 }
-
-
 
 function Update-UserPath {
     param (

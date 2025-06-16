@@ -32,6 +32,7 @@
         # helpers.psm1
         'Get-RootName',
         'IIf',
+        'Remove-CertByName',
         'Test-Sha',
         'UpdateModuleManifest',
         "Update-UserPath",
