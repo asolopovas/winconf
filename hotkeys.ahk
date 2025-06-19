@@ -114,7 +114,7 @@ LWin & ,::ShiftAltTab
     CycleWindowsWithinSameClass(+1)
 }
 
-#+Del::
+F7::
 {
     windowID := "ahk_class TAIMPMainForm ahk_exe AIMP.exe"
     exePath := "C:\\Program Files\\AIMP\\AIMP.exe"
