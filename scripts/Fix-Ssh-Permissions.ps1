@@ -28,7 +28,7 @@ try {
     Write-Host "Ownership successfully updated for $sshDir." -ForegroundColor Green
 } catch {
     Write-Host "Failed to take ownership of the .ssh directory: $($_.Exception.Message)" -ForegroundColor Red
-    Pause-BeforeExit
+    Wait-BeforeExit
     exit 1
 }
 

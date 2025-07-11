@@ -34,7 +34,11 @@ if ($Software) {
 }
 
 Write-Host "Setting execution policy to RemoteSigned..." -ForegroundColor Yellow
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process -Force
+try {
+    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process -Force
+} catch {
+    Write-Host "Warning: Could not set execution policy. Continuing..." -ForegroundColor Yellow
+}
 
 function Test-CommandExists {
     Param ($command)

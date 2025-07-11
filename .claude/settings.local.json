@@ -25,7 +25,8 @@
       "mcp__git__git_commit",
       "mcp__git__git_show",
       "mcp__filesystem__list_directory",
-      "Bash(cmd.exe /c \"where pwsh\")"
+      "Bash(cmd.exe /c \"where pwsh\")",
+      "Bash(grep:*)"
     ],
     "deny": []
   }
