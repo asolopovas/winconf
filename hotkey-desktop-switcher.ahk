@@ -1,4 +1,4 @@
-#Include "./configs/autohotkey-v2/desktop-switcher/init.ahk"
+#Include "./autohotkey/desktop-switcher/init.ahk"
 
 #+1:: MoveCurrentWindowToDesktop(0)
 #+2:: MoveCurrentWindowToDesktop(1)

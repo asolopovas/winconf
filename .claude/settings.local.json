@@ -12,7 +12,9 @@
       "mcp__filesystem__list_allowed_directories",
       "Bash(mv:*)",
       "mcp__filesystem__create_directory",
-      "mcp__filesystem__move_file"
+      "mcp__filesystem__move_file",
+      "Bash(git clean:*)",
+      "mcp__filesystem__read_file"
     ],
     "deny": []
   }

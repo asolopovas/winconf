@@ -14,7 +14,7 @@ function UpdateOrCreateRegKey($path, $name, $value, $type = 'DWord') {
     }
 }
 
-$autohotkeyPath = if ($version -eq 1) { "$env:USERPROFILE\winconf\configs\autohotkey" } else { "$env:USERPROFILE\winconf\configs\autohotkey-v2" }
+$autohotkeyPath = if ($version -eq 1) { "$env:USERPROFILE\winconf\configs\autohotkey" } else { "$env:USERPROFILE\winconf\autohotkey" }
 $autohotkeyExec = if ($version -eq 1) { "C:\Program Files\AutoHotkey\AutoHotkey.exe" } else { "C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe" }
 
 $taskName = "Autohotkey-$env:UserName"

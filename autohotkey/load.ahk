@@ -189,4 +189,4 @@ RunOrActivateTerminal(windowTitle, alwaysNewInstance := false) {
 
 
 #Include "./fast-scroll.ahk"
-#Include "../../hotkeys.ahk"
+#Include "../hotkeys.ahk"

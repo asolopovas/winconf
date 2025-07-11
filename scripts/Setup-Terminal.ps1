@@ -15,4 +15,4 @@ $settingsFile = "$terminal_conf_dir\settings.json"
 Remove-Item $settingsFile -Force -ErrorAction SilentlyContinue
 
 SetPermissions $terminal_conf_dir
-CreateSymLink $settingsFile "$env:userprofile\winconf\configs\winterminal\profiles.json"
+CreateSymLink $settingsFile "$env:userprofile\winconf\terminal\profiles.json"

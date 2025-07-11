@@ -21,7 +21,7 @@ This is a Windows dotfiles repository that provides automated setup and configur
 
 ### AutoHotkey Scripts
 - `hotkeys.ahk` - Main AutoHotkey script for system hotkeys
-- `configs/autohotkey-v2/` - AutoHotkey v2 configurations and desktop switcher
+- `autohotkey/` - AutoHotkey v2 configurations and desktop switcher
 
 ### Setup Scripts
 All located in `scripts/` directory:
@@ -68,8 +68,8 @@ The repository uses a custom PowerShell module system:
 
 ### Configuration Management
 - Configurations are stored in `configs/` directory
-- Terminal settings in `configs/winterminal/`
-- AutoHotkey configurations in `configs/autohotkey-v2/`
+- Terminal settings in `terminal/`
+- AutoHotkey configurations in `autohotkey/`
 
 ### Installation Flow
 1. `init.ps1` installs essential software via winget
