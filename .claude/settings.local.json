@@ -5,7 +5,8 @@
       "Bash(powershell.exe:*)",
       "Bash(ls:*)",
       "mcp__sequential-thinking__sequentialthinking",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(find:*)"
     ],
     "deny": []
   }
