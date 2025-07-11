@@ -22,7 +22,9 @@
       "mcp__filesystem__write_file",
       "mcp__filesystem__edit_file",
       "mcp__git__git_add",
-      "mcp__git__git_commit"
+      "mcp__git__git_commit",
+      "mcp__git__git_show",
+      "mcp__filesystem__list_directory"
     ],
     "deny": []
   }
