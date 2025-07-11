@@ -14,7 +14,14 @@
       "mcp__filesystem__create_directory",
       "mcp__filesystem__move_file",
       "Bash(git clean:*)",
-      "mcp__filesystem__read_file"
+      "mcp__filesystem__read_file",
+      "mcp__git__git_log",
+      "mcp__git__git_set_working_dir",
+      "mcp__git__git_diff",
+      "mcp__git__git_status",
+      "mcp__filesystem__write_file",
+      "mcp__filesystem__edit_file",
+      "mcp__git__git_add"
     ],
     "deny": []
   }
