@@ -5,7 +5,6 @@ $psdir = Join-Path $root 'powershell'
 . $psdir\completions\git-cli.ps1
 . $psdir\remove-aliases.ps1
 . $psdir\shortcuts.ps1
-. $psdir\git-aliases.ps1
 
 $ENV:STARSHIP_CONFIG = Join-Path $psdir 'starship.toml'
 $condaHook = Join-Path $env:USERPROFILE 'miniconda3\shell\condabin\conda-hook.ps1'
