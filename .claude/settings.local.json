@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(starship:*)",
-      "Bash(powershell.exe:*)"
+      "Bash(powershell.exe:*)",
+      "Bash(ls:*)",
+      "mcp__sequential-thinking__sequentialthinking",
+      "Bash(rm:*)"
     ],
     "deny": []
   }
