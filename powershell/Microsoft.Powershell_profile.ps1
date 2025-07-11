@@ -3,10 +3,10 @@ $psdir = Join-Path $root 'powershell'
 
 . $root\functions.ps1
 . $psdir\completions\git-cli.ps1
-. $psdir\remove-aliases.ps1
-. $psdir\shortcuts.ps1
+. $psdir\modules\aliases\remove-aliases.ps1
+. $psdir\modules\helpers\shortcuts.ps1
 
-$ENV:STARSHIP_CONFIG = Join-Path $psdir 'starship.toml'
+$ENV:STARSHIP_CONFIG = Join-Path $psdir 'configs\starship.toml'
 $condaHook = Join-Path $env:USERPROFILE 'miniconda3\shell\condabin\conda-hook.ps1'
 if (Test-Path $condaHook) {
     try { . $condaHook; conda activate base 2>$null } catch { }
