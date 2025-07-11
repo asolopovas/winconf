@@ -1,15 +1,13 @@
 {
     "$help": "https://aka.ms/terminal-documentation",
     "$schema": "https://aka.ms/terminal-profiles-schema",
-    "actions":
-    [
+    "actions": [
         {
             "command": "closeWindow",
             "id": "User.closeWindow"
         },
         {
-            "command":
-            {
+            "command": {
                 "action": "copy"
             },
             "id": "User.copy.644BA8F2"
@@ -23,22 +21,19 @@
             "id": "User.closePane"
         },
         {
-            "command":
-            {
+            "command": {
                 "action": "closeOtherTabs"
             },
             "id": "User.closeOtherTabs.0"
         },
         {
-            "command":
-            {
+            "command": {
                 "action": "prevTab"
             },
             "id": "User.prevTab.0"
         },
         {
-            "command":
-            {
+            "command": {
                 "action": "nextTab"
             },
             "id": "User.nextTab.0"
@@ -49,16 +44,14 @@
     "centerOnLaunch": true,
     "copyOnSelect": true,
     "defaultProfile": "{05b9d966-86e5-4a1f-a9df-d87cef4d716e}",
-    "disabledProfileSources":
-    [
+    "disabledProfileSources": [
         "Windows.Terminal.Azure",
         "Windows.Terminal.PowershellCore"
     ],
     "firstWindowPreference": "defaultProfile",
     "initialCols": 100,
     "initialRows": 25,
-    "keybindings":
-    [
+    "keybindings": [
         {
             "id": "User.closePane",
             "keys": "ctrl+w"
@@ -181,34 +174,23 @@
         }
     ],
     "launchMode": "default",
-    "newTabMenu":
-    [
+    "newTabMenu": [
         {
             "type": "remainingProfiles"
         }
     ],
-    "profiles":
-    {
-        "defaults":
-        {
+    "profiles": {
+        "defaults": {
             "colorScheme": "Legacy",
-            "font":
-            {
+            "font": {
                 "face": "FiraMono Nerd Font Mono",
-                "size": 13
+                "size": 14
             },
             "startingDirectory": null
         },
-        "list":
-        [
+        "list": [
             {
                 "commandline": "%LOCALAPPDATA%\\Microsoft\\WinGet\\Links\\pwsh.exe -nologo",
-                "font":
-                {
-                    "face": "FiraMono Nerd Font Mono",
-                    "size": 14,
-                    "weight": "normal"
-                },
                 "guid": "{05b9d966-86e5-4a1f-a9df-d87cef4d716e}",
                 "hidden": false,
                 "icon": "ms-appx:///ProfileIcons/{61c54bbd-c2c6-5271-96e7-009a87ff44bf}.png",
@@ -220,42 +202,15 @@
             },
             {
                 "elevate": true,
-                "font":
-                {
-                    "face": "FiraMono Nerd Font Mono",
-                    "size": 14,
-                    "weight": "normal"
-                },
                 "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
                 "hidden": false,
                 "name": "Admin",
                 "startingDirectory": "%USERPROFILE%"
             },
             {
-                "font":
-                {
-                    "face": "FiraMono Nerd Font Mono"
-                },
                 "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
                 "hidden": false,
                 "name": "Command Prompt"
-            },
-            {
-                "commandline": "%LOCALAPPDATA%\\Microsoft\\WinGet\\Links\\pwsh.exe -nologo",
-                "font":
-                {
-                    "face": "FiraMono Nerd Font Mono",
-                    "size": 14,
-                    "weight": "normal"
-                },
-                "guid": "{17c1be6f-7263-44bc-8945-97d7535b77fe}",
-                "hidden": false,
-                "icon": "ms-appx:///ProfileIcons/{61c54bbd-c2c6-5271-96e7-009a87ff44bf}.png",
-                "name": "PS7Admin",
-                "opacity": 95,
-                "startingDirectory": "%USERPROFILE%",
-                "suppressApplicationTitle": true,
-                "useAcrylic": false
             },
             {
                 "guid": "{51855cb2-8cce-5362-8f54-464b92b32386}",
@@ -269,25 +224,10 @@
                 "hidden": true,
                 "name": "Ubuntu",
                 "source": "Windows.Terminal.Wsl"
-            },
-            {
-                "commandline": "%WINDIR%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -ExecutionPolicy ByPass -NoExit -Command \"& 'C:\\Users\\asolo\\miniconda3\\shell\\condabin\\conda-hook.ps1' ; conda activate 'C:\\Users\\asolo\\miniconda3' \"",
-                "guid": "{baef6041-a2f3-5472-b295-a7d7fb0ed62f}",
-                "icon": "C:\\Users\\asolo\\miniconda3\\Menu\\anaconda_powershell_prompt.ico",
-                "name": "Anaconda PowerShell Prompt (miniconda3)",
-                "startingDirectory": "C:\\Users\\asolo"
-            },
-            {
-                "commandline": "%WINDIR%\\System32\\cmd.exe \"/K\" C:\\Users\\asolo\\miniconda3\\Scripts\\activate.bat C:\\Users\\asolo\\miniconda3",
-                "guid": "{35427e1d-45ad-517a-8692-8d5e4093f90f}",
-                "icon": "C:\\Users\\asolo\\miniconda3\\Menu\\anaconda_prompt.ico",
-                "name": "Anaconda Prompt (miniconda3)",
-                "startingDirectory": "C:\\Users\\asolo"
             }
         ]
     },
-    "schemes":
-    [
+    "schemes": [
         {
             "background": "#14191F",
             "black": "#000000",
