@@ -1,3 +1,4 @@
+# Basic git operations
 function ga { git commit --amend }
 function gs { git status }
 function gb { git branch }
@@ -8,15 +9,19 @@ function gc {
 }
 function gg { git log }
 function gd { git diff }
-function gp { git push }
-function gpo { git push origin }
-function gundo { git reset --hard HEAD~1 }
-function gpf { git push --force }
-function gl { git pull }
 function gk { 
     param([string]$branch)
     git checkout $branch
 }
+function gt { git tag }
+
+# Remote operations
+function gp { git push }
+function gpo { git push origin }
+function gpf { git push --force }
+function gl { git pull }
+
+# Clone operations
 function gsclone { 
     param([string]$repo)
     git clone "git@github.com:asolopovas/$repo"
@@ -24,6 +29,13 @@ function gsclone {
 function ghclone { 
     param([string]$repo)
     git clone "https://github.com/asolopovas/$repo"
+}
+
+# Utilities
+function gundo { git reset --hard HEAD~1 }
+function nah { 
+    git reset --hard
+    git clean -fd
 }
 function bfg { 
     param([string[]]$args)
@@ -46,8 +58,15 @@ function bfg {
     
     java -jar $bfgPath @args
 }
-function nah { 
-    git reset --hard
-    git clean -fd
+
+# Custom git workflow
+function gw {
+    git add -A
+    $commitMessage = Read-Host "Enter commit message"
+    if (-not [string]::IsNullOrWhiteSpace($commitMessage)) {
+        git commit -m "$commitMessage"
+    }
+    else {
+        git commit -m "save"
+    }
 }
-function gt { git tag }
