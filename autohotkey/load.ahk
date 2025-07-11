@@ -9,7 +9,7 @@ SetKeyDelay(0, 50)
 ; # = win
 
 global targetWindows := Map() ; A map to store window handles
-Loop 9 {
+loop 9 {
     currentKey := A_Index
     Hotkey "<^>!F" . currentKey, BindWindow
     Hotkey '+F' . currentKey, ActivateWindow
@@ -30,12 +30,11 @@ BindWindow(hotKey) {
     targetKey := GetTargetKey(hotKey)
     winID := WinGetID("A")
     targetWindows[targetKey] := winID
-    ToolTip("Window: " . winID . " bound to hotkey: " . SubStr(hotKey, StrLen(hotKey)-1, 2))
+    ToolTip("Window: " . winID . " bound to hotkey: " . SubStr(hotKey, StrLen(hotKey) - 1, 2))
     Sleep(1000)
     ToolTip("")
 }
-CycleWindowsWithinSameClass(Direction)
-{
+CycleWindowsWithinSameClass(Direction) {
     a := WinExist("A")
     wClass := WinGetClass()
     exe := WinGetProcessName()
@@ -64,19 +63,18 @@ CycleWindowsWithinSameClass(Direction)
     }
 }
 
-CycleWindows(Direction)
-{
-	DetectHiddenWindows(false)
-    global windowObjects := WinGetList(,,"Program Manager")
-	activeWindow := WinExist("A")
-	exe := WinGetProcessName()
-	total := windowObjects.Length
+CycleWindows(Direction) {
+    DetectHiddenWindows(false)
+    global windowObjects := WinGetList(, , "Program Manager")
+    activeWindow := WinExist("A")
+    exe := WinGetProcessName()
+    total := windowObjects.Length
     current := 0
 
-	for win in windowObjects {
-		if (activeWindow = win)
+    for win in windowObjects {
+        if (activeWindow = win)
             current := A_Index
-	}
+    }
 
     target := current + Direction
 
@@ -101,7 +99,7 @@ CycleWindows(Direction)
     }
 
     if (WinExist(windowObjects[target])) {
-        targetWindow  := windowObjects[target]
+        targetWindow := windowObjects[target]
         WinActivate("ahk_id" targetWindow)
     }
 
@@ -110,7 +108,8 @@ CycleWindows(Direction)
 GetDefaultBrowserPath() {
     try {
         ; Check the registry key for the current user
-        browserRegPath := "HKEY_CURRENT_USER\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\https\UserChoice"
+        browserRegPath :=
+            "HKEY_CURRENT_USER\Software\Microsoft\Windows\Shell\Associations\UrlAssociations\https\UserChoice"
         browserProgId := RegRead(browserRegPath, "ProgId", "ChromeHTML")
 
         if !browserProgId {
@@ -137,15 +136,15 @@ GetDefaultBrowserPath() {
 }
 
 GetTargetKey(val) {
-   Return SubStr(val, StrLen(val), 1)
+    return SubStr(val, StrLen(val), 1)
 }
 
-RestartExplorer(delay:=-1) {
-    If (A_OSVersion != "WIN_XP") {
+RestartExplorer(delay := -1) {
+    if (A_OSVersion != "WIN_XP") {
         PID := WinGetPID("ahk_class Shell_TrayWnd")
         PostMessage(0x5B4, 0, 0, , "ahk_class Shell_TrayWnd")
         PostMessage(0x111, 518, 0, , "ahk_class Shell_TrayWnd")
-    } Else {
+    } else {
         PID := WinGetPID("ahk_class Progman")
         PostMessage(0x012, 0, 0, , "ahk_class Progman")
         PostMessage(0x012, 0, 1, , "ahk_class Progman")
@@ -153,14 +152,14 @@ RestartExplorer(delay:=-1) {
     }
     RunWait("taskkill /F /IM explorer.exe", , "Hide")
     Sleep(delay)
-    If ((A_OSVersion != "WIN_XP") && A_IsAdmin) {
+    if ((A_OSVersion != "WIN_XP") && A_IsAdmin) {
         hMod := DllCall("LoadLibrary", "Str", "wdc.dll", "Ptr")
         WdcRunAsIU := DllCall("GetProcAddress", "Ptr", hMod, "AStr", "WdcRunTaskAsInteractiveUser", "Ptr")
         DllCall(WdcRunAsIU, "WStr", "%windir%\explorer.exe", "Ptr", 0, "UInt", 9, "UInt")
         DllCall("FreeLibrary", "Ptr", hMod)
-    } Else {
+    } else {
         ErrorLevel := "ERROR"
-        Try ErrorLevel := Run(A_WinDir "\explorer.exe", A_WinDir "\system32", "", )
+        try ErrorLevel := Run(A_WinDir "\explorer.exe", A_WinDir "\system32", "",)
     }
 }
 
@@ -186,7 +185,6 @@ RunOrActivateTerminal(windowTitle, alwaysNewInstance := false) {
 
     RunOrActivate(windowID, terminalPath, args, alwaysNewInstance)
 }
-
 
 #Include "./fast-scroll.ahk"
 #Include "../hotkeys.ahk"
