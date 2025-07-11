@@ -27,6 +27,13 @@ if (-not (Get-Module -Name $moduleName -ListAvailable)) {
     Import-Module $moduleName -ErrorAction SilentlyContinue
 }
 
+if ($PSVersionTable.PSVersion.Major -ge 5) {
+    $Host.UI.RawUI.WindowTitle = "PowerShell"
+    try {
+        $null = [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+    } catch {}
+}
+
 $starshipPs1 = Join-Path $power_shell_dir 'starship.ps1'
 if (Test-Path $starshipPs1) {
     . $starshipPs1
