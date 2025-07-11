@@ -21,7 +21,8 @@
       "mcp__git__git_status",
       "mcp__filesystem__write_file",
       "mcp__filesystem__edit_file",
-      "mcp__git__git_add"
+      "mcp__git__git_add",
+      "mcp__git__git_commit"
     ],
     "deny": []
   }
