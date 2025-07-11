@@ -27,7 +27,24 @@ function ghclone {
 }
 function bfg { 
     param([string[]]$args)
-    java -jar "$env:USERPROFILE\.local\bin\bfg.jar" @args
+    $bfgPath = Join-Path $env:LOCALAPPDATA 'Programs\bfg\bfg.jar'
+    $bfgDir = Split-Path $bfgPath -Parent
+    
+    if (-not (Test-Path $bfgPath)) {
+        Write-Host "BFG not found. Downloading..." -ForegroundColor Yellow
+        if (-not (Test-Path $bfgDir)) {
+            New-Item -ItemType Directory -Path $bfgDir -Force | Out-Null
+        }
+        try {
+            Invoke-WebRequest -Uri "https://repo1.maven.org/maven2/com/madgag/bfg/1.15.0/bfg-1.15.0.jar" -OutFile $bfgPath
+            Write-Host "BFG downloaded successfully!" -ForegroundColor Green
+        } catch {
+            Write-Error "Failed to download BFG: $($_.Exception.Message)"
+            return
+        }
+    }
+    
+    java -jar $bfgPath @args
 }
 function nah { 
     git reset --hard
