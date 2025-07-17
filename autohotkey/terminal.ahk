@@ -58,7 +58,7 @@ LaunchTerminal(terminal := 'Ubuntu') {
         if FileExist(path) {
             existingWindows := WinGetList("ahk_exe wezterm-gui.exe")
             if (terminal == "Ubuntu") {
-                Run(path . " start -- wsl.exe -d Ubuntu --cd ~")
+                RunAsUser(path . " start -- wsl.exe -d Ubuntu --cd ~")
             }
 
             if (terminal == 'Powershell') {
