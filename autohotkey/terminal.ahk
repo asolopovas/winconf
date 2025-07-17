@@ -51,8 +51,36 @@ WinEventProc(hWinEventHook, event, hwnd, idObject, idChild, dwEventThread, dwmsE
     LaunchTerminal()
 }
 
+<^>!Enter::
+{
+    global primaryTerminalId
+    if (primaryTerminalId && WinExist("ahk_id " . primaryTerminalId)) {
+        if (WinActive("ahk_id " . primaryTerminalId)) {
+            WinMinimize(primaryTerminalId)
+            return
+        }
+        WinShow(primaryTerminalId)
+        WinRestore(primaryTerminalId)
+        WinActivate(primaryTerminalId)
+        return
+    }
+
+    if WinExist("ahk_exe wezterm-gui.exe") {
+        for hwnd in WinGetList("ahk_exe wezterm-gui.exe") {
+            if (hwnd != WinGetID("A")) {
+                WinShow(hwnd)
+                WinRestore(hwnd)
+                WinActivate(hwnd)
+                primaryTerminalId := hwnd
+                return
+            }
+        }
+    }
+    LaunchTerminal('PowerShell')
+}
+
 #+Enter:: LaunchTerminal('Ubuntu')
-<^>!Enter::LaunchTerminal('Powershell')
+<^>!+Enter::LaunchTerminal('Powershell')
 
 LaunchTerminal(terminal := 'Ubuntu') {
     global primaryTerminalId
@@ -71,7 +99,7 @@ LaunchTerminal(terminal := 'Ubuntu') {
             }
 
             if (terminal == 'Powershell') {
-                Run(path . " start -- powershell.exe")
+                RunAsUser(path, "start -- powershell.exe")
             }
 
             startTime := A_TickCount
