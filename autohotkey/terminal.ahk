@@ -2,38 +2,6 @@
 
 ubuntuTerminalId := 0
 powershellTerminalId := 0
-SetWinEventHook(0x0003)
-
-SetWinEventHook(
-    eventMin,
-    eventMax := 0,
-    hmodWinEventProc := 0,
-    idProcess := 0,
-    idThread := 0,
-    dwFlags := 0
-) {
-    static WINEVENT_OUTOFCONTEXT := 0x0000
-    return DllCall("SetWinEventHook", "UInt", eventMin, "UInt", eventMax, "Ptr", hmodWinEventProc, "Ptr",
-        CallbackCreate(WinEventProc), "UInt", idProcess, "UInt", idThread, "UInt", WINEVENT_OUTOFCONTEXT)
-}
-
-WinEventProc(hWinEventHook, event, hwnd, idObject, idChild, dwEventThread, dwmsEventTime) {
-    global ubuntuTerminalId, powershellTerminalId
-    if (hwnd && WinExist("ahk_id " . hwnd) && WinGetProcessName("ahk_id " . hwnd) = "wezterm-gui.exe") {
-        try {
-            title := WinGetTitle("ahk_id " . hwnd)
-            if (InStr(title, "~") || InStr(title, "Ubuntu")) {
-                if (!ubuntuTerminalId) {
-                    ubuntuTerminalId := hwnd
-                }
-            } else if (InStr(title, "powershell.exe") || InStr(title, "PowerShell")) {
-                if (!powershellTerminalId) {
-                    powershellTerminalId := hwnd
-                }
-            }
-        }
-    }
-}
 
 ToggleTerminal(terminalType) {
     global ubuntuTerminalId, powershellTerminalId
