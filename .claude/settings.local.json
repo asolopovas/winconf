@@ -1,0 +1,40 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(\"/mnt/c/Windows/System32/wmic.exe\" process where \"name=''AutoHotkey64.exe''\" get processid,commandline)",
+      "Bash(bash:*)",
+      "Bash(chmod:*)",
+      "Bash(cmd.exe:*)",
+      "Bash(cp:*)",
+      "Bash(dos2unix:*)",
+      "Bash(fd:*)",
+      "Bash(ls:*)",
+      "Bash(mkdir:*)",
+      "Bash(mv:*)",
+      "Bash(powershell.exe:*)",
+      "Bash(rg:*)",
+      "Bash(rm:*)",
+      "Bash(sed:*)",
+      "Bash(taskkill:*)",
+      "Bash(tasklist:*)",
+      "Bash(timeout:*)",
+      "mcp__brave-search__brave_web_search",
+      "mcp__git__git_add",
+      "mcp__git__git_checkout",
+      "mcp__git__git_commit",
+      "mcp__git__git_diff",
+      "mcp__git__git_log",
+      "mcp__git__git_push",
+      "mcp__git__git_reset",
+      "mcp__git__git_set_working_dir",
+      "mcp__git__git_show",
+      "mcp__git__git_status",
+      "mcp__sequential-thinking__sequentialthinking",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_tab_select",
+      "Bash(cat:*)"
+    ],
+    "deny": []
+  }
+}
