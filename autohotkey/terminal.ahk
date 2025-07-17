@@ -22,11 +22,11 @@ WinEventProc(hWinEventHook, event, hwnd, idObject, idChild, dwEventThread, dwmsE
     if (hwnd && WinExist("ahk_id " . hwnd) && WinGetProcessName("ahk_id " . hwnd) = "wezterm-gui.exe") {
         try {
             title := WinGetTitle("ahk_id " . hwnd)
-            if (InStr(title, "wsl") || InStr(title, "Ubuntu") || InStr(title, "bash")) {
+            if (InStr(title, "~") || InStr(title, "Ubuntu")) {
                 if (!ubuntuTerminalId) {
                     ubuntuTerminalId := hwnd
                 }
-            } else if (InStr(title, "powershell") || InStr(title, "PowerShell")) {
+            } else if (InStr(title, "powershell.exe") || InStr(title, "PowerShell")) {
                 if (!powershellTerminalId) {
                     powershellTerminalId := hwnd
                 }
@@ -37,9 +37,9 @@ WinEventProc(hWinEventHook, event, hwnd, idObject, idChild, dwEventThread, dwmsE
 
 ToggleTerminal(terminalType) {
     global ubuntuTerminalId, powershellTerminalId
-    
+
     terminalId := (terminalType == "Ubuntu") ? ubuntuTerminalId : powershellTerminalId
-    
+
     if (terminalId && WinExist("ahk_id " . terminalId)) {
         if (WinActive("ahk_id " . terminalId)) {
             WinMinimize(terminalId)
@@ -67,7 +67,7 @@ ToggleTerminal(terminalType) {
             }
         }
     }
-    
+
     LaunchTerminal(terminalType == "Ubuntu" ? "Ubuntu" : "Powershell")
 }
 
