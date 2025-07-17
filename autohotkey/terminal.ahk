@@ -43,7 +43,7 @@ ToggleTerminal(terminalType) {
 <^>!Enter:: ToggleTerminal("Powershell")
 
 #+Enter:: LaunchTerminal('Ubuntu')
-<^>!+Enter::LaunchTerminal('Powershell')
+<^>!+Enter:: LaunchTerminal('Powershell')
 
 LaunchTerminal(terminal := 'Ubuntu') {
     global ubuntuTerminalId, powershellTerminalId
@@ -58,7 +58,7 @@ LaunchTerminal(terminal := 'Ubuntu') {
         if FileExist(path) {
             existingWindows := WinGetList("ahk_exe wezterm-gui.exe")
             if (terminal == "Ubuntu") {
-                RunAsUser(path . " start -- wsl.exe -d Ubuntu --cd ~")
+                RunAsUser(path, " start -- wsl.exe -d Ubuntu --cd ~")
             }
 
             if (terminal == 'Powershell') {
