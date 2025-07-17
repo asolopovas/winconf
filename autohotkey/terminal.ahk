@@ -35,21 +35,23 @@ WinEventProc(hWinEventHook, event, hwnd, idObject, idChild, dwEventThread, dwmsE
     }
 }
 
-#Enter::
-{
-    global ubuntuTerminalId
-    if (ubuntuTerminalId && WinExist("ahk_id " . ubuntuTerminalId)) {
-        if (WinActive("ahk_id " . ubuntuTerminalId)) {
-            WinMinimize(ubuntuTerminalId)
+ToggleTerminal(terminalType) {
+    global ubuntuTerminalId, powershellTerminalId
+    
+    terminalId := (terminalType == "Ubuntu") ? ubuntuTerminalId : powershellTerminalId
+    
+    if (terminalId && WinExist("ahk_id " . terminalId)) {
+        if (WinActive("ahk_id " . terminalId)) {
+            WinMinimize(terminalId)
             return
         }
-        WinShow(ubuntuTerminalId)
-        WinRestore(ubuntuTerminalId)
-        WinActivate(ubuntuTerminalId)
+        WinShow(terminalId)
+        WinRestore(terminalId)
+        WinActivate(terminalId)
         return
     }
 
-    if WinExist("ahk_exe wezterm-gui.exe") {
+    if (terminalType == "Ubuntu" && WinExist("ahk_exe wezterm-gui.exe")) {
         for hwnd in WinGetList("ahk_exe wezterm-gui.exe") {
             if (hwnd != WinGetID("A")) {
                 try {
@@ -65,25 +67,12 @@ WinEventProc(hWinEventHook, event, hwnd, idObject, idChild, dwEventThread, dwmsE
             }
         }
     }
-    LaunchTerminal()
+    
+    LaunchTerminal(terminalType == "Ubuntu" ? "Ubuntu" : "Powershell")
 }
 
-<^>!Enter::
-{
-    global powershellTerminalId
-    if (powershellTerminalId && WinExist("ahk_id " . powershellTerminalId)) {
-        if (WinActive("ahk_id " . powershellTerminalId)) {
-            WinMinimize(powershellTerminalId)
-            return
-        }
-        WinShow(powershellTerminalId)
-        WinRestore(powershellTerminalId)
-        WinActivate(powershellTerminalId)
-        return
-    }
-
-    LaunchTerminal('Powershell')
-}
+#Enter:: ToggleTerminal("Ubuntu")
+<^>!Enter:: ToggleTerminal("Powershell")
 
 #+Enter:: LaunchTerminal('Ubuntu')
 <^>!+Enter::LaunchTerminal('Powershell')
