@@ -51,9 +51,10 @@ WinEventProc(hWinEventHook, event, hwnd, idObject, idChild, dwEventThread, dwmsE
     LaunchTerminal()
 }
 
-#+Enter:: LaunchTerminal()
+#+Enter:: LaunchTerminal('Ubuntu')
+<^>!Enter::LaunchTerminal('Powershell')
 
-LaunchTerminal() {
+LaunchTerminal(terminal := 'Ubuntu') {
     global primaryTerminalId
     userDir := "C:\Users\" . EnvGet("username")
     paths := [
@@ -65,7 +66,13 @@ LaunchTerminal() {
     for path in paths {
         if FileExist(path) {
             existingWindows := WinGetList("ahk_exe wezterm-gui.exe")
-            Run(path . " start -- wsl.exe -d Ubuntu --cd ~")
+            if (terminal == "Ubuntu") {
+                Run(path . " start -- wsl.exe -d Ubuntu --cd ~")
+            }
+
+            if (terminal == 'Powershell') {
+                Run(path . " start -- powershell.exe")
+            }
 
             startTime := A_TickCount
             while (A_TickCount - startTime < 3000) {
