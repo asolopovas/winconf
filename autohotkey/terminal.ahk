@@ -3,7 +3,14 @@
 primaryTerminalId := 0
 SetWinEventHook(0x0003)
 
-SetWinEventHook(eventMin, eventMax := 0, hmodWinEventProc := 0, idProcess := 0, idThread := 0, dwFlags := 0) {
+SetWinEventHook(
+    eventMin,
+    eventMax := 0,
+    hmodWinEventProc := 0,
+    idProcess := 0,
+    idThread := 0,
+    dwFlags := 0
+) {
     static WINEVENT_OUTOFCONTEXT := 0x0000
     return DllCall("SetWinEventHook", "UInt", eventMin, "UInt", eventMax, "Ptr", hmodWinEventProc, "Ptr",
         CallbackCreate(WinEventProc), "UInt", idProcess, "UInt", idThread, "UInt", WINEVENT_OUTOFCONTEXT)
