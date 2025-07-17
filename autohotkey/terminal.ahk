@@ -1,6 +1,7 @@
 #Requires AutoHotkey v2.0
 
-primaryTerminalId := 0
+ubuntuTerminalId := 0
+powershellTerminalId := 0
 SetWinEventHook(0x0003)
 
 SetWinEventHook(
@@ -17,34 +18,50 @@ SetWinEventHook(
 }
 
 WinEventProc(hWinEventHook, event, hwnd, idObject, idChild, dwEventThread, dwmsEventTime) {
-    global primaryTerminalId
+    global ubuntuTerminalId, powershellTerminalId
     if (hwnd && WinExist("ahk_id " . hwnd) && WinGetProcessName("ahk_id " . hwnd) = "wezterm-gui.exe") {
-        primaryTerminalId := hwnd
+        try {
+            title := WinGetTitle("ahk_id " . hwnd)
+            if (InStr(title, "wsl") || InStr(title, "Ubuntu") || InStr(title, "bash")) {
+                if (!ubuntuTerminalId) {
+                    ubuntuTerminalId := hwnd
+                }
+            } else if (InStr(title, "powershell") || InStr(title, "PowerShell")) {
+                if (!powershellTerminalId) {
+                    powershellTerminalId := hwnd
+                }
+            }
+        }
     }
 }
 
 #Enter::
 {
-    global primaryTerminalId
-    if (primaryTerminalId && WinExist("ahk_id " . primaryTerminalId)) {
-        if (WinActive("ahk_id " . primaryTerminalId)) {
-            WinMinimize(primaryTerminalId)
+    global ubuntuTerminalId
+    if (ubuntuTerminalId && WinExist("ahk_id " . ubuntuTerminalId)) {
+        if (WinActive("ahk_id " . ubuntuTerminalId)) {
+            WinMinimize(ubuntuTerminalId)
             return
         }
-        WinShow(primaryTerminalId)
-        WinRestore(primaryTerminalId)
-        WinActivate(primaryTerminalId)
+        WinShow(ubuntuTerminalId)
+        WinRestore(ubuntuTerminalId)
+        WinActivate(ubuntuTerminalId)
         return
     }
 
     if WinExist("ahk_exe wezterm-gui.exe") {
         for hwnd in WinGetList("ahk_exe wezterm-gui.exe") {
             if (hwnd != WinGetID("A")) {
-                WinShow(hwnd)
-                WinRestore(hwnd)
-                WinActivate(hwnd)
-                primaryTerminalId := hwnd
-                return
+                try {
+                    title := WinGetTitle("ahk_id " . hwnd)
+                    if (InStr(title, "wsl") || InStr(title, "Ubuntu") || InStr(title, "bash")) {
+                        WinShow(hwnd)
+                        WinRestore(hwnd)
+                        WinActivate(hwnd)
+                        ubuntuTerminalId := hwnd
+                        return
+                    }
+                }
             }
         }
     }
@@ -53,37 +70,26 @@ WinEventProc(hWinEventHook, event, hwnd, idObject, idChild, dwEventThread, dwmsE
 
 <^>!Enter::
 {
-    global primaryTerminalId
-    if (primaryTerminalId && WinExist("ahk_id " . primaryTerminalId)) {
-        if (WinActive("ahk_id " . primaryTerminalId)) {
-            WinMinimize(primaryTerminalId)
+    global powershellTerminalId
+    if (powershellTerminalId && WinExist("ahk_id " . powershellTerminalId)) {
+        if (WinActive("ahk_id " . powershellTerminalId)) {
+            WinMinimize(powershellTerminalId)
             return
         }
-        WinShow(primaryTerminalId)
-        WinRestore(primaryTerminalId)
-        WinActivate(primaryTerminalId)
+        WinShow(powershellTerminalId)
+        WinRestore(powershellTerminalId)
+        WinActivate(powershellTerminalId)
         return
     }
 
-    if WinExist("ahk_exe wezterm-gui.exe") {
-        for hwnd in WinGetList("ahk_exe wezterm-gui.exe") {
-            if (hwnd != WinGetID("A")) {
-                WinShow(hwnd)
-                WinRestore(hwnd)
-                WinActivate(hwnd)
-                primaryTerminalId := hwnd
-                return
-            }
-        }
-    }
-    LaunchTerminal('PowerShell')
+    LaunchTerminal('Powershell')
 }
 
 #+Enter:: LaunchTerminal('Ubuntu')
 <^>!+Enter::LaunchTerminal('Powershell')
 
 LaunchTerminal(terminal := 'Ubuntu') {
-    global primaryTerminalId
+    global ubuntuTerminalId, powershellTerminalId
     userDir := "C:\Users\" . EnvGet("username")
     paths := [
         "C:\Program Files\WezTerm\wezterm-gui.exe",
@@ -108,7 +114,11 @@ LaunchTerminal(terminal := 'Ubuntu') {
                 if (currentWindows.Length > existingWindows.Length) {
                     for hwnd in currentWindows {
                         if !existingWindows.Has(hwnd) {
-                            primaryTerminalId := hwnd
+                            if (terminal == "Ubuntu") {
+                                ubuntuTerminalId := hwnd
+                            } else if (terminal == 'Powershell') {
+                                powershellTerminalId := hwnd
+                            }
                             WinActivate(hwnd)
                             return
                         }
