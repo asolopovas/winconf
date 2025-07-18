@@ -4,6 +4,39 @@ global ENABLE_DEBUG := false
 global DEBUG_LOG_FILE := "C:\Users\" . A_UserName . "\winconf\logs\terminal_debug.md"
 global ENABLE_KEY_LOGGING := false
 
+; F1::
+; {
+;     global ENABLE_DEBUG, ENABLE_KEY_LOGGING, DEBUG_LOG_FILE
+;     ENABLE_DEBUG := !ENABLE_DEBUG
+
+;     if (ENABLE_DEBUG) {
+;         logDir := StrReplace(DEBUG_LOG_FILE, "terminal_debug.md", "")
+;         try {
+;             DirCreate(logDir)
+;         }
+
+;         result := MsgBox("Clear existing debug logs before starting new session?", "Debug Mode", "YesNo Icon?")
+;         if (result = "Yes") {
+;             ClearDebugLogs()
+;         }
+
+;         ENABLE_KEY_LOGGING := True
+
+;         try {
+;             WriteTableHeader()
+
+;             MsgBox("Debug Mode: ENABLED`n`nKey Logging: " . (ENABLE_KEY_LOGGING ? "ON" : "OFF") . "`n`nDebug log: " .
+;             DEBUG_LOG_FILE . "`n`nF1: Toggle Debug`n`nCtrl+Win+Alt+R: Restart Script", "Debug Mode", "Icon! T5")
+;         } catch as err {
+;             MsgBox("Failed to create debug log: " . err.Message . "`nPath: " . DEBUG_LOG_FILE, "Debug Error", "Icon!")
+;         }
+;     } else {
+;         ENABLE_KEY_LOGGING := false
+;         MsgBox("Debug Mode: DISABLED`n`nLogs preserved. Use F1 again to clear on next enable.", "Debug Mode",
+;             "Icon! T2")
+;     }
+; }
+
 if (ENABLE_DEBUG) {
     try {
         FileAppend("# Terminal Debug Log`n`n**Started:** " . A_Now . "`n", DEBUG_LOG_FILE)
@@ -168,37 +201,4 @@ KeyLogger(ThisHotkey) {
         currentProcessName := WinGetProcessName("A")
     }
     DebugLog("KEY", ThisHotkey, currentWin, currentProcessName)
-}
-
-F1::
-{
-    global ENABLE_DEBUG, ENABLE_KEY_LOGGING, DEBUG_LOG_FILE
-    ENABLE_DEBUG := !ENABLE_DEBUG
-
-    if (ENABLE_DEBUG) {
-        logDir := StrReplace(DEBUG_LOG_FILE, "terminal_debug.md", "")
-        try {
-            DirCreate(logDir)
-        }
-
-        result := MsgBox("Clear existing debug logs before starting new session?", "Debug Mode", "YesNo Icon?")
-        if (result = "Yes") {
-            ClearDebugLogs()
-        }
-
-        ENABLE_KEY_LOGGING := True
-
-        try {
-            WriteTableHeader()
-
-            MsgBox("Debug Mode: ENABLED`n`nKey Logging: " . (ENABLE_KEY_LOGGING ? "ON" : "OFF") . "`n`nDebug log: " .
-            DEBUG_LOG_FILE . "`n`nF1: Toggle Debug`n`nCtrl+Win+Alt+R: Restart Script", "Debug Mode", "Icon! T5")
-        } catch as err {
-            MsgBox("Failed to create debug log: " . err.Message . "`nPath: " . DEBUG_LOG_FILE, "Debug Error", "Icon!")
-        }
-    } else {
-        ENABLE_KEY_LOGGING := false
-        MsgBox("Debug Mode: DISABLED`n`nLogs preserved. Use F1 again to clear on next enable.", "Debug Mode",
-            "Icon! T2")
-    }
 }
