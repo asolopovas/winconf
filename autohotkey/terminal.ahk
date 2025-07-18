@@ -3,6 +3,8 @@
 
 currentToggleId := 0
 previousToggleId := 0
+currentPowershellId := 0
+previousPowershellId := 0
 
 #Enter:: ToggleTerminal("Ubuntu")
 <^>!Enter:: ToggleTerminal("Powershell")
@@ -13,60 +15,91 @@ previousToggleId := 0
 SetTimer(UpdateTerminalTracking, 500)
 
 UpdateTerminalTracking() {
-    global currentToggleId, previousToggleId
+    global currentToggleId, previousToggleId, currentPowershellId, previousPowershellId
 
     if (currentToggleId && !WinExist("ahk_id " . currentToggleId)) {
-        DebugLog("TRACK", "Current terminal closed", currentToggleId, "-")
+        DebugLog("TRACK", "Current Ubuntu terminal closed", currentToggleId, "-")
         currentToggleId := previousToggleId
         previousToggleId := 0
 
         if (currentToggleId) {
-            DebugLog("TRACK", "Switched to previous terminal", currentToggleId, "-")
+            DebugLog("TRACK", "Switched to previous Ubuntu terminal", currentToggleId, "-")
         }
     }
 
     if (previousToggleId && !WinExist("ahk_id " . previousToggleId)) {
-        DebugLog("TRACK", "Previous terminal closed", previousToggleId, "-")
+        DebugLog("TRACK", "Previous Ubuntu terminal closed", previousToggleId, "-")
         previousToggleId := 0
+    }
+
+    if (currentPowershellId && !WinExist("ahk_id " . currentPowershellId)) {
+        DebugLog("TRACK", "Current PowerShell terminal closed", currentPowershellId, "-")
+        currentPowershellId := previousPowershellId
+        previousPowershellId := 0
+
+        if (currentPowershellId) {
+            DebugLog("TRACK", "Switched to previous PowerShell terminal", currentPowershellId, "-")
+        }
+    }
+
+    if (previousPowershellId && !WinExist("ahk_id " . previousPowershellId)) {
+        DebugLog("TRACK", "Previous PowerShell terminal closed", previousPowershellId, "-")
+        previousPowershellId := 0
     }
 }
 
 ToggleTerminal(terminalType := "Ubuntu") {
-    global currentToggleId, previousToggleId
+    global currentToggleId, previousToggleId, currentPowershellId, previousPowershellId
 
-    DebugLog("TOGGLE", "Current: " . currentToggleId . " Previous: " . previousToggleId, "-", "-")
+    if (terminalType == "Powershell") {
+        DebugLog("TOGGLE", "PowerShell - Current: " . currentPowershellId . " Previous: " . previousPowershellId, "-", "-")
 
-    if (currentToggleId && WinExist("ahk_id " . currentToggleId)) {
-        minMax := WinGetMinMax("ahk_id " . currentToggleId)
-        isActive := WinActive("ahk_id " . currentToggleId)
+        if (currentPowershellId && WinExist("ahk_id " . currentPowershellId)) {
+            minMax := WinGetMinMax("ahk_id " . currentPowershellId)
+            isActive := WinActive("ahk_id " . currentPowershellId)
 
-        DebugLog("TOGGLE", "State - Active: " . isActive . " MinMax: " . minMax, currentToggleId, "-")
+            DebugLog("TOGGLE", "PowerShell State - Active: " . isActive . " MinMax: " . minMax, currentPowershellId, "-")
 
-        if (isActive) {
-            DebugLog("TOGGLE_MINIMIZE", currentToggleId)
-            WinMinimize(currentToggleId)
-            return
-        } else if (minMax = -1) {
-            DebugLog("TOGGLE_RESTORE", currentToggleId)
-            WinRestore(currentToggleId)
-            WinActivate(currentToggleId)
-            return
-        } else {
-            DebugLog("TOGGLE_ACTIVATE", currentToggleId)
-            WinShow(currentToggleId)
-            WinActivate(currentToggleId)
-            return
+            if (isActive) {
+                DebugLog("TOGGLE_MINIMIZE", currentPowershellId)
+                WinMinimize(currentPowershellId)
+                return
+            } else if (minMax = -1) {
+                DebugLog("TOGGLE_RESTORE", currentPowershellId)
+                WinRestore(currentPowershellId)
+                WinActivate(currentPowershellId)
+                return
+            } else {
+                DebugLog("TOGGLE_ACTIVATE", currentPowershellId)
+                WinShow(currentPowershellId)
+                WinActivate(currentPowershellId)
+                return
+            }
         }
-    }
+    } else {
+        DebugLog("TOGGLE", "Ubuntu - Current: " . currentToggleId . " Previous: " . previousToggleId, "-", "-")
 
-    if (WinExist("ahk_exe wezterm-gui.exe")) {
-        for hwnd in WinGetList("ahk_exe wezterm-gui.exe") {
-            WinShow(hwnd)
-            WinRestore(hwnd)
-            WinActivate(hwnd)
-            currentToggleId := hwnd
-            DebugLog("TOGGLE", "Found existing terminal", hwnd, "-")
-            return
+        if (currentToggleId && WinExist("ahk_id " . currentToggleId)) {
+            minMax := WinGetMinMax("ahk_id " . currentToggleId)
+            isActive := WinActive("ahk_id " . currentToggleId)
+
+            DebugLog("TOGGLE", "Ubuntu State - Active: " . isActive . " MinMax: " . minMax, currentToggleId, "-")
+
+            if (isActive) {
+                DebugLog("TOGGLE_MINIMIZE", currentToggleId)
+                WinMinimize(currentToggleId)
+                return
+            } else if (minMax = -1) {
+                DebugLog("TOGGLE_RESTORE", currentToggleId)
+                WinRestore(currentToggleId)
+                WinActivate(currentToggleId)
+                return
+            } else {
+                DebugLog("TOGGLE_ACTIVATE", currentToggleId)
+                WinShow(currentToggleId)
+                WinActivate(currentToggleId)
+                return
+            }
         }
     }
 
@@ -75,7 +108,7 @@ ToggleTerminal(terminalType := "Ubuntu") {
 
 
 LaunchTerminal(terminal := 'Ubuntu') {
-    global currentToggleId, previousToggleId
+    global currentToggleId, previousToggleId, currentPowershellId, previousPowershellId
     userDir := "C:\Users\" . EnvGet("username")
     paths := [
         "C:\Program Files\WezTerm\wezterm-gui.exe",
@@ -102,13 +135,21 @@ LaunchTerminal(terminal := 'Ubuntu') {
                 Sleep(50)
                 for hwnd in WinGetList("ahk_exe wezterm-gui.exe") {
                     if !existingWindows.Has(hwnd) {
-                        if (currentToggleId) {
-                            previousToggleId := currentToggleId
+                        if (terminal == "Powershell") {
+                            if (currentPowershellId) {
+                                previousPowershellId := currentPowershellId
+                            }
+                            currentPowershellId := hwnd
+                            DebugLog("LAUNCH", "New PowerShell terminal created", hwnd, "-")
+                            DebugLog("LAUNCH", "PowerShell - Previous: " . previousPowershellId . " Current: " . currentPowershellId, "-", "-")
+                        } else {
+                            if (currentToggleId) {
+                                previousToggleId := currentToggleId
+                            }
+                            currentToggleId := hwnd
+                            DebugLog("LAUNCH", "New Ubuntu terminal created", hwnd, "-")
+                            DebugLog("LAUNCH", "Ubuntu - Previous: " . previousToggleId . " Current: " . currentToggleId, "-", "-")
                         }
-                        currentToggleId := hwnd
-
-                        DebugLog("LAUNCH", "New terminal created", hwnd, "-")
-                        DebugLog("LAUNCH", "Previous: " . previousToggleId . " Current: " . currentToggleId, "-", "-")
 
                         WinActivate("ahk_id " . hwnd)
                         WinWaitActive("ahk_id " . hwnd, , 2)
