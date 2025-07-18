@@ -31,16 +31,26 @@ ToggleTerminal(terminalType := "Ubuntu") {
     DebugLog("TOGGLE", "Current: " . currentToggleId . " Previous: " . previousToggleId, "-", "-")
 
     if (currentToggleId && WinExist("ahk_id " . currentToggleId)) {
-        if (WinActive("ahk_id " . currentToggleId)) {
+        minMax := WinGetMinMax("ahk_id " . currentToggleId)
+        isActive := WinActive("ahk_id " . currentToggleId)
+        
+        DebugLog("TOGGLE", "State - Active: " . isActive . " MinMax: " . minMax, currentToggleId, "-")
+        
+        if (isActive) {
             DebugLog("TOGGLE_MINIMIZE", currentToggleId)
             WinMinimize(currentToggleId)
             return
+        } else if (minMax = -1) {
+            DebugLog("TOGGLE_RESTORE", currentToggleId)
+            WinRestore(currentToggleId)
+            WinActivate(currentToggleId)
+            return
+        } else {
+            DebugLog("TOGGLE_ACTIVATE", currentToggleId)
+            WinShow(currentToggleId)
+            WinActivate(currentToggleId)
+            return
         }
-        WinShow(currentToggleId)
-        WinRestore(currentToggleId)
-        WinActivate(currentToggleId)
-        DebugLog("TOGGLE_ACTIVATE", currentToggleId, "restored", "-", "-", "-", "-")
-        return
     }
 
     if (WinExist("ahk_exe wezterm-gui.exe")) {
