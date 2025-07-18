@@ -17,6 +17,13 @@ ToggleTerminal(terminalType) {
         WinRestore(terminalId)
         WinActivate(terminalId)
         return
+    } else if (terminalId) {
+        ; Clear invalid terminal ID
+        if (terminalType == "Ubuntu") {
+            ubuntuTerminalId := 0
+        } else {
+            powershellTerminalId := 0
+        }
     }
 
     if (terminalType == "Ubuntu" && WinExist("ahk_exe wezterm-gui.exe")) {
