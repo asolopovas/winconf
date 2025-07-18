@@ -1,49 +1,60 @@
 #Requires AutoHotkey v2.0
+#Include "debug.ahk"
 
-ubuntuTerminalId := 0
-powershellTerminalId := 0
+currentToggleId := 0
+previousToggleId := 0
 
-ToggleTerminal(terminalType) {
-    global ubuntuTerminalId, powershellTerminalId
+SetTimer(UpdateTerminalTracking, 500)
 
-    terminalId := (terminalType == "Ubuntu") ? ubuntuTerminalId : powershellTerminalId
+UpdateTerminalTracking() {
+    global currentToggleId, previousToggleId
+    
+    if (currentToggleId && !WinExist("ahk_id " . currentToggleId)) {
+        DebugLog("TRACK", "Current terminal closed", currentToggleId, "-")
+        currentToggleId := previousToggleId
+        previousToggleId := 0
+        
+        if (currentToggleId) {
+            DebugLog("TRACK", "Switched to previous terminal", currentToggleId, "-")
+        }
+    }
+    
+    if (previousToggleId && !WinExist("ahk_id " . previousToggleId)) {
+        DebugLog("TRACK", "Previous terminal closed", previousToggleId, "-")
+        previousToggleId := 0
+    }
+}
 
-    if (terminalId && WinExist("ahk_id " . terminalId)) {
-        if (WinActive("ahk_id " . terminalId)) {
-            WinMinimize(terminalId)
+ToggleTerminal(terminalType := "Ubuntu") {
+    global currentToggleId, previousToggleId
+    
+    DebugLog("TOGGLE", "Current: " . currentToggleId . " Previous: " . previousToggleId, "-", "-")
+
+    if (currentToggleId && WinExist("ahk_id " . currentToggleId)) {
+        if (WinActive("ahk_id " . currentToggleId)) {
+            DebugLog("TOGGLE_MINIMIZE", currentToggleId)
+            WinMinimize(currentToggleId)
             return
         }
-        WinShow(terminalId)
-        WinRestore(terminalId)
-        WinActivate(terminalId)
+        WinShow(currentToggleId)
+        WinRestore(currentToggleId)
+        WinActivate(currentToggleId)
+        DebugLog("TOGGLE_ACTIVATE", currentToggleId, "restored", "-", "-", "-", "-")
         return
-    } else if (terminalId) {
-        ; Clear invalid terminal ID
-        if (terminalType == "Ubuntu") {
-            ubuntuTerminalId := 0
-        } else {
-            powershellTerminalId := 0
-        }
     }
 
-    if (terminalType == "Ubuntu" && WinExist("ahk_exe wezterm-gui.exe")) {
+    if (WinExist("ahk_exe wezterm-gui.exe")) {
         for hwnd in WinGetList("ahk_exe wezterm-gui.exe") {
-            if (hwnd != WinGetID("A")) {
-                try {
-                    title := WinGetTitle("ahk_id " . hwnd)
-                    if (InStr(title, "wsl") || InStr(title, "Ubuntu") || InStr(title, "bash")) {
-                        WinShow(hwnd)
-                        WinRestore(hwnd)
-                        WinActivate(hwnd)
-                        ubuntuTerminalId := hwnd
-                        return
-                    }
-                }
-            }
+            WinShow(hwnd)
+            WinRestore(hwnd)
+            WinActivate(hwnd)
+            currentToggleId := hwnd
+            DebugLog("TOGGLE", "Found existing terminal", hwnd, "-")
+            return
         }
     }
 
-    LaunchTerminal(terminalType == "Ubuntu" ? "Ubuntu" : "Powershell")
+    LaunchTerminal(terminalType)
 }
 
 #Enter:: ToggleTerminal("Ubuntu")
@@ -53,7 +64,7 @@ ToggleTerminal(terminalType) {
 <^>!+Enter:: LaunchTerminal('Powershell')
 
 LaunchTerminal(terminal := 'Ubuntu') {
-    global ubuntuTerminalId, powershellTerminalId
+    global currentToggleId, previousToggleId
     userDir := "C:\Users\" . EnvGet("username")
     paths := [
         "C:\Program Files\WezTerm\wezterm-gui.exe",
@@ -80,11 +91,13 @@ LaunchTerminal(terminal := 'Ubuntu') {
                 Sleep(50)
                 for hwnd in WinGetList("ahk_exe wezterm-gui.exe") {
                     if !existingWindows.Has(hwnd) {
-                        if (terminal == "Ubuntu") {
-                            ubuntuTerminalId := hwnd
-                        } else if (terminal == 'Powershell') {
-                            powershellTerminalId := hwnd
+                        if (currentToggleId) {
+                            previousToggleId := currentToggleId
                         }
+                        currentToggleId := hwnd
+                        
+                        DebugLog("LAUNCH", "New terminal created", hwnd, "-")
+                        DebugLog("LAUNCH", "Previous: " . previousToggleId . " Current: " . currentToggleId, "-", "-")
                         
                         WinActivate("ahk_id " . hwnd)
                         WinWaitActive("ahk_id " . hwnd, , 2)
