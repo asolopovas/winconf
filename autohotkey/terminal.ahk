@@ -56,32 +56,41 @@ LaunchTerminal(terminal := 'Ubuntu') {
 
     for path in paths {
         if FileExist(path) {
-            existingWindows := WinGetList("ahk_exe wezterm-gui.exe")
+            existingWindows := Map()
+            for hwnd in WinGetList("ahk_exe wezterm-gui.exe") {
+                existingWindows[hwnd] := true
+            }
+            
             if (terminal == "Ubuntu") {
-                RunAsUser(path, " start -- wsl.exe -d Ubuntu --cd ~")
+                Run(path . " start -- wsl.exe -d Ubuntu --cd ~")
             }
 
             if (terminal == 'Powershell') {
-                RunAsUser(path, "start -- powershell.exe")
+                Run(path . " start -- powershell.exe")
             }
 
-            startTime := A_TickCount
-            while (A_TickCount - startTime < 3000) {
-                currentWindows := WinGetList("ahk_exe wezterm-gui.exe")
-                if (currentWindows.Length > existingWindows.Length) {
-                    for hwnd in currentWindows {
-                        if !existingWindows.Has(hwnd) {
-                            if (terminal == "Ubuntu") {
-                                ubuntuTerminalId := hwnd
-                            } else if (terminal == 'Powershell') {
-                                powershellTerminalId := hwnd
-                            }
-                            WinActivate(hwnd)
+            Loop 60 {
+                Sleep(50)
+                for hwnd in WinGetList("ahk_exe wezterm-gui.exe") {
+                    if !existingWindows.Has(hwnd) {
+                        if (terminal == "Ubuntu") {
+                            ubuntuTerminalId := hwnd
+                        } else if (terminal == 'Powershell') {
+                            powershellTerminalId := hwnd
+                        }
+                        
+                        WinActivate("ahk_id " . hwnd)
+                        WinWaitActive("ahk_id " . hwnd, , 2)
+                        if WinActive("ahk_id " . hwnd) {
                             return
                         }
+                        
+                        WinShow("ahk_id " . hwnd)
+                        WinRestore("ahk_id " . hwnd) 
+                        WinActivate("ahk_id " . hwnd)
+                        return
                     }
                 }
-                Sleep(50)
             }
             return
         }
