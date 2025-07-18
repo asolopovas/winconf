@@ -91,11 +91,11 @@ LaunchTerminal(terminal := 'Ubuntu') {
             }
 
             if (terminal == "Ubuntu") {
-                Run(path . " start -- wsl.exe -d Ubuntu --cd ~")
+                RunAsUser(path, " start -- wsl.exe -d Ubuntu --cd ~")
             }
 
             if (terminal == 'Powershell') {
-                Run(path . " start -- powershell.exe")
+                RunAsUser(path, " start -- powershell.exe")
             }
 
             Loop 60 {
