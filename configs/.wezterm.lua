@@ -61,6 +61,12 @@ config.default_prog = { 'powershell.exe' }
 config.skip_close_confirmation_for_processes_named = { 'bash', 'sh', 'zsh', 'fish', 'tmux', 'nu', 'cmd.exe', 'pwsh.exe', 'powershell.exe' }
 config.window_close_confirmation = 'NeverPrompt'
 
+-- Terminal behavior
+config.scrollback_lines = 10000
+config.enable_scroll_bar = false
+config.alternate_buffer_wheel_scroll_speed = 1
+config.treat_east_asian_ambiguous_width_as_wide = false
+
 -- Launch menu
 config.launch_menu = {
   {

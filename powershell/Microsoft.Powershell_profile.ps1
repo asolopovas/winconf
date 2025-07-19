@@ -27,7 +27,7 @@ try { $null = [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch {
 
 # Initialize Starship prompt
 if (Test-CommandExists starship) {
-    try { 
+    try {
         Invoke-Expression (&starship init powershell)
     } catch {
         Write-Warning "Error initializing Starship: $_"
@@ -35,9 +35,6 @@ if (Test-CommandExists starship) {
 } else {
     Write-Warning "Starship not found in PATH. Please ensure it's installed and in your PATH."
 }
-
-# Fix for duplicate cd completions
-# . $psdir\fix-cd-completion.ps1
 
 # PowerToys integration
 if ($PSVersionTable.PSVersion.Major -ge 7) {
@@ -47,20 +44,11 @@ if ($PSVersionTable.PSVersion.Major -ge 7) {
     }
 }
 
-# FNM Node.js version manager
 if (Get-Command fnm -ErrorAction SilentlyContinue) {
     fnm env --use-on-cd | Out-String | Invoke-Expression
 }
-# Import the Chocolatey Profile that contains the necessary code to enable
-# tab-completions to function for `choco`.
-# Be aware that if you are missing these lines from your profile, tab completion
-# for `choco` will not function.
-# See https://ch0.co/tab-completion for details.
-# Chocolatey
+
 $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 if (Test-Path($ChocolateyProfile)) {
   Import-Module "$ChocolateyProfile"
 }
-
-# Fix PSReadLine completion display issue - load LAST after all modules
-. $psdir\fix-psreadline-completion.ps1
