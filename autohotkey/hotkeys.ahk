@@ -35,36 +35,6 @@
 LWin & .::AltTab
 LWin & ,::ShiftAltTab
 
-#F12::
-{
-    ; Launch WezTerm as administrator
-    windowID := "ahk_exe wezterm-gui.exe ahk_class Admin"
-    if (WinExist(windowID)) {
-        WinActivate(windowID)
-    } else {
-        ; Find WezTerm path
-        weztermPath := ""
-        possiblePaths := [
-            "C:\\Program Files\\WezTerm\\wezterm-gui.exe",
-            "C:\\Program Files (x86)\\WezTerm\\wezterm-gui.exe",
-            "C:\\Users\\" . EnvGet("username") . "\\AppData\\Local\\Microsoft\\WindowsApps\\wezterm-gui.exe",
-            "C:\\tools\\wezterm\\wezterm-gui.exe"
-        ]
-
-        for path in possiblePaths {
-            if FileExist(path) {
-                weztermPath := path
-                break
-            }
-        }
-
-        if (weztermPath != "") {
-            ; Launch WezTerm as administrator with Admin class
-            args := "start --class Admin"
-            Run("*RunAs " . weztermPath . " " . args)
-        }
-    }
-}
 
 #c::
 {

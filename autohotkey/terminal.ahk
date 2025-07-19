@@ -13,6 +13,37 @@ previousPowershellId := 0
 #+Enter:: LaunchTerminal('Ubuntu')
 <^>!+Enter:: LaunchTerminal('Powershell')
 
+#F12::
+{
+    ; Launch WezTerm as administrator
+    windowID := "ahk_exe wezterm-gui.exe ahk_class Admin"
+    if (WinExist(windowID)) {
+        WinActivate(windowID)
+    } else {
+        ; Find WezTerm path
+        weztermPath := ""
+        possiblePaths := [
+            "C:\\Program Files\\WezTerm\\wezterm-gui.exe",
+            "C:\\Program Files (x86)\\WezTerm\\wezterm-gui.exe",
+            "C:\\Users\\" . EnvGet("username") . "\\AppData\\Local\\Microsoft\\WindowsApps\\wezterm-gui.exe",
+            "C:\\tools\\wezterm\\wezterm-gui.exe"
+        ]
+
+        for path in possiblePaths {
+            if FileExist(path) {
+                weztermPath := path
+                break
+            }
+        }
+
+        if (weztermPath != "") {
+            ; Launch WezTerm as administrator with Admin class
+            args := "start --class Admin"
+            Run("*RunAs " . weztermPath . " " . args)
+        }
+    }
+}
+
 SetTimer(UpdateTerminalTracking, 500)
 
 UpdateTerminalTracking() {
@@ -84,7 +115,6 @@ ToggleTerminal(terminalType := "Ubuntu") {
     LaunchTerminal(terminalType)
 }
 
-
 LaunchTerminal(terminal := 'Ubuntu') {
     global currentToggleId, previousToggleId, currentPowershellId, previousPowershellId
 
@@ -93,15 +123,17 @@ LaunchTerminal(terminal := 'Ubuntu') {
         existingWindows[hwnd] := true
     }
 
+    terminal_path := "C:\Users\asolo\AppData\Local\Microsoft\WindowsApps\wt.exe"
+
     if (terminal == "Ubuntu") {
-        RunAsUser("wt.exe", "new-tab -p Ubuntu")
+        RunAsUser(terminal_path, "new-tab -p Ubuntu")
     }
 
     if (terminal == 'Powershell') {
-        RunAsUser("wt.exe", "new-tab -p PowerShell")
+        RunAsUser(terminal_path, "new-tab -p PowerShell")
     }
 
-    Loop 60 {
+    loop 60 {
         Sleep(50)
         for hwnd in WinGetList("ahk_class CASCADIA_HOSTING_WINDOW_CLASS") {
             if !existingWindows.Has(hwnd) {
