@@ -94,11 +94,11 @@ LaunchTerminal(terminal := 'Ubuntu') {
     }
 
     if (terminal == "Ubuntu") {
-        Run("wt.exe new-tab -p Ubuntu")
+        RunAsUser("wt.exe", "new-tab -p Ubuntu")
     }
 
     if (terminal == 'Powershell') {
-        Run("wt.exe new-tab -p PowerShell")
+        RunAsUser("wt.exe", "new-tab -p PowerShell")
     }
 
     Loop 60 {
@@ -110,15 +110,11 @@ LaunchTerminal(terminal := 'Ubuntu') {
                         previousPowershellId := currentPowershellId
                     }
                     currentPowershellId := hwnd
-                    DebugLog("LAUNCH", "New PowerShell terminal created", hwnd, "-")
-                    DebugLog("LAUNCH", "PowerShell - Previous: " . previousPowershellId . " Current: " . currentPowershellId, "-", "-")
                 } else {
                     if (currentToggleId) {
                         previousToggleId := currentToggleId
                     }
                     currentToggleId := hwnd
-                    DebugLog("LAUNCH", "New Ubuntu terminal created", hwnd, "-")
-                    DebugLog("LAUNCH", "Ubuntu - Previous: " . previousToggleId . " Current: " . currentToggleId, "-", "-")
                 }
 
                 WinActivate("ahk_id " . hwnd)
