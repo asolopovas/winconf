@@ -39,9 +39,6 @@ if (Test-CommandExists starship) {
 # Fix for duplicate cd completions
 # . $psdir\fix-cd-completion.ps1
 
-# Fix PSReadLine completion display issue
-. $psdir\fix-psreadline-completion.ps1
-
 # PowerToys integration
 if ($PSVersionTable.PSVersion.Major -ge 7) {
     $ptPath = Join-Path $env:LOCALAPPDATA 'PowerToys\WinGetCommandNotFound.psd1'
@@ -64,3 +61,6 @@ $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 if (Test-Path($ChocolateyProfile)) {
   Import-Module "$ChocolateyProfile"
 }
+
+# Fix PSReadLine completion display issue - load LAST after all modules
+. $psdir\fix-psreadline-completion.ps1

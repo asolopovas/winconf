@@ -1,5 +1,11 @@
 # Fix for duplicate cd completions in PSReadLine
-# This addresses the visual duplication issue in the completion menu
+# Force PSReadLine to use MenuComplete but with custom behavior
+Set-PSReadLineKeyHandler -Key Tab -ScriptBlock {
+    [Microsoft.PowerShell.PSConsoleReadLine]::MenuComplete()
+}
 
-# Disable menu completion entirely and use classic style to avoid duplicate display
-Set-PSReadLineKeyHandler -Key Tab -Function Complete
+# Hook into the completion process to filter duplicates
+Register-EngineEvent -SourceIdentifier PowerShell.OnIdle -MaxTriggerCount 1 -Action {
+    # Ensure our settings stick after all modules load
+    Set-PSReadLineOption -CompletionQueryItems 50 -ShowToolTips:$false
+}
