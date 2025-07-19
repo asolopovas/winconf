@@ -2,10 +2,6 @@ function Invoke-DockerCompose {
     & "docker" compose @args
 }
 
-function Invoke-DockerCompose {
-    & "docker" compose @args
-}
-
 Set-Alias -Name dc -Value Invoke-DockerCompose -Option AllScope
 
 Register-ArgumentCompleter -CommandName 'Invoke-DockerCompose' -ScriptBlock {

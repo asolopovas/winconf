@@ -36,6 +36,12 @@ if (Test-CommandExists starship) {
     Write-Warning "Starship not found in PATH. Please ensure it's installed and in your PATH."
 }
 
+# Fix for duplicate cd completions
+# . $psdir\fix-cd-completion.ps1
+
+# Fix PSReadLine completion display issue
+. $psdir\fix-psreadline-completion.ps1
+
 # PowerToys integration
 if ($PSVersionTable.PSVersion.Major -ge 7) {
     $ptPath = Join-Path $env:LOCALAPPDATA 'PowerToys\WinGetCommandNotFound.psd1'
@@ -53,6 +59,7 @@ if (Get-Command fnm -ErrorAction SilentlyContinue) {
 # Be aware that if you are missing these lines from your profile, tab completion
 # for `choco` will not function.
 # See https://ch0.co/tab-completion for details.
+# Chocolatey
 $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 if (Test-Path($ChocolateyProfile)) {
   Import-Module "$ChocolateyProfile"
