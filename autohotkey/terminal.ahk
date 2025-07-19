@@ -15,32 +15,13 @@ previousPowershellId := 0
 
 #F12::
 {
-    ; Launch WezTerm as administrator
-    windowID := "ahk_exe wezterm-gui.exe ahk_class Admin"
+    windowID := "ahk_class CASCADIA_HOSTING_WINDOW_CLASS"
     if (WinExist(windowID)) {
         WinActivate(windowID)
     } else {
-        ; Find WezTerm path
-        weztermPath := ""
-        possiblePaths := [
-            "C:\\Program Files\\WezTerm\\wezterm-gui.exe",
-            "C:\\Program Files (x86)\\WezTerm\\wezterm-gui.exe",
-            "C:\\Users\\" . EnvGet("username") . "\\AppData\\Local\\Microsoft\\WindowsApps\\wezterm-gui.exe",
-            "C:\\tools\\wezterm\\wezterm-gui.exe"
-        ]
+        terminal_path := "C:\Users\asolo\AppData\Local\Microsoft\WindowsApps\wt.exe"
 
-        for path in possiblePaths {
-            if FileExist(path) {
-                weztermPath := path
-                break
-            }
-        }
-
-        if (weztermPath != "") {
-            ; Launch WezTerm as administrator with Admin class
-            args := "start --class Admin"
-            Run("*RunAs " . weztermPath . " " . args)
-        }
+        Run(terminal_path . " new-tab -p PowerShell")
     }
 }
 
