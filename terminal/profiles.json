@@ -55,33 +55,33 @@
         "Windows.Terminal.PowershellCore"
     ],
     "firstWindowPreference": "defaultProfile",
-    "initialCols": 100,
-    "initialRows": 25,
+    "initialCols": 140,
+    "initialRows": 36,
     "keybindings": 
     [
         {
-            "id": "User.copy.644BA8F2",
-            "keys": "ctrl+shift+c"
-        },
-        {
-            "id": null,
-            "keys": "ctrl+alt+5"
+            "id": "User.closePane",
+            "keys": "ctrl+w"
         },
         {
             "id": "User.paste",
             "keys": "shift+insert"
         },
         {
-            "id": "User.closePane",
-            "keys": "ctrl+w"
+            "id": null,
+            "keys": "ctrl+alt+5"
         },
         {
-            "id": null,
-            "keys": "ctrl+shift+w"
+            "id": "User.copy.644BA8F2",
+            "keys": "ctrl+shift+c"
         },
         {
             "id": null,
             "keys": "win+sc(41)"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+w"
         },
         {
             "id": null,
