@@ -72,9 +72,26 @@ LWin & ,::ShiftAltTab
 
 #b::
 {
-    windowID := "ahk_class SWT_Window0 ahk_exe dbeaver.exe"
-    exePath := "C:\\Users\\asolo\\AppData\\Local\\DBeaver\dbeaver.exe"
-    RunOrActivate(windowID, exePath, "")
+    commonFirefoxPaths := [
+        "C:\\Program Files\\Mozilla Firefox\\firefox.exe",
+        "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe",
+        "C:\\Users\\" . A_UserName . "\\AppData\\Local\\Mozilla Firefox\\firefox.exe"
+    ]
+
+    firefoxPath := ""
+    for browserPath in commonFirefoxPaths {
+        if FileExist(browserPath) {
+            firefoxPath := browserPath
+            break
+        }
+    }
+
+    if firefoxPath {
+        windowId := "ahk_exe firefox.exe"
+        RunOrActivate(windowId, firefoxPath, "")
+    } else {
+        MsgBox("Firefox not found")
+    }
 }
 
 #m::
