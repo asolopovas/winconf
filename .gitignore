@@ -1,0 +1,5 @@
+.idea
+logs/
+tmp/
+*.log
+.claude/settings.local.json
