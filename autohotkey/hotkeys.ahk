@@ -130,9 +130,13 @@ LWin & ,::ShiftAltTab
 
 #q::
 {
-    Title := WinGetTitle("A")
-    PostMessage(0x112, 0xF060, , , Title)
-
+    try {
+        if WinExist("A") {
+            Title := WinGetTitle("A")
+            PostMessage(0x112, 0xF060, , , Title)
+        }
+    }
+    
     #SingleInstance force
 }
 
