@@ -1,0 +1,8 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\WSL_Ubuntu]
+@="Open in Ubuntu"
+"Icon"="C:\\Program Files\\WindowsApps\\CanonicalGroupLimited.Ubuntu_2404.1.68.0_x64__79rhkp1fndgsc\\ubuntu.exe"
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\WSL_Ubuntu\command]
+@="wsl.exe -d Ubuntu --cd \"%V\""
