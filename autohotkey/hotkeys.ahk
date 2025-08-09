@@ -136,7 +136,7 @@ LWin & ,::ShiftAltTab
             PostMessage(0x112, 0xF060, , , Title)
         }
     }
-    
+
     #SingleInstance force
 }
 
@@ -180,7 +180,7 @@ F7::
 
     Send("!{Del}")
     Send("{Enter}")
-    Sleep(500)
+    Sleep(1000)
     Send("#m")
 }
 
