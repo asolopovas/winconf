@@ -60,24 +60,20 @@
     "keybindings": 
     [
         {
-            "id": "User.closePane",
-            "keys": "ctrl+w"
-        },
-        {
-            "id": "User.paste",
-            "keys": "shift+insert"
+            "id": "User.copy.644BA8F2",
+            "keys": "ctrl+shift+c"
         },
         {
             "id": null,
             "keys": "ctrl+alt+5"
         },
         {
-            "id": "User.copy.644BA8F2",
-            "keys": "ctrl+shift+c"
+            "id": "User.paste",
+            "keys": "shift+insert"
         },
         {
-            "id": null,
-            "keys": "ctrl+alt+2"
+            "id": "User.closePane",
+            "keys": "ctrl+w"
         },
         {
             "id": null,
@@ -85,11 +81,15 @@
         },
         {
             "id": null,
-            "keys": "ctrl+shift+w"
+            "keys": "ctrl+alt+2"
         },
         {
             "id": null,
             "keys": "win+sc(41)"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+w"
         },
         {
             "id": null,
