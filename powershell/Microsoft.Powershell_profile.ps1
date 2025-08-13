@@ -15,12 +15,6 @@ try {
 # Configure Starship prompt
 $ENV:STARSHIP_CONFIG = Join-Path $psdir 'configs\starship.toml'
 
-# Conda initialization
-$condaHook = Join-Path $env:USERPROFILE 'miniconda3\shell\condabin\conda-hook.ps1'
-if (Test-Path $condaHook) {
-    try { . $condaHook; conda activate base 2>$null } catch { }
-}
-
 # Configure console
 $Host.UI.RawUI.WindowTitle = "PowerShell"
 try { $null = [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch {}
