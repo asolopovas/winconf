@@ -8,7 +8,6 @@ $chocoApps = @(
     "fzf",
     "gpg4win",
     "miktex",
-    "miniconda3",
     "nodejs-lts",
     "platform-tools",
     "powertoys",

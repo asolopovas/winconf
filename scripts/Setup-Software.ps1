@@ -1,6 +1,5 @@
 $wingetApps = @(
     "ALCPU.CoreTemp"
-    "Anaconda.Miniconda3"
     "Calibre.calibre"
     "GnuPG.Gpg4win"
     "Google.PlatformTools"
