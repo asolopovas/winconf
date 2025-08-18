@@ -1,4 +1,4 @@
-#Include "desktop-switcher/init.ahk"
+#Include "%A_ScriptDir%\autohotkey\desktop-switcher\init.ahk"
 
 ; Desktop Switcher Hotkeys
 #+1:: MoveCurrentWindowToDesktop(0)

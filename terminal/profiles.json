@@ -4,15 +4,15 @@
     "actions": 
     [
         {
-            "command": "closeWindow",
-            "id": "User.closeWindow"
-        },
-        {
             "command": 
             {
                 "action": "copy"
             },
             "id": "User.copy.644BA8F2"
+        },
+        {
+            "command": "closeWindow",
+            "id": "User.closeWindow"
         },
         {
             "command": "paste",
@@ -25,16 +25,16 @@
         {
             "command": 
             {
-                "action": "closeOtherTabs"
+                "action": "prevTab"
             },
-            "id": "User.closeOtherTabs.0"
+            "id": "User.prevTab.0"
         },
         {
             "command": 
             {
-                "action": "prevTab"
+                "action": "closeOtherTabs"
             },
-            "id": "User.prevTab.0"
+            "id": "User.closeOtherTabs.0"
         },
         {
             "command": 
@@ -60,20 +60,20 @@
     "keybindings": 
     [
         {
-            "id": "User.copy.644BA8F2",
-            "keys": "ctrl+shift+c"
-        },
-        {
-            "id": null,
-            "keys": "ctrl+alt+5"
+            "id": "User.closePane",
+            "keys": "ctrl+w"
         },
         {
             "id": "User.paste",
             "keys": "shift+insert"
         },
         {
-            "id": "User.closePane",
-            "keys": "ctrl+w"
+            "id": "User.copy.644BA8F2",
+            "keys": "ctrl+shift+c"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+alt+5"
         },
         {
             "id": null,
@@ -85,11 +85,11 @@
         },
         {
             "id": null,
-            "keys": "win+sc(41)"
+            "keys": "ctrl+shift+w"
         },
         {
             "id": null,
-            "keys": "ctrl+shift+w"
+            "keys": "win+sc(41)"
         },
         {
             "id": null,
@@ -101,7 +101,7 @@
         },
         {
             "id": null,
-            "keys": "ctrl+shift+n"
+            "keys": "ctrl+alt+4"
         },
         {
             "id": null,
@@ -109,7 +109,7 @@
         },
         {
             "id": null,
-            "keys": "ctrl+alt+4"
+            "keys": "ctrl+shift+n"
         },
         {
             "id": null,
@@ -141,11 +141,11 @@
         },
         {
             "id": null,
-            "keys": "ctrl+shift+5"
+            "keys": "ctrl+shift+2"
         },
         {
             "id": null,
-            "keys": "ctrl+shift+2"
+            "keys": "ctrl+shift+5"
         },
         {
             "id": null,
@@ -153,11 +153,11 @@
         },
         {
             "id": null,
-            "keys": "ctrl+shift+t"
+            "keys": "ctrl+shift+4"
         },
         {
             "id": null,
-            "keys": "ctrl+shift+4"
+            "keys": "ctrl+shift+t"
         },
         {
             "id": null,
@@ -237,6 +237,18 @@
                 "hidden": true,
                 "name": "Ubuntu",
                 "source": "Windows.Terminal.Wsl"
+            },
+            {
+                "guid": "{3dfa5583-b9ce-50bc-8fee-958c7e4deb3d}",
+                "hidden": false,
+                "name": "Developer Command Prompt for VS 2019",
+                "source": "Windows.Terminal.VisualStudio"
+            },
+            {
+                "guid": "{c2d8e0a9-a621-5206-aef6-7798f71b6ca8}",
+                "hidden": false,
+                "name": "Developer PowerShell for VS 2019",
+                "source": "Windows.Terminal.VisualStudio"
             }
         ]
     },
