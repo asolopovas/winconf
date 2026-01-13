@@ -202,7 +202,7 @@
         "list": 
         [
             {
-                "commandline": "%LOCALAPPDATA%\\Microsoft\\WinGet\\Links\\pwsh.exe -nologo",
+                "commandline": "powershell.exe",
                 "guid": "{05b9d966-86e5-4a1f-a9df-d87cef4d716e}",
                 "hidden": false,
                 "icon": "ms-appx:///ProfileIcons/{61c54bbd-c2c6-5271-96e7-009a87ff44bf}.png",
