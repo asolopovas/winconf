@@ -4,15 +4,15 @@
     "actions": 
     [
         {
+            "command": "closeWindow",
+            "id": "User.closeWindow"
+        },
+        {
             "command": 
             {
                 "action": "copy"
             },
             "id": "User.copy.644BA8F2"
-        },
-        {
-            "command": "closeWindow",
-            "id": "User.closeWindow"
         },
         {
             "command": "paste",
@@ -25,16 +25,16 @@
         {
             "command": 
             {
-                "action": "prevTab"
+                "action": "closeOtherTabs"
             },
-            "id": "User.prevTab.0"
+            "id": "User.closeOtherTabs.0"
         },
         {
             "command": 
             {
-                "action": "closeOtherTabs"
+                "action": "prevTab"
             },
-            "id": "User.closeOtherTabs.0"
+            "id": "User.prevTab.0"
         },
         {
             "command": 
@@ -60,20 +60,20 @@
     "keybindings": 
     [
         {
-            "id": "User.closePane",
-            "keys": "ctrl+w"
-        },
-        {
-            "id": "User.paste",
-            "keys": "shift+insert"
-        },
-        {
             "id": "User.copy.644BA8F2",
             "keys": "ctrl+shift+c"
         },
         {
             "id": null,
             "keys": "ctrl+alt+5"
+        },
+        {
+            "id": "User.paste",
+            "keys": "shift+insert"
+        },
+        {
+            "id": "User.closePane",
+            "keys": "ctrl+w"
         },
         {
             "id": null,
@@ -85,11 +85,11 @@
         },
         {
             "id": null,
-            "keys": "ctrl+shift+w"
+            "keys": "win+sc(41)"
         },
         {
             "id": null,
-            "keys": "win+sc(41)"
+            "keys": "ctrl+shift+w"
         },
         {
             "id": null,
@@ -101,7 +101,7 @@
         },
         {
             "id": null,
-            "keys": "ctrl+alt+4"
+            "keys": "ctrl+shift+n"
         },
         {
             "id": null,
@@ -109,7 +109,7 @@
         },
         {
             "id": null,
-            "keys": "ctrl+shift+n"
+            "keys": "ctrl+alt+4"
         },
         {
             "id": null,
@@ -141,11 +141,11 @@
         },
         {
             "id": null,
-            "keys": "ctrl+shift+2"
+            "keys": "ctrl+shift+5"
         },
         {
             "id": null,
-            "keys": "ctrl+shift+5"
+            "keys": "ctrl+shift+2"
         },
         {
             "id": null,
@@ -153,11 +153,11 @@
         },
         {
             "id": null,
-            "keys": "ctrl+shift+4"
+            "keys": "ctrl+shift+t"
         },
         {
             "id": null,
-            "keys": "ctrl+shift+t"
+            "keys": "ctrl+shift+4"
         },
         {
             "id": null,
@@ -248,6 +248,18 @@
                 "guid": "{c2d8e0a9-a621-5206-aef6-7798f71b6ca8}",
                 "hidden": false,
                 "name": "Developer PowerShell for VS 2019",
+                "source": "Windows.Terminal.VisualStudio"
+            },
+            {
+                "guid": "{6ba3af2f-5de1-5ab2-8782-c015ff67826f}",
+                "hidden": false,
+                "name": "Developer Command Prompt for VS 2022",
+                "source": "Windows.Terminal.VisualStudio"
+            },
+            {
+                "guid": "{b99ba06a-6cfd-5593-81d6-c02563d1d4c7}",
+                "hidden": false,
+                "name": "Developer PowerShell for VS 2022",
                 "source": "Windows.Terminal.VisualStudio"
             }
         ]
