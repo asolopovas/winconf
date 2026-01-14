@@ -37,4 +37,4 @@ Start-Process "`$codeExe" -ArgumentList '--new-window', "`"`$hostsFile`"" -Verb 
 
 
 
-Set-Alias -Name ehosts -Value Edit-HostsWithVSCode
+Set-Alias -Name hosts-edit -Value Edit-HostsWithVSCode
