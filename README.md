@@ -67,3 +67,16 @@ All scripts are idempotent and safe to re-run.
 ```
 Set-LocalUser -Name $env:username -Password (Read-Host -AsSecureString "New password")
 ```
+
+*OpenSSH change default sheel*
+```powershell
+New-ItemProperty `
+  -Path "HKLM:\SOFTWARE\OpenSSH" `
+  -Name "DefaultShell" `
+  -PropertyType String `
+  -Value "$env:WINDIR\System32\wsl.exe" `
+  -Force | Out-Null
+
+# Restart sshd so it picks it up
+Restart-Service sshd
+```
