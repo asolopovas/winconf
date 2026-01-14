@@ -1,4 +1,5 @@
 $wingetApps = @(
+    "AIMP.AIMP"
     "ALCPU.CoreTemp"
     "Calibre.calibre"
     "GnuPG.Gpg4win"
