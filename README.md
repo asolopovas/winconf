@@ -8,7 +8,7 @@ Automated Windows development environment with PowerShell, AutoHotkey v2, and mo
 # Basic setup
 iwr https://raw.githubusercontent.com/asolopovas/winconf/main/init.ps1 | iex
 
-# With additional software  
+# With additional software
 iwr https://raw.githubusercontent.com/asolopovas/winconf/main/init-software.ps1 | iex
 ```
 
@@ -22,7 +22,7 @@ iwr https://raw.githubusercontent.com/asolopovas/winconf/main/init-software.ps1 
 
 - **Virtual Desktop Management** - Win+1-9 switching with vim-style navigation
 - **Application Launchers** - Quick access to development tools
-- **Enhanced Git Workflow** - Custom aliases and PowerShell integration  
+- **Enhanced Git Workflow** - Custom aliases and PowerShell integration
 - **Terminal Automation** - WezTerm with Ubuntu WSL integration
 - **Window Management** - Vim-style controls and smart navigation
 
@@ -41,7 +41,7 @@ iwr https://raw.githubusercontent.com/asolopovas/winconf/main/init-software.ps1 
 ```powershell
 # Git shortcuts
 gs          # git status
-gc "msg"    # git add . && git commit -m "msg"  
+gc "msg"    # git add . && git commit -m "msg"
 gp          # git push
 gl          # git pull
 gk branch   # git checkout branch
@@ -60,3 +60,10 @@ Test-CommandExists git              # Check if command exists
 ```
 
 All scripts are idempotent and safe to re-run.
+
+# Notes
+
+*Set password for samba user with microsoft account:*
+```
+Set-LocalUser -Name $env:username -Password (Read-Host -AsSecureString "New password")
+```

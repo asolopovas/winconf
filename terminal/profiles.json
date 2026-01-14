@@ -60,24 +60,20 @@
     "keybindings": 
     [
         {
-            "id": "User.closePane",
-            "keys": "ctrl+w"
-        },
-        {
-            "id": "User.paste",
-            "keys": "shift+insert"
+            "id": null,
+            "keys": "ctrl+alt+5"
         },
         {
             "id": "User.copy.644BA8F2",
             "keys": "ctrl+shift+c"
         },
         {
-            "id": null,
-            "keys": "ctrl+alt+5"
+            "id": "User.paste",
+            "keys": "shift+insert"
         },
         {
-            "id": null,
-            "keys": "ctrl+alt+9"
+            "id": "User.closePane",
+            "keys": "ctrl+w"
         },
         {
             "id": null,
@@ -85,11 +81,15 @@
         },
         {
             "id": null,
-            "keys": "ctrl+shift+w"
+            "keys": "ctrl+alt+9"
         },
         {
             "id": null,
             "keys": "win+sc(41)"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+w"
         },
         {
             "id": null,
@@ -202,7 +202,7 @@
         "list": 
         [
             {
-                "commandline": "powershell.exe",
+                "commandline": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
                 "guid": "{05b9d966-86e5-4a1f-a9df-d87cef4d716e}",
                 "hidden": false,
                 "icon": "ms-appx:///ProfileIcons/{61c54bbd-c2c6-5271-96e7-009a87ff44bf}.png",
