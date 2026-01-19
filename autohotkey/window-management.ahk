@@ -91,7 +91,9 @@ RunOrActivate(windowID, exePath, args, alwaysNewInstance := false) {
         }
     } else {
         RunAsUser(exePath, args)
-        WinWait(windowID)
-        WinActivate(windowID)
+        if WinWait(windowID, , 10) {
+            hwnd := WinExist(windowID)
+            WinActivate("ahk_id " . hwnd)
+        }
     }
 }
