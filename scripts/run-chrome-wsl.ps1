@@ -1,0 +1,1 @@
+Start-Process -FilePath 'C:\Windows\System32\wsl.exe' -ArgumentList 'bash', '-l', '-c', 'export DISPLAY=:0; setsid /home/andrius/dotfiles/scripts/chrome-debug.sh' -WindowStyle Hidden
