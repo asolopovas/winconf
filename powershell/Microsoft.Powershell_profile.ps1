@@ -47,16 +47,3 @@ $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 if (Test-Path($ChocolateyProfile)) {
   Import-Module "$ChocolateyProfile"
 }
-
-$pageantPaths = @(
-    "$env:LOCALAPPDATA\Programs\WinSCP\PuTTY\pageant.exe"
-    "$env:ProgramFiles\PuTTY\pageant.exe"
-    "$env:ProgramFiles(x86)\PuTTY\pageant.exe"
-)
-$pageant = $pageantPaths | Where-Object { Test-Path $_ } | Select-Object -First 1
-if ($pageant -and !(Get-Process pageant -ErrorAction SilentlyContinue)) {
-    $ppkFiles = Get-ChildItem "$env:USERPROFILE\.ssh\*.ppk" -ErrorAction SilentlyContinue
-    if ($ppkFiles) {
-        Start-Process $pageant -ArgumentList ($ppkFiles.FullName)
-    }
-}

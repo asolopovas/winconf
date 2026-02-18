@@ -29,6 +29,7 @@ $SOURCE_FILES = @(
     'Setup-Powershell'
     'Setup-Terminal'
     'Setup-Autohotkey'
+    'Setup-Pageant'
     'Setup-Wezterm'
 )
 
