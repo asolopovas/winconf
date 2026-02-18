@@ -13,3 +13,4 @@ $env:ProgramFiles\starship\bin
 $env:ProgramFiles\AutoHotkey\v2
 $env:ProgramFiles\MiKTeX\miktex\bin\x64
 $env:USERPROFILE\src\toc-gen
+$env:LOCALAPPDATA\Programs\WinSCP

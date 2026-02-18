@@ -18,6 +18,7 @@ $ESSENTIAL_SOFTWARE = @(
     "sharkdp.fd"
     "VideoLAN.VLC"
     'wez.wezterm'
+    'WinSCP.WinSCP'
 )
 
 $SOURCE_FILES = @(
