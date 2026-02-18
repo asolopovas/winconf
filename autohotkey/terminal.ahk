@@ -10,8 +10,8 @@ previousPowershellId := 0
 #Enter:: ToggleTerminal("Ubuntu")
 <^>!Enter:: ToggleTerminal("Powershell")
 
-#+Enter:: LaunchTerminal('Ubuntu')
-<^>!+Enter:: LaunchTerminal('Powershell')
+#+Enter:: OpenNewTab('Ubuntu')
+<^>!+Enter:: OpenNewTab('Powershell')
 
 #F12::
 {
@@ -93,6 +93,28 @@ ToggleTerminal(terminalType := "Ubuntu") {
     }
 
     LaunchTerminal(terminalType)
+}
+
+OpenNewTab(terminal := 'Ubuntu') {
+    global currentToggleId, currentPowershellId
+
+    terminal_path := "C:\Users\asolo\AppData\Local\Microsoft\WindowsApps\wt.exe"
+
+    if (terminal == "Ubuntu") {
+        targetId := currentToggleId
+        profile := "Ubuntu"
+    } else {
+        targetId := currentPowershellId
+        profile := "PowerShell"
+    }
+
+    if (targetId && WinExist("ahk_id " . targetId)) {
+        WinActivate("ahk_id " . targetId)
+        WinWaitActive("ahk_id " . targetId, , 2)
+        RunAsUser(terminal_path, "--window 0 new-tab -p " . profile)
+    } else {
+        LaunchTerminal(terminal)
+    }
 }
 
 LaunchTerminal(terminal := 'Ubuntu') {
