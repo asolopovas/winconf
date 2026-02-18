@@ -2,38 +2,42 @@
 SETLOCAL EnableDelayedExpansion
 
 SET "SSH_DIR=%USERPROFILE%\.ssh"
-SET "PUTTYGEN="
+SET "WINSCP="
 
 FOR %%P IN (
-    "%ProgramFiles%\PuTTY\puttygen.exe"
-    "%ProgramFiles(x86)%\PuTTY\puttygen.exe"
-    "%LOCALAPPDATA%\Microsoft\WinGet\Links\puttygen.exe"
+    "%ProgramFiles%\WinSCP\WinSCP.com"
+    "%ProgramFiles(x86)%\WinSCP\WinSCP.com"
+    "%LOCALAPPDATA%\Programs\WinSCP\WinSCP.com"
+    "%LOCALAPPDATA%\Microsoft\WinGet\Links\WinSCP.com"
 ) DO (
-    IF EXIST %%P SET "PUTTYGEN=%%~P"
+    IF EXIST %%P SET "WINSCP=%%~P"
 )
 
-IF "%PUTTYGEN%"=="" (
-    WHERE puttygen >nul 2>nul
+IF "%WINSCP%"=="" (
+    WHERE WinSCP.com >nul 2>nul
     IF !ERRORLEVEL! EQU 0 (
-        FOR /F "tokens=*" %%G IN ('where puttygen') DO SET "PUTTYGEN=%%G"
+        FOR /F "tokens=*" %%G IN ('where WinSCP.com') DO SET "WINSCP=%%G"
     )
 )
 
-IF "%PUTTYGEN%"=="" (
-    ECHO PuTTY not found. Installing via winget...
-    winget install --id PuTTY.PuTTY --accept-source-agreements --accept-package-agreements
+IF "%WINSCP%"=="" (
+    ECHO WinSCP not found. Installing via winget...
+    winget install --id WinSCP.WinSCP --accept-source-agreements --accept-package-agreements
     IF !ERRORLEVEL! NEQ 0 (
-        ECHO Failed to install PuTTY. Please install manually.
+        ECHO Failed to install WinSCP. Please install manually.
         EXIT /B 1
     )
-    SET "PUTTYGEN=%ProgramFiles%\PuTTY\puttygen.exe"
-    IF NOT EXIST "!PUTTYGEN!" (
-        ECHO puttygen.exe not found after installation.
-        EXIT /B 1
+    SET "WINSCP=%ProgramFiles%\WinSCP\WinSCP.com"
+    IF NOT EXIST "!WINSCP!" (
+        SET "WINSCP=%ProgramFiles(x86)%\WinSCP\WinSCP.com"
+        IF NOT EXIST "!WINSCP!" (
+            ECHO WinSCP.com not found after installation.
+            EXIT /B 1
+        )
     )
 )
 
-ECHO Using puttygen: %PUTTYGEN%
+ECHO Using WinSCP: %WINSCP%
 ECHO.
 
 IF NOT EXIST "%SSH_DIR%" (
@@ -52,7 +56,7 @@ FOR %%F IN ("%SSH_DIR%\id_*") DO (
             ECHO [SKIP] %%~nxF -- !PPK_FILE! already exists
         ) ELSE (
             ECHO [CONVERT] %%~nxF -- generating %%~nF.ppk
-            "%PUTTYGEN%" "%%F" -o "!PPK_FILE!"
+            "!WINSCP!" /keygen "%%F" /output="!PPK_FILE!"
             IF !ERRORLEVEL! EQU 0 (
                 ECHO [OK] %%~nF.ppk created
             ) ELSE (
