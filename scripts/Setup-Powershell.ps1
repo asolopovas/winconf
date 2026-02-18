@@ -1,23 +1,23 @@
 . $env:userprofile\winconf\functions.ps1
 
 $winconf = "$env:USERPROFILE\winconf"
-
 $mydocs = [Environment]::GetFolderPath("MyDocuments")
-$dir_1 = "$mydocs\WindowsPowerShell"
-$dir_2 = "$mydocs\PowerShell"
+$modulePath = "$winconf\powershell\modules"
 $profile_src = "$winconf\powershell\Microsoft.PowerShell_profile.ps1"
 
 $currentPath = [System.Environment]::GetEnvironmentVariable("PSModulePath", "User")
-[System.Environment]::SetEnvironmentVariable("PSModulePath", "$currentPath;$winconf\powershell\modules", "User")
+$cleanPaths = ($currentPath -split ";" | Where-Object { $_ -and $_ -ne $modulePath }) -join ";"
+$newPath = if ($cleanPaths) { "$cleanPaths;$modulePath" } else { $modulePath }
+[System.Environment]::SetEnvironmentVariable("PSModulePath", $newPath, "User")
 
-if (-not (Test-Path $dir_1)) {
-    New-Item -ItemType Directory -Path $dir_1
+$profileDirs = @(
+    "$mydocs\WindowsPowerShell"
+    "$mydocs\PowerShell"
+)
+
+foreach ($dir in $profileDirs) {
+    if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir }
+    CreateSymLink "$dir\Microsoft.PowerShell_profile.ps1" $profile_src
+    CreateSymLink "$dir\Microsoft.VSCode_profile.ps1" $profile_src
+    CreateSymLink "$dir\Profile.ps1" $profile_src
 }
-
-if (-not (Test-Path $dir_2)) {
-    New-Item -ItemType Directory -Path $dir_2
-}
-
-CreateSymLink "$dir_1\Microsoft.PowerShell_profile.ps1" $profile_src
-CreateSymLink "$dir_1\Microsoft.VSCode_profile.ps1" $profile_src
-CreateSymLink "$dir_2\Profile.ps1" $profile_src

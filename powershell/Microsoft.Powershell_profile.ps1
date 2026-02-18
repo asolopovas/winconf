@@ -7,6 +7,7 @@ try {
     . $root\functions.ps1
     . $psdir\completions\git-cli.ps1
     . $psdir\modules\aliases\remove-aliases.ps1
+    Import-Module $psdir\modules\aliases
     . $psdir\modules\helpers\shortcuts.ps1
 } catch {
     Write-Warning "Error loading PowerShell modules: $_"
