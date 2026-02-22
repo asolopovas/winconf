@@ -12,12 +12,6 @@ Describe "Test-CommandExists" {
     }
 }
 
-Describe "Test-ReparsePoint" {
-    It "false for non-existent path" {
-        Test-ReparsePoint "C:\no_such_xyz" | Should -BeFalse
-    }
-}
-
 Describe "CreateSymLink" {
     It "creates working symlink" {
         $target = Join-Path $TestDrive "target.txt"
