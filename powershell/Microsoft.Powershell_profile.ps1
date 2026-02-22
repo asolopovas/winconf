@@ -1,11 +1,8 @@
-# PowerShell Profile - Windows Configuration
 $root = Join-Path $env:USERPROFILE 'winconf'
 $psdir = Join-Path $root 'powershell'
 
-# Source core functions with error handling
 try {
     . $root\functions.ps1
-    . $psdir\completions\git-cli.ps1
     . $psdir\modules\aliases\remove-aliases.ps1
     Import-Module $psdir\modules\aliases
     . $psdir\modules\helpers\shortcuts.ps1
@@ -13,25 +10,40 @@ try {
     Write-Warning "Error loading PowerShell modules: $_"
 }
 
-# Configure Starship prompt
-$ENV:STARSHIP_CONFIG = Join-Path $psdir 'configs\starship.toml'
+try {
+    Set-PSReadLineOption -EditMode Windows
+    Set-PSReadLineOption -PredictionSource HistoryAndPlugin
+    Set-PSReadLineOption -PredictionViewStyle ListView
+    Set-PSReadLineOption -HistorySearchCursorMovesToEnd
+    Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
+    Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward
+    Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
+    Set-PSReadLineKeyHandler -Key Ctrl+d -Function DeleteCharOrExit
+    Set-PSReadLineKeyHandler -Key Ctrl+w -Function BackwardDeleteWord
+    Set-PSReadLineKeyHandler -Key Alt+d -Function DeleteWord
+} catch {}
 
-# Configure console
+foreach ($mod in @('posh-git', 'Terminal-Icons', 'ZLocation', 'DockerCompletion')) {
+    if (Get-Module -Name $mod -ListAvailable -ErrorAction SilentlyContinue) {
+        Import-Module $mod
+    }
+}
+
+if (Get-Module -Name posh-git) {
+    $env:POSH_GIT_ENABLED = $false
+}
+
+Get-ChildItem "$psdir\completions\*.ps1" | ForEach-Object { . $_.FullName }
+
+$ENV:STARSHIP_CONFIG = Join-Path $psdir 'configs\starship.toml'
 $Host.UI.RawUI.WindowTitle = "PowerShell"
 try { $null = [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch {}
 
-# Initialize Starship prompt
 if (Test-CommandExists starship) {
-    try {
-        Invoke-Expression (&starship init powershell)
-    } catch {
-        Write-Warning "Error initializing Starship: $_"
-    }
-} else {
-    Write-Warning "Starship not found in PATH. Please ensure it's installed and in your PATH."
+    try { Invoke-Expression (&starship init powershell) }
+    catch { Write-Warning "Error initializing Starship: $_" }
 }
 
-# PowerToys integration
 if ($PSVersionTable.PSVersion.Major -ge 7) {
     $ptPath = Join-Path $env:LOCALAPPDATA 'PowerToys\WinGetCommandNotFound.psd1'
     if (Test-Path $ptPath) {
@@ -45,5 +57,5 @@ if (Get-Command fnm -ErrorAction SilentlyContinue) {
 
 $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 if (Test-Path($ChocolateyProfile)) {
-  Import-Module "$ChocolateyProfile"
+    Import-Module "$ChocolateyProfile"
 }
