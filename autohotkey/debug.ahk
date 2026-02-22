@@ -138,10 +138,10 @@ FormatLogMessage(category, timestamp, params*) {
             processPath := GetProcessPath(params[3])
             return FormatTableRow(timestamp, params[2], "TOGGLE", params[1], "-", "-", "-", "-", processPath)
         case "TOGGLE_MINIMIZE":
-            processPath := GetProcessPath("wezterm-gui.exe")
+            processPath := GetProcessPath(params[1])
             return FormatTableRow(timestamp, params[1], "TOGGLE", "minimizing", "-", "-", "-", "-", processPath)
         case "TOGGLE_ACTIVATE":
-            processPath := GetProcessPath("wezterm-gui.exe")
+            processPath := GetProcessPath(params[1])
             return FormatTableRow(timestamp, params[1], "TOGGLE", "activating", params[2], params[3] . "," . params[4],
                 params[5] . "x" . params[6], "-", processPath)
         case "TOGGLE_LAUNCH":
@@ -150,15 +150,15 @@ FormatLogMessage(category, timestamp, params*) {
             processPath := GetProcessPath(params[3])
             return FormatTableRow(timestamp, params[2], "LAUNCH", params[1], "-", "-", "-", "-", processPath)
         case "LAUNCH_FOUND":
-            return FormatTableRow(timestamp, "-", "LAUNCH", "found_wezterm", "-", "-", "-", "-", "-")
+            return FormatTableRow(timestamp, "-", "LAUNCH", "found_terminal", "-", "-", "-", "-", "-")
         case "LAUNCH_RUNNING":
             return FormatTableRow(timestamp, "-", "LAUNCH", "running_cmd", "-", "-", "-", params[1], "-")
         case "LAUNCH_SUCCESS":
-            processPath := GetProcessPath("wezterm-gui.exe")
+            processPath := GetProcessPath(params[1])
             return FormatTableRow(timestamp, params[1], "LAUNCH", "launched", params[4], params[5] . "," . params[6],
                 params[7] . "x" . params[8], params[2] . "->" . params[3], processPath)
         case "LAUNCH_ACTIVATED":
-            processPath := GetProcessPath("wezterm-gui.exe")
+            processPath := GetProcessPath(params[1])
             return FormatTableRow(timestamp, params[1], "LAUNCH", "activated", "-", "-", "-", "-", processPath)
         case "LAUNCH_TIMEOUT":
             return FormatTableRow(timestamp, "-", "LAUNCH", "ERROR", "-", "-", "-", "-", "-")

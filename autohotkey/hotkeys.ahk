@@ -200,12 +200,12 @@ F7::
     KeyLogger(A_ThisHotkey)
     currentWin := WinGetID("A")
     currentProcessName := WinGetProcessName("A")
-    count := WinGetCount("ahk_exe wezterm-gui.exe")
+    count := WinGetCount("ahk_class CASCADIA_HOSTING_WINDOW_CLASS")
 
     DebugLog("STATUS", currentWin, currentProcessName, count)
 
     if (count > 0) {
-        termWindows := WinGetList("ahk_exe wezterm-gui.exe")
+        termWindows := WinGetList("ahk_class CASCADIA_HOSTING_WINDOW_CLASS")
         windowList := ""
         detailedList := ""
         for hwnd in termWindows {

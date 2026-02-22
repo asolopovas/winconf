@@ -17,7 +17,6 @@ $ESSENTIAL_SOFTWARE = @(
     'Starship.Starship'
     "sharkdp.fd"
     "VideoLAN.VLC"
-    'wez.wezterm'
     'WinSCP.WinSCP'
 )
 
@@ -30,7 +29,6 @@ $SOURCE_FILES = @(
     'Setup-Terminal'
     'Setup-Autohotkey'
     'Setup-SSH'
-    'Setup-Wezterm'
 )
 
 if ($Software) {

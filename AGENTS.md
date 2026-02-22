@@ -17,7 +17,6 @@ system, package.json, or compiled output.
 |-------------|----------------------------------------|-------|
 | PowerShell  | Profile, modules, setup/provisioning   | ~70%  |
 | AutoHotkey v2 | Hotkeys, window management, terminal | ~25%  |
-| Lua         | WezTerm terminal config               | ~5%   |
 | JSON/TOML   | Terminal profiles, Starship config     | Minor |
 
 ## Build / Run / Test Commands
@@ -76,7 +75,7 @@ Pester, .editorconfig, or formatting config exists.
 | `powershell/modules/aliases/` | PS module: global aliases (git, docker, etc.) |
 | `powershell/modules/helpers/` | PS module: 83+ exported utility functions    |
 | `scripts/`                  | Setup-*.ps1 provisioning scripts (run by init.ps1) |
-| `configs/`                  | WezTerm config, registry files                |
+| `configs/`                  | Registry files                                |
 | `terminal/`                 | Windows Terminal profiles.json                |
 | `bin/`                      | User binaries (on PATH)                       |
 | `tmp/`                      | Scratch scripts (gitignored)                  |
@@ -170,12 +169,6 @@ Every `.ahk` file must start with:
 - Track window handles in global `Map()` objects
 - Always check `WinExist()` before `WinActivate()` operations
 - Use `WinWaitActive` with timeout after launching processes
-
-## Code Style - Lua (WezTerm)
-
-- All variables `local`
-- Config-builder pattern: `local config = wezterm.config_builder()`
-- Event handlers via `wezterm.on('event', function(cmd) ... end)`
 
 ## Git Conventions
 

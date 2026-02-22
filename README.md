@@ -14,7 +14,7 @@ iwr https://raw.githubusercontent.com/asolopovas/winconf/main/init-software.ps1 
 
 ## What's Included
 
-**Core Tools:** PowerShell 7, WezTerm, AutoHotkey v2, Git, fzf, Starship, Everything, PowerToys, VLC
+**Core Tools:** PowerShell 7, AutoHotkey v2, Git, fzf, Starship, Everything, PowerToys, VLC
 
 **Extended Software:** CoreTemp, Miniconda, Calibre, GPG4Win, FFmpeg, Sysinternals, qBittorrent, ShareX, Rufus
 
@@ -23,7 +23,7 @@ iwr https://raw.githubusercontent.com/asolopovas/winconf/main/init-software.ps1 
 - **Virtual Desktop Management** - Win+1-9 switching with vim-style navigation
 - **Application Launchers** - Quick access to development tools
 - **Enhanced Git Workflow** - Custom aliases and PowerShell integration
-- **Terminal Automation** - WezTerm with Ubuntu WSL integration
+- **Terminal Automation** - Windows Terminal with Ubuntu WSL integration
 - **Window Management** - Vim-style controls and smart navigation
 
 ## Hotkeys
