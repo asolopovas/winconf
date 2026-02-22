@@ -58,12 +58,12 @@ Describe "Format-String" {
     }
 
     It "returns null on empty string" {
-        $result = Format-String "snakecase" "" 2>$null
+        $result = Format-String "snakecase" "" -ErrorAction SilentlyContinue
         $result | Should -BeNullOrEmpty
     }
 
     It "returns null on invalid case" {
-        $result = Format-String "kebabcase" "test" 2>$null
+        $result = Format-String "kebabcase" "test" -ErrorAction SilentlyContinue
         $result | Should -BeNullOrEmpty
     }
 }

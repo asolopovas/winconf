@@ -35,35 +35,44 @@ function  Convert-ExcelToCsvDir {
   }
 }
 
-function Format-String([string]$case, [string]$string) {
-    if (!$string) {
+function Format-String {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory, Position = 0)]
+        [string]$Case,
+
+        [Parameter(Position = 1)]
+        [string]$String
+    )
+
+    if (!$String) {
         Write-Error "String argument is null or empty"
         return
     }
 
-    switch ($case) {
+    switch ($Case) {
         "camelcase" {
-            $string = $string -replace "([a-z])([A-Z])", '$1 $2'
-            $string = $string -replace " ", ""
-            $string = $string.Substring(0,1).ToLower() + $string.Substring(1)
-            return $string
+            $String = $String -replace "([a-z])([A-Z])", '$1 $2'
+            $String = $String -replace " ", ""
+            $String = $String.Substring(0,1).ToLower() + $String.Substring(1)
+            return $String
         }
 
         "pascalcase" {
-            $string = $string -replace "([a-z])([A-Z])", '$1 $2'
-            $string = $string -replace " ", ""
-            $string = $string.Substring(0,1).ToUpper() + $string.Substring(1)
-            return $string
+            $String = $String -replace "([a-z])([A-Z])", '$1 $2'
+            $String = $String -replace " ", ""
+            $String = $String.Substring(0,1).ToUpper() + $String.Substring(1)
+            return $String
         }
 
         "snakecase" {
-            $string = $string.ToLower()
-            $string = $string -replace " ", "_"
-            return $string
+            $String = $String.ToLower()
+            $String = $String -replace " ", "_"
+            return $String
         }
 
         default {
-            Write-Error "Invalid case argument: $case"
+            Write-Error "Invalid case argument: $Case"
             return
         }
     }
