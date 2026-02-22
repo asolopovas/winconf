@@ -21,18 +21,17 @@ $ESSENTIAL_SOFTWARE = @(
 )
 
 $SOURCE_FILES = @(
-    'Bloatware-Removal'
-    'Cleanup'
-    'Setup-EnvironmentPaths'
-    'Setup-NerdFonts'
-    'Setup-Powershell'
-    'Setup-Terminal'
-    'Setup-Autohotkey'
-    'Setup-SSH'
+    'cleanup'
+    'inst-paths'
+    'inst-fonts'
+    'inst-pwsh'
+    'inst-terminal'
+    'inst-ahk'
+    'inst-ssh'
 )
 
 if ($Software) {
-    $SOURCE_FILES += 'Setup-Software'
+    $SOURCE_FILES += 'inst-software'
 }
 
 Write-Host "Setting execution policy to RemoteSigned..." -ForegroundColor Yellow
@@ -51,7 +50,7 @@ function Test-CommandExists {
 function SourceFile {
     param ($file)
     Write-Host "`nSourcing $file ..." -ForegroundColor DarkCyan
-    if ($file -eq 'Setup-Autohotkey') {
+    if ($file -eq 'inst-ahk') {
         & "$SCRIPTS_DIR\$file.ps1" -version $AUTOHOTKEYVERSION
     } else {
         & "$SCRIPTS_DIR\$file.ps1"

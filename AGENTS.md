@@ -45,8 +45,8 @@ Load shared utility functions in a session:
 
 Run a single setup script:
 ```powershell
-& .\scripts\Setup-SSH.ps1
-& .\scripts\Setup-Powershell.ps1
+& .\scripts\inst-ssh.ps1
+& .\scripts\inst-pwsh.ps1
 ```
 
 Reload PowerShell modules after changes:

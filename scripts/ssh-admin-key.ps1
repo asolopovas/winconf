@@ -8,7 +8,6 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-# Validate SSH key format
 if (-not ($PublicKey -match '^ssh-(rsa|ed25519|ecdsa|dss)\s+[\w+/=]+(\s+.+)?$')) {
     Write-Error "Invalid SSH public key format"
     exit 1
@@ -17,17 +16,14 @@ if (-not ($PublicKey -match '^ssh-(rsa|ed25519|ecdsa|dss)\s+[\w+/=]+(\s+.+)?$'))
 $sshDir = "C:\ProgramData\ssh"
 $authKeysFile = Join-Path $sshDir "administrators_authorized_keys"
 
-# Create SSH directory if it doesn't exist
 if (-not (Test-Path $sshDir)) {
     Write-Host "Creating SSH directory: $sshDir"
     New-Item -ItemType Directory -Path $sshDir -Force | Out-Null
 }
 
-# Add the public key to authorized_keys file
 Write-Host "Adding SSH key to: $authKeysFile"
 Add-Content -Path $authKeysFile -Value $PublicKey -Encoding UTF8
 
-# Set proper permissions using icacls
 Write-Host "Setting proper permissions..."
 $icaclsCmd = @(
     "`"$authKeysFile`"",

@@ -187,7 +187,7 @@ function Invoke-Pageant {
 
     $ppkFiles = Get-ChildItem "$SshDir\*.ppk" -ErrorAction SilentlyContinue
     if (-not $ppkFiles) {
-        Write-Fail "No PPK keys found in $SshDir. Run: Setup-SSH.ps1 convert"
+        Write-Fail "No PPK keys found in $SshDir. Run: inst-ssh.ps1 convert"
         return
     }
 
@@ -255,7 +255,7 @@ function Invoke-OpenSSH {
 
 function Invoke-CopyId {
     if (-not $Target) {
-        Write-Fail "Usage: Setup-SSH.ps1 copy-id <host> [-Identity <key.pub>]"
+        Write-Fail "Usage: inst-ssh.ps1 copy-id <host> [-Identity <key.pub>]"
         return
     }
 
@@ -266,7 +266,7 @@ function Invoke-CopyId {
     }
 
     if (-not (Test-Path $pubKey)) {
-        Write-Fail "No public key found. Run: Setup-SSH.ps1 generate"
+        Write-Fail "No public key found. Run: inst-ssh.ps1 generate"
         return
     }
 
@@ -288,7 +288,7 @@ function Invoke-Deploy {
     }
 
     if (-not (Test-Path $pubKey)) {
-        Write-Fail "No public key found. Run: Setup-SSH.ps1 generate"
+        Write-Fail "No public key found. Run: inst-ssh.ps1 generate"
         return
     }
 
@@ -371,7 +371,7 @@ echo "  Processed $user_count user(s): $updated_count updated, $skipped_count sk
 
 function Invoke-All {
     Write-Host ""
-    Write-Host "  Setup-SSH: Full SSH Configuration" -ForegroundColor White
+    Write-Host "  inst-ssh: Full SSH Configuration" -ForegroundColor White
     Write-Host "  =================================" -ForegroundColor DarkGray
     Write-Host ""
 
@@ -387,9 +387,9 @@ function Invoke-All {
 
 function Show-Help {
     Write-Host ""
-    Write-Host "  Setup-SSH.ps1 - Consolidated SSH key management" -ForegroundColor White
+    Write-Host "  inst-ssh.ps1 - Consolidated SSH key management" -ForegroundColor White
     Write-Host ""
-    Write-Host "  Usage: Setup-SSH.ps1 <action> [options]" -ForegroundColor DarkGray
+    Write-Host "  Usage: inst-ssh.ps1 <action> [options]" -ForegroundColor DarkGray
     Write-Host ""
     Write-Host "  Actions:" -ForegroundColor Yellow
     Write-Host "    all          Run full setup (generate, convert, permissions, pageant, deploy)"
@@ -410,15 +410,15 @@ function Show-Help {
     Write-Host "    -DryRun      Preview deploy without changes"
     Write-Host ""
     Write-Host "  Examples:" -ForegroundColor Yellow
-    Write-Host "    Setup-SSH.ps1                             # Full setup with Ed25519"
-    Write-Host "    Setup-SSH.ps1 generate                    # Generate Ed25519 key"
-    Write-Host "    Setup-SSH.ps1 generate -KeyType rsa       # Generate RSA key"
-    Write-Host "    Setup-SSH.ps1 convert                     # Convert all keys to PPKv2"
-    Write-Host "    Setup-SSH.ps1 convert -Force              # Re-convert all keys"
-    Write-Host "    Setup-SSH.ps1 deploy -DryRun              # Preview Plesk deployment"
-    Write-Host "    Setup-SSH.ps1 deploy -Force               # Overwrite all authorized_keys"
-    Write-Host "    Setup-SSH.ps1 copy-id root                # Copy key to 'root' host"
-    Write-Host "    Setup-SSH.ps1 copy-id threeoakwood        # Copy key to specific host"
+    Write-Host "    inst-ssh.ps1                             # Full setup with Ed25519"
+    Write-Host "    inst-ssh.ps1 generate                    # Generate Ed25519 key"
+    Write-Host "    inst-ssh.ps1 generate -KeyType rsa       # Generate RSA key"
+    Write-Host "    inst-ssh.ps1 convert                     # Convert all keys to PPKv2"
+    Write-Host "    inst-ssh.ps1 convert -Force              # Re-convert all keys"
+    Write-Host "    inst-ssh.ps1 deploy -DryRun              # Preview Plesk deployment"
+    Write-Host "    inst-ssh.ps1 deploy -Force               # Overwrite all authorized_keys"
+    Write-Host "    inst-ssh.ps1 copy-id root                # Copy key to 'root' host"
+    Write-Host "    inst-ssh.ps1 copy-id threeoakwood        # Copy key to specific host"
     Write-Host ""
 }
 
