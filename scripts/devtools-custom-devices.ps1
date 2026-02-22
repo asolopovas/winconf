@@ -7,23 +7,38 @@ function Set-DevtoolDevices {
 
     $source = Get-Content $configPath -Raw | ConvertFrom-Json
     $custom = $source.devtools.preferences.'custom-emulated-device-list'
-    $standard = $source.devtools.preferences.'standard-emulated-device-list'
 
-    if (-not $custom -and -not $standard) {
-        Write-Warning "No device lists found in source config."
+    if (-not $custom) {
+        Write-Warning "No custom device list found in source config."
         return
     }
 
-    $browsers = @{
-        Brave  = "$env:LOCALAPPDATA\BraveSoftware\Brave-Browser\User Data\Default\Preferences"
-        Chrome = "$env:LOCALAPPDATA\Google\Chrome\User Data\Default\Preferences"
-        Edge   = "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Default\Preferences"
+    $browsers = @(
+        @{ Name = "Brave";  Process = "brave";  Path = "$env:LOCALAPPDATA\BraveSoftware\Brave-Browser\User Data\Default\Preferences" }
+        @{ Name = "Chrome"; Process = "chrome"; Path = "$env:LOCALAPPDATA\Google\Chrome\User Data\Default\Preferences" }
+        @{ Name = "Edge";   Process = "msedge"; Path = "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Default\Preferences" }
+    )
+
+    $running = @()
+    foreach ($browser in $browsers) {
+        if (-not (Test-Path $browser.Path)) { continue }
+        if (Get-Process $browser.Process -ErrorAction SilentlyContinue) {
+            $running += $browser
+        }
     }
 
-    foreach ($entry in $browsers.GetEnumerator()) {
-        if (-not (Test-Path $entry.Value)) { continue }
+    if ($running.Count -gt 0) {
+        Write-Host "Closing browsers: $($running.Name -join ', ')" -ForegroundColor Yellow
+        foreach ($browser in $running) {
+            Stop-Process -Name $browser.Process -Force -ErrorAction SilentlyContinue
+        }
+        Start-Sleep -Seconds 2
+    }
 
-        $prefs = Get-Content $entry.Value -Raw | ConvertFrom-Json
+    foreach ($browser in $browsers) {
+        if (-not (Test-Path $browser.Path)) { continue }
+
+        $prefs = Get-Content $browser.Path -Raw | ConvertFrom-Json
 
         if ($null -eq $prefs.devtools) {
             $prefs | Add-Member -NotePropertyName "devtools" -NotePropertyValue ([PSCustomObject]@{})
@@ -33,16 +48,17 @@ function Set-DevtoolDevices {
         }
 
         $p = $prefs.devtools.preferences
-        foreach ($key in @('custom-emulated-device-list', 'standard-emulated-device-list')) {
-            if ($null -eq $p.$key) {
-                $p | Add-Member -NotePropertyName $key -NotePropertyValue ""
-            }
+        if ($null -eq $p.'custom-emulated-device-list') {
+            $p | Add-Member -NotePropertyName 'custom-emulated-device-list' -NotePropertyValue ""
         }
 
         $p.'custom-emulated-device-list' = $custom
-        $p.'standard-emulated-device-list' = $standard
 
-        $prefs | ConvertTo-Json -Depth 100 | Set-Content $entry.Value
-        Write-Host "Updated $($entry.Key)" -ForegroundColor Green
+        $prefs | ConvertTo-Json -Depth 100 | Set-Content $browser.Path
+        Write-Host "Updated $($browser.Name)" -ForegroundColor Green
+    }
+
+    foreach ($browser in $running) {
+        Start-Process $browser.Process
     }
 }
