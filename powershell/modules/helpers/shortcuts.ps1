@@ -1,13 +1,13 @@
-if (Get-Module -Name PSFzf -ListAvailable) {
-    $fzfCmd = Get-Command fzf -ErrorAction SilentlyContinue
-    if (-not $fzfCmd) {
-        $fzfPkg = Get-ChildItem "$env:LOCALAPPDATA\Microsoft\WinGet\Packages" -Filter "junegunn.fzf*" -Directory -ErrorAction SilentlyContinue | Select-Object -First 1
-        if ($fzfPkg) { $env:PATH += ";$($fzfPkg.FullName)" }
-    }
+$fzfCmd = Get-Command fzf -ErrorAction SilentlyContinue
+if (-not $fzfCmd) {
+    $fzfPkg = Get-ChildItem "$env:LOCALAPPDATA\Microsoft\WinGet\Packages" -Filter "junegunn.fzf*" -Directory -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($fzfPkg) { $env:PATH += ";$($fzfPkg.FullName)" }
+}
 
-    if (Get-Command fzf -ErrorAction SilentlyContinue) {
-        Import-Module PSFzf
+if (Get-Command fzf -ErrorAction SilentlyContinue) {
+    Import-Module PSFzf -ErrorAction SilentlyContinue
 
+    if (Get-Module PSFzf) {
         $env:FZF_DEFAULT_OPTS = '--height 40% --layout=reverse --border'
 
         $excludeDirs = @(

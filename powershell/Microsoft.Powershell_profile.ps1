@@ -23,14 +23,8 @@ try {
     Set-PSReadLineKeyHandler -Key Alt+d -Function DeleteWord
 } catch {}
 
-foreach ($mod in @('posh-git', 'Terminal-Icons', 'ZLocation', 'DockerCompletion')) {
-    if (Get-Module -Name $mod -ListAvailable -ErrorAction SilentlyContinue) {
-        Import-Module $mod
-    }
-}
-
-if (Get-Module -Name posh-git) {
-    $env:POSH_GIT_ENABLED = $false
+foreach ($mod in @('Terminal-Icons', 'ZLocation', 'DockerCompletion')) {
+    Import-Module $mod -ErrorAction SilentlyContinue
 }
 
 Get-ChildItem "$psdir\completions\*.ps1" | ForEach-Object { . $_.FullName }
@@ -44,16 +38,6 @@ if (Test-CommandExists starship) {
     catch { Write-Warning "Error initializing Starship: $_" }
 }
 
-if ($PSVersionTable.PSVersion.Major -ge 7) {
-    $ptPath = Join-Path $env:LOCALAPPDATA 'PowerToys\WinGetCommandNotFound.psd1'
-    if (Test-Path $ptPath) {
-        try { Import-Module $ptPath } catch {}
-    }
-}
-
-if (Get-Command fnm -ErrorAction SilentlyContinue) {
-    fnm env --use-on-cd | Out-String | Invoke-Expression
-}
 
 $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 if (Test-Path($ChocolateyProfile)) {
