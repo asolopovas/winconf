@@ -26,9 +26,15 @@ jobs:
         with:
           path: winconf
 
-      - name: Install Pester
+      - name: Ensure Pester 5+
         shell: pwsh
-        run: Install-Module Pester -Force -SkipPublisherCheck -Scope CurrentUser -MinimumVersion 5.0
+        run: |
+          $mod = Get-Module Pester -ListAvailable | Sort-Object Version -Descending | Select-Object -First 1
+          if ($mod -and $mod.Version.Major -ge 5) {
+            Write-Host "Pester $($mod.Version) already installed"
+          } else {
+            Install-Module Pester -Force -SkipPublisherCheck -Scope CurrentUser -MinimumVersion 5.0
+          }
 
       - name: Link repo to USERPROFILE\winconf
         shell: pwsh
