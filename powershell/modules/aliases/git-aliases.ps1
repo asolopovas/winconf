@@ -1,4 +1,3 @@
-# Basic git operations
 function ga { git commit --amend }
 function gs { git status }
 function gb { git branch }
@@ -15,13 +14,11 @@ function gk {
 }
 function gt { git tag }
 
-# Remote operations
 function gp { git push }
 function gpo { git push origin }
 function gpf { git push --force }
 function gl { git pull }
 
-# Clone operations
 function gsclone { 
     param([string]$repo)
     git clone "git@github.com:asolopovas/$repo"
@@ -31,7 +28,6 @@ function ghclone {
     git clone "https://github.com/asolopovas/$repo"
 }
 
-# Utilities
 function gundo { git reset --hard HEAD~1 }
 function nah { 
     git reset --hard
@@ -59,7 +55,6 @@ function bfg {
     java -jar $bfgPath @args
 }
 
-# Custom git workflow
 function gw {
     git add -A
     $commitMessage = Read-Host "Enter commit message"

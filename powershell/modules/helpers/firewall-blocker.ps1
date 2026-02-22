@@ -146,8 +146,7 @@ function firewallBlocker([string]$action, [string]$target = "*", [int]$depth = 0
 
     if ($action -eq "block") {
         if ($target -eq "*") {
-            Get-ChildItem -Path (Get-Location).Path -Recurse -Filter "*.exe" -Depth $depth | Foreach-Object {
-                $object =
+        Get-ChildItem -Path (Get-Location).Path -Recurse -Filter "*.exe" -Depth $depth | Foreach-Object {
                 if (! (ExecutablesStore exist $_)) {
                     ExecutablesStore add $_ Blocked
                     Add-FirewallRule $_.FullName $prefix
@@ -190,12 +189,7 @@ function firewallBlocker([string]$action, [string]$target = "*", [int]$depth = 0
     }
 
     if ($action -eq "list") {
-        if ($executables.Count -eq 0) {
-            Write-Host "No executables in the list."
-        }
-        else {
-            $executables
-        }
+        ExecutablesStore list
         return
     }
 

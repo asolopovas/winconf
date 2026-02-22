@@ -28,6 +28,7 @@ $SOURCE_FILES = @(
     'inst-terminal'
     'inst-ahk'
     'inst-ssh'
+    'wsl-exclusions'
 )
 
 if ($Software) {

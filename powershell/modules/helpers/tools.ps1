@@ -1,18 +1,3 @@
-function buildWebConfig {
-    Param(
-        [String][Parameter(Mandatory = $False)] $Config = "\\wsl$\Ubuntu\home\andrius\www\web-hosts.json"
-    )
-
-    $config = Get-Content $Config
-    $data = ConvertFrom-Json $config
-
-    foreach ($host in $data.hosts) {
-        New-HostnameMapping $host.name
-    }
-
-    wsl -d Ubuntu -- webconf-build
-}
-
 function clearShellContextMenu {
     param (
         [Parameter(Mandatory = $false)]
@@ -61,19 +46,6 @@ function conf {
     }
 }
 
-function devHostMappings {
-    $hosts = @(
-        "redis",
-        "mariadb",
-        "phpmyadmin.test",
-        "mailhog"
-    )
-
-    foreach ($host in $hosts) {
-        New-HostnameMapping -Hostname $host
-    }
-}
-
 function gitRmPreviousCommits {
     $yn = Read-Host -Prompt "This will delete all previous commits in the current repository. Are you sure you want to proceed? (yes/no)"
     switch -Wildcard ($yn) {
@@ -99,7 +71,6 @@ function sshCopyID($hostname) {
 }
 
 function tail($path, [Boolean]$f = $false, [string]$n = 10) {
-    # if $f is true, then Get-Content -Wait will be used
     if ($f) {
         Get-Content -Path $path -Wait -Tail $n
     }

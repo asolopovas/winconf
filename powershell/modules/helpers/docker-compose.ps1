@@ -11,9 +11,7 @@ Register-ArgumentCompleter -CommandName 'Dc' -ScriptBlock {
         'ps', 'pull', 'push', 'restart', 'rm', 'run', 'start', 'stop', 'top', 'unpause', 'up', 'version'
     )
 
-    $completions = $commands |
+    $commands |
         Where-Object { $_.StartsWith($wordToComplete) } |
-        ForEach-Object { New-CompletionResult -CompletionText $_ -ToolTip $_ }
-
-    $completions
+        ForEach-Object { [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_) }
 }

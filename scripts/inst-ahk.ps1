@@ -17,7 +17,6 @@ function UpdateOrCreateRegKey($path, $name, $value, $type = 'DWord') {
 $autohotkeyPath = if ($version -eq 1) { "$env:USERPROFILE\winconf\configs\autohotkey" } else { "$env:USERPROFILE\winconf" }
 $autohotkeyExec = if ($version -eq 1) { "C:\Program Files\AutoHotkey\AutoHotkey.exe" } else { "C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe" }
 
-# Remove old tasks
 $oldTaskNames = @("Autohotkey-$env:UserName", "Autohotkey-$env:UserName" + "v2")
 foreach ($oldTask in $oldTaskNames) {
     if (Test-ScheduledTask $oldTask) {

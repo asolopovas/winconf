@@ -3,10 +3,6 @@
 
 function lsChoco { choco list --local-only }
 
-function Log($value) {
-    Write-Output $value
-}
-
 function lsModules {
     [CmdletBinding()]
     param()

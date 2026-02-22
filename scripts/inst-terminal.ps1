@@ -1,6 +1,5 @@
 . "$env:userprofile\winconf\functions.ps1"
 
-# Config
 $terminal_conf_dir = @(
     "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState",
     "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminalPreview_8wekyb3d8bbwe\LocalState"

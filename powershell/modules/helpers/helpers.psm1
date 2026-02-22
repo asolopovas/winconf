@@ -49,13 +49,6 @@ function UpdateModuleManifest {
     $moduleManifest | Set-Content -Path $moduleManifestPath
 }
 
-function keyboardLayoutSetup {
-    Set-ItemProperty -Path "HKCU:\Keyboard Layout\Preload" -Name "1" -Value "00000809"
-    Set-ItemProperty -Path "HKCU:\Keyboard Layout\Preload" -Name "2" -Value "00000419"
-    Set-ItemProperty -Path "HKCU:\Keyboard Layout\ShowToast" -Name "Show" -Value 1 -Type DWord
-    Set-ItemProperty -Path "HKCU:\Keyboard Layout\Substitutes" -Name "00000409" -Value "00000809"
-}
-
 function LinuxDriveMounter {
     if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
         Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
@@ -243,7 +236,7 @@ function Update-UserPath {
 }
 
 . $PSScriptRoot\devtools-custom-devices.ps1
-. $PSScriptRoot\convertions.ps1
+. $PSScriptRoot\conversions.ps1
 . $PSScriptRoot\docker-compose.ps1
 . $PSScriptRoot\edit-hosts.ps1
 . $PSScriptRoot\files.ps1

@@ -1,6 +1,6 @@
 @{
 
-    RootModule        = 'aliases'
+    RootModule        = 'aliases.psm1'
     ModuleVersion     = '1.0.0'
     GUID              = '52b86611-6a12-4960-944c-679643acab2c'
     Author            = 'Andrius Solopovas'
@@ -36,18 +36,14 @@
     )
     AliasesToExport   = @(
         'which',
-        'get',
-        'tail',
         'pt',
-        'touch',
-        'ln',
         'grep',
-        'vim',
         'dk',
-        'l'
-        'gs'
+        'l',
+        'pbpaste',
+        'ppaste',
+        'pbcopy',
+        'pcopy'
     )
 
 }
-
-

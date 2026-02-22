@@ -7,45 +7,36 @@
     Copyright         = '(c) Andrius Solopovas. All rights reserved.'
     Description       = 'A collection of powershell utilities to help with daily tasks.'
 
-    AliasesToExport   = @('hosts-edit')
+    AliasesToExport   = @('hosts-edit', 'dc')
     FunctionsToExport = @(
-        # convertions.ps1
         'Convert-ExcelToCsv',
+        'Convert-ExcelToCsvDir',
         'Convert-ToUnixEndings',
         'Format-String',
-        # docker-compose.ps1
         'Dc',
-        # files.ps1
         'Find-Replace',
         'Get-File',
         'New-File',
         'New-HardLink',
         'New-SymLink',
         'Test-IsSymLink',
-        # firewall-blocker.ps1
         'ExecutablesStore',
-        'LinuxDriveMounter',
         'ObjectStore',
-        'Read-ObjectStore',
-        'Write-ObjectStore',
         'firewallBlocker',
-        # helpers.psm1
         'Get-RootName',
         'IIf',
+        'LinuxDriveMounter',
         'Remove-CertByName',
         'Register-Cert',
         'Test-Sha',
         'UpdateModuleManifest',
-        "Update-UserPath",
-        # rm-pattern.ps1
+        'Update-UserPath',
         'Remove-ByPattern',
-        # security.ps1
         'Add-DefenderExclusion',
         'Add-FirewallRule',
         'Clear-DefenderHistory',
         'DefenderMode',
         'Remove-FirewallRule',
-        # system.ps1
         'Add-AdminShortcut',
         'Add-StartupItem',
         'Add-ToPath',
@@ -62,21 +53,16 @@
         'Test-ScheduledTask',
         'Update-UserPassword',
         'Write-ColorOutput',
-        # tools.ps1
-        'buildWebConfig',
         'clearShellContextMenu',
         'conf',
-        'devHostMappings',
         'Edit-HostsWithVSCode',
         'gitRmPreviousCommits',
         'sshCopyID',
         'Show-EnvironmentPaths',
         'tail',
-        # wsl.ps1
         'WslExport',
         'WslImport',
         'WslRemove',
-        # devtools-custom-devices.ps1
         'Get-DevtoolDevices',
         'Set-DevtoolDevices'
     )
