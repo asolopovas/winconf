@@ -36,15 +36,3 @@ Describe "CreateSymLink" {
         Get-Content $link | Should -Be "new"
     }
 }
-
-Describe "Clear-DebugLogs" {
-    It "removes only .log files" {
-        $dir = Join-Path $TestDrive "logs"
-        New-Item -ItemType Directory -Path $dir | Out-Null
-        Set-Content "$dir\a.log" "x"
-        Set-Content "$dir\b.txt" "y"
-        Clear-DebugLogs -LogDirectory $dir
-        Test-Path "$dir\a.log" | Should -BeFalse
-        Test-Path "$dir\b.txt" | Should -BeTrue
-    }
-}

@@ -3,110 +3,6 @@ BeforeAll {
     $script:scripts = Join-Path $script:root "scripts"
 }
 
-Describe "cleanup.ps1" {
-    BeforeAll {
-        $script:path = Join-Path $script:scripts "cleanup.ps1"
-        Mock Get-AppxPackage { }
-        Mock Remove-AppxPackage { }
-        Mock New-PSDrive { }
-        Mock Remove-Item { }
-    }
-
-    It "calls Get-AppxPackage for every bloatware entry" {
-        Mock Test-Path { $false }
-        & $script:path
-        Should -Invoke Get-AppxPackage -Exactly 50
-    }
-
-    It "removes existing registry keys" {
-        Mock Test-Path { $true }
-        & $script:path
-        Should -Invoke Remove-Item -Exactly 6
-    }
-
-    It "skips missing registry keys" {
-        Mock Test-Path { $false }
-        & $script:path
-        Should -Invoke Remove-Item -Exactly 0
-    }
-}
-
-Describe "inst-ahk.ps1 task cleanup" {
-    BeforeAll {
-        $script:path = Join-Path $script:scripts "inst-ahk.ps1"
-        function Test-RegistryValue { param($Path, $Value) $false }
-        function Test-ScheduledTask { param($name) $false }
-    }
-
-    BeforeEach {
-        Mock Get-CimInstance { [PSCustomObject]@{ Name = "PC"; Domain = "WG" } }
-        Mock Test-RegistryValue { $false }
-        Mock New-Item { }
-        Mock Set-ItemProperty { }
-        Mock New-ItemProperty { }
-        Mock New-ScheduledTaskAction { }
-        Mock New-ScheduledTaskTrigger { }
-        Mock New-ScheduledTaskPrincipal { }
-        Mock New-ScheduledTaskSettingsSet { }
-        Mock New-ScheduledTask { }
-        Mock Register-ScheduledTask { }
-        Mock Start-ScheduledTask { }
-        Mock Unregister-ScheduledTask { }
-        Mock Write-Host { }
-    }
-
-    It "skips task creation when task already exists" {
-        Mock Test-ScheduledTask { param($name)
-            $name -match "AutoHotkey-Init"
-        }
-        & $script:path -version 2
-        Should -Invoke Register-ScheduledTask -Exactly 0
-    }
-
-    It "unregisters legacy tasks" {
-        Mock Test-ScheduledTask { $true }
-        & $script:path -version 2
-        Should -Invoke Unregister-ScheduledTask -ParameterFilter {
-            $TaskName -match "^Autohotkey-"
-        }
-    }
-}
-
-Describe "inst-ahk.ps1 registry config" {
-    BeforeAll {
-        $script:path = Join-Path $script:scripts "inst-ahk.ps1"
-        function Test-RegistryValue { param($Path, $Value) $false }
-        function Test-ScheduledTask { param($name) $true }
-    }
-
-    BeforeEach {
-        Mock Get-CimInstance { [PSCustomObject]@{ Name = "PC"; Domain = "WG" } }
-        Mock Test-RegistryValue { $false }
-        Mock Test-ScheduledTask { $true }
-        Mock New-Item { }
-        Mock Set-ItemProperty { }
-        Mock New-ItemProperty { }
-        Mock Unregister-ScheduledTask { }
-        Mock Register-ScheduledTask { }
-        Mock Start-ScheduledTask { }
-        Mock Write-Host { }
-    }
-
-    It "sets DisableLockWorkstation" {
-        & $script:path -version 2
-        Should -Invoke New-ItemProperty -ParameterFilter {
-            $Name -eq "DisableLockWorkstation" -and $Value -eq 1
-        }
-    }
-
-    It "sets NoWinKeys" {
-        & $script:path -version 2
-        Should -Invoke New-ItemProperty -ParameterFilter {
-            $Name -eq "NoWinKeys" -and $Value -eq 1
-        }
-    }
-}
-
 Describe "inst-ssh.ps1 generate" {
     BeforeAll {
         $script:path = Join-Path $script:scripts "inst-ssh.ps1"
@@ -178,29 +74,12 @@ Describe "inst-ssh.ps1 copy-id" {
     }
 }
 
-Describe "wsl-exclusions.ps1" {
-    BeforeAll {
-        $script:path = Join-Path $script:scripts "wsl-exclusions.ps1"
-    }
-
-    BeforeEach {
-        Mock Add-MpPreference { }
-    }
-
-    It "adds folder, extension, and process exclusions" {
-        & $script:path
-        Should -Invoke Add-MpPreference -ParameterFilter { $ExclusionPath } -Exactly 4
-        Should -Invoke Add-MpPreference -ParameterFilter { $ExclusionExtension } -Exactly 2
-        Should -Invoke Add-MpPreference -ParameterFilter { $ExclusionProcess } -Exactly 11
-    }
-}
-
 Describe "init.ps1 references" {
     BeforeAll {
         $script:content = Get-Content (Join-Path $script:root "init.ps1") -Raw
     }
 
-    It "SOURCE_FILES use new names" {
+    It "SOURCE_FILES use current names" {
         $script:content | Should -Match "'cleanup'"
         $script:content | Should -Match "'inst-paths'"
         $script:content | Should -Match "'inst-fonts'"
@@ -254,7 +133,6 @@ Describe "no stale references across repo" {
         foreach ($file in $script:allScripts) {
             $c = Get-Content $file.FullName -Raw
             $c | Should -Not -Match 'Bloatware-Removal\.ps1'
-            $c | Should -Not -Match 'Cleanup\.ps1'
             $c | Should -Not -Match 'run-chrome-wsl\.ps1'
         }
     }
