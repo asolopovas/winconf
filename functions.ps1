@@ -1,21 +1,40 @@
 function Test-CommandExists {
-    Param ($command)
-    $oldPreference = $ErrorActionPreference
-    $ErrorActionPreference = "stop"
+    param (
+        [Parameter(Mandatory)]
+        [string]$Command
+    )
 
-    try { if (Get-Command $command) { return $true } }
-    Catch { return $false }
-    Finally { $ErrorActionPreference = $oldPreference }
+    [bool](Get-Command $Command -ErrorAction SilentlyContinue)
 }
 
-function SetPermissions($dir) {
-    $acl = Get-Acl $dir
-    $accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule("$env:UserName", "FullControl", "Allow")
+function SetPermissions {
+    param (
+        [Parameter(Mandatory)]
+        [string]$Dir
+    )
+
+    if (-not (Test-Path $Dir)) {
+        Write-Error "Path '$Dir' does not exist"
+        return
+    }
+
+    $acl = Get-Acl $Dir
+    $accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule(
+        $env:UserName, "FullControl", "Allow"
+    )
     $acl.SetAccessRule($accessRule)
-    Set-Acl $dir $acl
+    Set-Acl $Dir $acl
 }
 
-function CreateSymLink($src, $target) {
-    Remove-Item -Force -Recurse -Confirm:$false $src -ErrorAction SilentlyContinue
-    New-Item -ItemType SymbolicLink -Path $src -Target $target -Force
+function CreateSymLink {
+    param (
+        [Parameter(Mandatory)]
+        [string]$Src,
+
+        [Parameter(Mandatory)]
+        [string]$Target
+    )
+
+    Remove-Item -Force -Recurse -Confirm:$false $Src -ErrorAction SilentlyContinue
+    New-Item -ItemType SymbolicLink -Path $Src -Target $Target -Force
 }

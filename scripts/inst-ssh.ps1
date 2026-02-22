@@ -95,10 +95,10 @@ function Invoke-Generate {
     Write-Step "Generating $KeyType key: $name"
 
     $comment = "$env:USERNAME@$env:COMPUTERNAME"
-    $args = @("-t", $KeyType, "-C", $comment, "-f", $keyPath, "-N", '""')
-    if ($KeyType -eq "rsa") { $args += @("-b", $Bits) }
+    $keygenArgs = @("-t", $KeyType, "-C", $comment, "-f", $keyPath, "-N", '""')
+    if ($KeyType -eq "rsa") { $keygenArgs += @("-b", $Bits) }
 
-    & ssh-keygen @args 2>&1 | Out-Null
+    & ssh-keygen @keygenArgs 2>&1 | Out-Null
     if ($LASTEXITCODE -ne 0) { Write-Fail "ssh-keygen failed"; return }
 
     Write-OK "$keyPath"

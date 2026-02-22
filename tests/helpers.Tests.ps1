@@ -16,6 +16,10 @@ Describe "Get-RootName" {
     It "handles path with directory" {
         Get-RootName "C:\tools\app.msi" | Should -Be "app"
     }
+
+    It "strips only last extension from double extension" {
+        Get-RootName "archive.tar.gz" | Should -Be "archive.tar"
+    }
 }
 
 Describe "IIf" {
@@ -33,6 +37,10 @@ Describe "IIf" {
 
     It "evaluates ScriptBlock for Else" {
         IIf $false "fallback" { "computed" } | Should -Be "computed"
+    }
+
+    It "returns null Then on false without Else" {
+        IIf $false "yes" | Should -BeNullOrEmpty
     }
 }
 
@@ -114,19 +122,19 @@ Describe "SortEnvPaths" {
 }
 
 Describe "Test-Sha" {
+    BeforeAll {
+        $script:knownHash = "2CF24DBA5FB0A30E26E83B2AC5B9E29E1B161E5C1FA7425E73043362938B9824"
+    }
+
     It "matches correct hash" {
         $file = Join-Path $TestDrive "test.bin"
         Set-Content -Path $file -Value "hello" -NoNewline
-        $sha256 = [System.Security.Cryptography.SHA256]::Create()
-        $bytes = [System.IO.File]::ReadAllBytes($file)
-        $expectedHash = -join ($sha256.ComputeHash($bytes) | ForEach-Object { $_.ToString("X2") })
 
         $shaFile = Join-Path $TestDrive "test.sha256"
-        Set-Content -Path $shaFile -Value "$expectedHash  test.bin" -NoNewline
+        Set-Content -Path $shaFile -Value "$($script:knownHash)  test.bin" -NoNewline
 
         Mock Write-Host { }
-        $result = Test-Sha -ShaOrFilePath $shaFile -FileToCheck $file
-        $result | Should -Be "Hash matches!"
+        Test-Sha -ShaOrFilePath $shaFile -FileToCheck $file | Should -Be "Hash matches!"
     }
 
     It "detects mismatched hash" {
@@ -134,10 +142,34 @@ Describe "Test-Sha" {
         Set-Content -Path $file -Value "hello" -NoNewline
 
         $shaFile = Join-Path $TestDrive "test2.sha256"
-        Set-Content -Path $shaFile -Value "0000000000000000000000000000000000000000000000000000000000000000  test2.bin" -NoNewline
+        $badHash = "0" * 64
+        Set-Content -Path $shaFile -Value "$badHash  test2.bin" -NoNewline
 
         Mock Write-Host { }
-        $result = Test-Sha -ShaOrFilePath $shaFile -FileToCheck $file
-        $result | Should -Be "Hash doesn't match!"
+        Test-Sha -ShaOrFilePath $shaFile -FileToCheck $file | Should -Be "Hash doesn't match!"
+    }
+
+    It "accepts raw hash string instead of file" {
+        $file = Join-Path $TestDrive "test3.bin"
+        Set-Content -Path $file -Value "hello" -NoNewline
+
+        Mock Write-Host { }
+        Test-Sha -ShaOrFilePath $script:knownHash -FileToCheck $file | Should -Be "Hash matches!"
+    }
+}
+
+Describe "Test-IsSymLink" {
+    It "returns true for symlink" {
+        $target = Join-Path $TestDrive "real.txt"
+        $link = Join-Path $TestDrive "sym.txt"
+        Set-Content $target "data"
+        New-Item -ItemType SymbolicLink -Path $link -Target $target | Out-Null
+        Test-IsSymLink $link | Should -BeTrue
+    }
+
+    It "returns false for regular file" {
+        $file = Join-Path $TestDrive "normal.txt"
+        Set-Content $file "data"
+        Test-IsSymLink $file | Should -BeFalse
     }
 }

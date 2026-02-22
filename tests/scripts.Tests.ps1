@@ -35,6 +35,15 @@ Describe "inst-ssh.ps1 generate" {
         & $script:path -Action generate
         Should -Invoke ssh-keygen -Exactly 0
     }
+
+    It "regenerates when -Force is set" {
+        $sshDir = Join-Path $script:tmpHome ".ssh"
+        New-Item -ItemType Directory $sshDir | Out-Null
+        Set-Content "$sshDir\id_ed25519" "key"
+        Mock ssh-keygen { $global:LASTEXITCODE = 0 }
+        & $script:path -Action generate -Force
+        Should -Invoke ssh-keygen -Exactly 2
+    }
 }
 
 Describe "inst-ssh.ps1 copy-id" {
