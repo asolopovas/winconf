@@ -1,5 +1,6 @@
 BeforeAll {
-    . "$env:USERPROFILE\winconf\functions.ps1"
+    $root = Split-Path $PSScriptRoot -Parent
+    . "$root\functions.ps1"
 }
 
 Describe "Test-CommandExists" {

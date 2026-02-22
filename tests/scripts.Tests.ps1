@@ -1,6 +1,11 @@
+BeforeAll {
+    $script:root = Split-Path $PSScriptRoot -Parent
+    $script:scripts = Join-Path $script:root "scripts"
+}
+
 Describe "cleanup.ps1" {
     BeforeAll {
-        $script:path = "$env:USERPROFILE\winconf\scripts\cleanup.ps1"
+        $script:path = Join-Path $script:scripts "cleanup.ps1"
         Mock Get-AppxPackage { }
         Mock Remove-AppxPackage { }
         Mock New-PSDrive { }
@@ -28,7 +33,7 @@ Describe "cleanup.ps1" {
 
 Describe "inst-ahk.ps1 task cleanup" {
     BeforeAll {
-        $script:path = "$env:USERPROFILE\winconf\scripts\inst-ahk.ps1"
+        $script:path = Join-Path $script:scripts "inst-ahk.ps1"
         function Test-RegistryValue { param($Path, $Value) $false }
         function Test-ScheduledTask { param($name) $false }
     }
@@ -69,7 +74,7 @@ Describe "inst-ahk.ps1 task cleanup" {
 
 Describe "inst-ahk.ps1 registry config" {
     BeforeAll {
-        $script:path = "$env:USERPROFILE\winconf\scripts\inst-ahk.ps1"
+        $script:path = Join-Path $script:scripts "inst-ahk.ps1"
         function Test-RegistryValue { param($Path, $Value) $false }
         function Test-ScheduledTask { param($name) $true }
     }
@@ -104,7 +109,7 @@ Describe "inst-ahk.ps1 registry config" {
 
 Describe "inst-ssh.ps1 generate" {
     BeforeAll {
-        $script:path = "$env:USERPROFILE\winconf\scripts\inst-ssh.ps1"
+        $script:path = Join-Path $script:scripts "inst-ssh.ps1"
         $script:origProfile = $env:USERPROFILE
     }
 
@@ -138,7 +143,7 @@ Describe "inst-ssh.ps1 generate" {
 
 Describe "inst-ssh.ps1 copy-id" {
     BeforeAll {
-        $script:path = "$env:USERPROFILE\winconf\scripts\inst-ssh.ps1"
+        $script:path = Join-Path $script:scripts "inst-ssh.ps1"
         $script:origProfile = $env:USERPROFILE
     }
 
@@ -175,7 +180,7 @@ Describe "inst-ssh.ps1 copy-id" {
 
 Describe "wsl-exclusions.ps1" {
     BeforeAll {
-        $script:path = "$env:USERPROFILE\winconf\scripts\wsl-exclusions.ps1"
+        $script:path = Join-Path $script:scripts "wsl-exclusions.ps1"
     }
 
     BeforeEach {
@@ -192,7 +197,7 @@ Describe "wsl-exclusions.ps1" {
 
 Describe "init.ps1 references" {
     BeforeAll {
-        $script:content = Get-Content "$env:USERPROFILE\winconf\init.ps1" -Raw
+        $script:content = Get-Content (Join-Path $script:root "init.ps1") -Raw
     }
 
     It "SOURCE_FILES use new names" {
@@ -229,14 +234,13 @@ Describe "all scripts exist" {
         @{ name = "inst-software-choco.ps1" }
         @{ name = "inst-base.ps1" }
     ) {
-        Test-Path "$env:USERPROFILE\winconf\scripts\$name" | Should -BeTrue
+        Test-Path (Join-Path $script:scripts $name) | Should -BeTrue
     }
 }
 
 Describe "no stale references across repo" {
     BeforeAll {
-        $script:allScripts = Get-ChildItem "$env:USERPROFILE\winconf\scripts\*.ps1" -File
-        $script:initContent = Get-Content "$env:USERPROFILE\winconf\init.ps1" -Raw
+        $script:allScripts = Get-ChildItem (Join-Path $script:scripts "*.ps1") -File
     }
 
     It "no script references old Setup- names" {

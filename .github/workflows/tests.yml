@@ -21,13 +21,24 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: winconf
 
       - name: Install Pester
         shell: pwsh
         run: Install-Module Pester -Force -SkipPublisherCheck -Scope CurrentUser -MinimumVersion 5.0
 
+      - name: Link repo to USERPROFILE\winconf
+        shell: pwsh
+        run: |
+          $target = "$env:USERPROFILE\winconf"
+          if (-not (Test-Path $target)) {
+            New-Item -ItemType Junction -Path $target -Target "${{ github.workspace }}\winconf" | Out-Null
+          }
+
       - name: Run tests
         shell: pwsh
+        working-directory: winconf
         run: |
           $cfg = New-PesterConfiguration
           $cfg.Run.Path = "tests"
@@ -43,4 +54,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: test-results.xml
+          path: winconf/test-results.xml
