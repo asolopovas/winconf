@@ -54,6 +54,22 @@ function Set-DevtoolDevices {
 
         $p.'custom-emulated-device-list' = $custom
 
+        $std = $p.'standard-emulated-device-list'
+        if ($std) {
+            $stdDevices = $std | ConvertFrom-Json
+            $seen = @{}
+            $deduped = @()
+            foreach ($device in $stdDevices) {
+                if (-not $seen.ContainsKey($device.title)) {
+                    $seen[$device.title] = $true
+                    $deduped += $device
+                }
+            }
+            if ($deduped.Count -ne $stdDevices.Count) {
+                $p.'standard-emulated-device-list' = $deduped | ConvertTo-Json -Depth 50 -Compress
+            }
+        }
+
         $prefs | ConvertTo-Json -Depth 100 | Set-Content $browser.Path
         Write-Host "Updated $($browser.Name)" -ForegroundColor Green
     }
