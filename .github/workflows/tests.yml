@@ -1,0 +1,46 @@
+name: Pester Tests
+
+on:
+  push:
+    paths:
+      - 'scripts/**'
+      - 'functions.ps1'
+      - 'init.ps1'
+      - 'tests/**'
+      - '.github/workflows/tests.yml'
+  pull_request:
+    paths:
+      - 'scripts/**'
+      - 'functions.ps1'
+      - 'init.ps1'
+      - 'tests/**'
+      - '.github/workflows/tests.yml'
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Pester
+        shell: pwsh
+        run: Install-Module Pester -Force -SkipPublisherCheck -Scope CurrentUser -MinimumVersion 5.0
+
+      - name: Run tests
+        shell: pwsh
+        run: |
+          $cfg = New-PesterConfiguration
+          $cfg.Run.Path = "tests"
+          $cfg.Output.Verbosity = "Detailed"
+          $cfg.TestResult.Enabled = $true
+          $cfg.TestResult.OutputPath = "test-results.xml"
+          $cfg.TestResult.OutputFormat = "NUnitXml"
+          $cfg.Run.Exit = $true
+          Invoke-Pester -Configuration $cfg
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results.xml
