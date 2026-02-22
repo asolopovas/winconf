@@ -63,7 +63,6 @@
         'WslExport',
         'WslImport',
         'WslRemove',
-        'Get-DevtoolDevices',
         'Set-DevtoolDevices'
     )
 }

@@ -1,50 +1,48 @@
-function Get-DevtoolDevices {
-    param (
-        [string]$ChromeConfigPath = "$env:LOCALAPPDATA\BraveSoftware\Brave-Browser\User Data\Default\Preferences",
-        [string]$DevtoolsDevicesConfig = "./devtools-devices.json"
-    )
-
-    $sourceContent = Get-Content -Path $ChromeConfigPath -Raw | ConvertFrom-Json
-    $customDeviceList = $sourceContent.devtools.preferences.'custom-emulated-device-list'
-    $standardDeviceList = $sourceContent.devtools.preferences.'standard-emulated-device-list'
-
-    $deviceData = @{
-        customDevices = $customDeviceList
-        standardDevices = $standardDeviceList
-    }
-
-    if ($null -ne $deviceData.customDevices -or $null -ne $deviceData.standardDevices) {
-        $deviceData | ConvertTo-Json -Depth 100 | Set-Content -Path $DevtoolsDevicesConfig
-    }
-}
-
 function Set-DevtoolDevices {
-    param (
-        [string]$ChromeConfigPath = "$env:LOCALAPPDATA\BraveSoftware\Brave-Browser\User Data\Default\Preferences",
-        [string]$DevtoolsDevicesConfig = "./devtools-devices.json"
-    )
+    $configPath = "Z:\My Drive\configs\Preferences"
+    if (-not (Test-Path $configPath)) {
+        Write-Error "Source config not found: $configPath"
+        return
+    }
 
-    $inputContent = Get-Content -Path $DevtoolsDevicesConfig -Raw | ConvertFrom-Json
-    $targetContent = Get-Content -Path $ChromeConfigPath -Raw | ConvertFrom-Json
+    $source = Get-Content $configPath -Raw | ConvertFrom-Json
+    $custom = $source.devtools.preferences.'custom-emulated-device-list'
+    $standard = $source.devtools.preferences.'standard-emulated-device-list'
 
-    if ($null -ne $inputContent) {
-        if ($null -eq $targetContent.devtools) {
-            $targetContent | Add-Member -Type NoteProperty -Name "devtools" -Value @{ }
+    if (-not $custom -and -not $standard) {
+        Write-Warning "No device lists found in source config."
+        return
+    }
+
+    $browsers = @{
+        Brave  = "$env:LOCALAPPDATA\BraveSoftware\Brave-Browser\User Data\Default\Preferences"
+        Chrome = "$env:LOCALAPPDATA\Google\Chrome\User Data\Default\Preferences"
+        Edge   = "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Default\Preferences"
+    }
+
+    foreach ($entry in $browsers.GetEnumerator()) {
+        if (-not (Test-Path $entry.Value)) { continue }
+
+        $prefs = Get-Content $entry.Value -Raw | ConvertFrom-Json
+
+        if ($null -eq $prefs.devtools) {
+            $prefs | Add-Member -NotePropertyName "devtools" -NotePropertyValue ([PSCustomObject]@{})
         }
-        if ($null -eq $targetContent.devtools.preferences) {
-            $targetContent.devtools | Add-Member -Type NoteProperty -Name "preferences" -Value @{ }
-        }
-        if ($null -eq $targetContent.devtools.preferences.'custom-emulated-device-list') {
-            $targetContent.devtools.preferences | Add-Member -Type NoteProperty -Name 'custom-emulated-device-list' -Value @()
-        }
-        if ($null -eq $targetContent.devtools.preferences.'standard-emulated-device-list') {
-            $targetContent.devtools.preferences | Add-Member -Type NoteProperty -Name 'standard-emulated-device-list' -Value @()
+        if ($null -eq $prefs.devtools.preferences) {
+            $prefs.devtools | Add-Member -NotePropertyName "preferences" -NotePropertyValue ([PSCustomObject]@{})
         }
 
-        $targetContent.devtools.preferences.'custom-emulated-device-list' = $inputContent.customDevices
-        $targetContent.devtools.preferences.'standard-emulated-device-list' = $inputContent.standardDevices
+        $p = $prefs.devtools.preferences
+        foreach ($key in @('custom-emulated-device-list', 'standard-emulated-device-list')) {
+            if ($null -eq $p.$key) {
+                $p | Add-Member -NotePropertyName $key -NotePropertyValue ""
+            }
+        }
 
-        $targetContent | ConvertTo-Json -Depth 100 | Set-Content -Path $ChromeConfigPath
+        $p.'custom-emulated-device-list' = $custom
+        $p.'standard-emulated-device-list' = $standard
+
+        $prefs | ConvertTo-Json -Depth 100 | Set-Content $entry.Value
+        Write-Host "Updated $($entry.Key)" -ForegroundColor Green
     }
 }
-
