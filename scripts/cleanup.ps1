@@ -50,8 +50,20 @@ $bloatwarePackages = @(
     "*Microsoft.BingWeather*"
 )
 
-foreach ($package in $bloatwarePackages) {
-    Get-AppxPackage $package | Remove-AppxPackage
+$installedApps = Get-AppxPackage -ErrorAction SilentlyContinue
+$removed = 0
+
+foreach ($pattern in $bloatwarePackages) {
+    $matches = $installedApps | Where-Object { $_.Name -like $pattern }
+    foreach ($app in $matches) {
+        Write-Host "  Removing $($app.Name)..." -ForegroundColor Yellow
+        $app | Remove-AppxPackage -ErrorAction SilentlyContinue
+        $removed++
+    }
+}
+
+if ($removed -eq 0) {
+    Write-Host "  No bloatware found to remove" -ForegroundColor DarkGray
 }
 
 New-PSDrive -PSProvider registry -Root HKEY_CLASSES_ROOT -Name HKCR -ErrorAction SilentlyContinue | Out-Null

@@ -27,7 +27,6 @@ $SOURCE_FILES = @(
     'inst-pwsh'
     'inst-terminal'
     'inst-ahk'
-    'inst-ssh'
     'wsl-exclusions'
     'inst-modules'
 )
@@ -90,10 +89,26 @@ if ($isUpdate) {
         Write-Host "Warning: git pull failed. Continuing with local version..." -ForegroundColor Yellow
     }
 
-    Write-Host "`nUpgrading essential software..." -ForegroundColor Green
-    foreach ($soft in $ESSENTIAL_SOFTWARE) {
-        Write-Host "  Upgrading $soft... " -ForegroundColor DarkGray
-        winget upgrade --id $soft -h --disable-interactivity --accept-source-agreements --accept-package-agreements 2>$null
+    Write-Host "`nChecking for software upgrades..." -ForegroundColor Green
+    $upgradeOutput = winget upgrade --accept-source-agreements 2>$null | Out-String
+    $toUpgrade = $ESSENTIAL_SOFTWARE | Where-Object { $upgradeOutput -match [regex]::Escape($_) }
+
+    if ($toUpgrade) {
+        Write-Host "  Upgrades available: $($toUpgrade -join ', ')" -ForegroundColor Yellow
+        $jobs = @()
+        foreach ($soft in $toUpgrade) {
+            Write-Host "  Upgrading $soft..." -ForegroundColor DarkGray
+            $jobs += Start-Job -ScriptBlock {
+                param($id)
+                winget upgrade --id $id -h --disable-interactivity --accept-source-agreements --accept-package-agreements 2>$null
+            } -ArgumentList $soft
+        }
+        $jobs | Wait-Job | ForEach-Object {
+            Receive-Job $_ -ErrorAction SilentlyContinue
+            Remove-Job $_
+        }
+    } else {
+        Write-Host "  All essential software is up to date" -ForegroundColor DarkGray
     }
 } else {
     Write-Host "`n========================================" -ForegroundColor Cyan
@@ -109,11 +124,24 @@ if ($isUpdate) {
     winget source reset --force
     winget source update
 
-    Write-Host "`nInstalling essential software..." -ForegroundColor Green
-    foreach ($soft in $ESSENTIAL_SOFTWARE) {
-        Write-Host "  Installing $soft... " -ForegroundColor DarkGray
-        winget install --id $soft -h --disable-interactivity --accept-source-agreements --accept-package-agreements --force
+    Write-Host "`nInstalling Git first (required for clone)..." -ForegroundColor Green
+    winget install --id Git.Git -h --disable-interactivity --accept-source-agreements --accept-package-agreements --force
+
+    $remainingSoftware = $ESSENTIAL_SOFTWARE | Where-Object { $_ -ne 'Git.Git' }
+    Write-Host "`nInstalling remaining software in parallel..." -ForegroundColor Green
+    $jobs = @()
+    foreach ($soft in $remainingSoftware) {
+        Write-Host "  Queuing $soft..." -ForegroundColor DarkGray
+        $jobs += Start-Job -ScriptBlock {
+            param($id)
+            winget install --id $id -h --disable-interactivity --accept-source-agreements --accept-package-agreements --force 2>$null
+        } -ArgumentList $soft
     }
+    $jobs | Wait-Job | ForEach-Object {
+        Receive-Job $_ -ErrorAction SilentlyContinue
+        Remove-Job $_
+    }
+    Write-Host "  Software installation complete" -ForegroundColor Green
 
     if (!(Test-CommandExists git)) {
         Write-Host "Adding git to Path" -ForegroundColor Yellow
