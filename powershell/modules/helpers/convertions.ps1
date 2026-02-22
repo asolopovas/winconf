@@ -31,7 +31,7 @@ function  Convert-ExcelToCsvDir {
   $items = Get-ChildItem -Recurse | Where-Object {!($_.PSIsContainer)}
 
   foreach ($item in $items) {
-    ExcelCSV($item)
+    Convert-ExcelToCsv $item
   }
 }
 

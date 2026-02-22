@@ -92,8 +92,6 @@ function RefreshUserPath ($envFilePath = "$env:USERPROFILE\winconf\.user-paths")
 
     foreach ($path in $paths) {
         $expandedPath = $ExecutionContext.InvokeCommand.ExpandString($path)
-        $normalizedPath = $expandedPath.TrimEnd('\').ToLower()
-
         Add-ToPath -Path $expandedPath
     }
 }
@@ -146,7 +144,8 @@ function Test-EnvPath {
     $LOC = if ($Machine) { [EnvironmentVariableTarget]::Machine } else { [EnvironmentVariableTarget]::User }
     $ENV_PATH = [Environment]::GetEnvironmentVariable("Path", $LOC)
 
-    return $ENV_PATH.Contains($Path)
+    $paths = $ENV_PATH -split ';' | ForEach-Object { $_.TrimEnd('\') }
+    return ($paths -contains $Path.TrimEnd('\'))
 }
 
 function Test-RegistryValue {

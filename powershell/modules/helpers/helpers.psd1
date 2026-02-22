@@ -7,7 +7,7 @@
     Copyright         = '(c) Andrius Solopovas. All rights reserved.'
     Description       = 'A collection of powershell utilities to help with daily tasks.'
 
-    AliasesToExport   = @('ehosts')
+    AliasesToExport   = @('hosts-edit')
     FunctionsToExport = @(
         # convertions.ps1
         'Convert-ExcelToCsv',

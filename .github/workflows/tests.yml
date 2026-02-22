@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'scripts/**'
+      - 'powershell/**'
       - 'functions.ps1'
       - 'init.ps1'
       - 'tests/**'
@@ -11,6 +12,7 @@ on:
   pull_request:
     paths:
       - 'scripts/**'
+      - 'powershell/**'
       - 'functions.ps1'
       - 'init.ps1'
       - 'tests/**'

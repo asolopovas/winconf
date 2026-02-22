@@ -1,5 +1,5 @@
 $excludeFolders = @(
-    "C:\Programm Files\Docker",
+    "C:\Program Files\Docker",
     "\\wsl$\Ubuntu\home\andrius\src",
     "\\wsl$\Ubuntu\home\andrius\www",
     "\\wsl.localhost\Ubuntu\home\andrius\src"

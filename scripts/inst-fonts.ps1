@@ -1,4 +1,4 @@
-[Reflection.Assembly]::LoadWithPartialName("System.Web")
+Add-Type -AssemblyName System.Web
 
 $fonts = @(
     "https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/FiraMono/Regular/FiraMonoNerdFontMono-Regular.otf"

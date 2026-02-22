@@ -31,7 +31,7 @@ function CreateSymLink($src, $target) {
 }
 
 function RestartExplorer {
-    Stop-Process -name explorer -Force explorer.exe
+    Stop-Process -Name explorer -Force
     Start-Process explorer.exe
 }
 

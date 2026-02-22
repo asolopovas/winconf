@@ -45,7 +45,7 @@ function DefenderMode {
     )
 
     $status = (Get-MpPreference).DisableRealtimeMonitoring
-    $targetValue = if ($on -or $status) { $false } else { $true }
+    $targetValue = if ($off) { $true } elseif ($on) { $false } else { -not $status }
     $message = if ($targetValue) { "Windows Defender Settings Disabled." } else { "Windows Defender Settings Enabled." }
 
     foreach ($setting in $settingsToToggle) {

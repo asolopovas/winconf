@@ -10,10 +10,10 @@ Write-Host "`nCurrent Paths:" -ForegroundColor Cyan
 $currentPaths | ForEach-Object { Write-Host $_ -ForegroundColor Cyan }
 
 
-$newPaths = $additionalPaths | Where-Object { $_.TrimEnd('\') -notin $currentPaths } | ForEach-Object { $_ }
+$newPaths = $additionalPaths | Where-Object { $_.TrimEnd('\') -notin $currentPaths }
 
 foreach ($path in $newPaths) {
-    Write-Host "`Adding Path - $path" -ForegroundColor Green
+    Write-Host "Adding Path - $path" -ForegroundColor Green
 }
 
 if ($newPaths) {

@@ -8,7 +8,7 @@ $bloatwarePackages = @(
     "*king.com.CandyCrushSodaSaga*",
     "*Microsoft.DrawboardPDF*",
     "*Facebook*",
-    "*Microsoft.OneDriveSync*"
+    "*Microsoft.OneDriveSync*",
     "*BethesdaSoftworks.FalloutShelter*",
     "*FarmVille2CountryEscape*",
     "*Microsoft.WindowsFeedbackHub*",
@@ -43,7 +43,6 @@ $bloatwarePackages = @(
     "*YourPhone*",
     "*Office.Sway*",
     "*MicrosoftStickyNotes*",
-    "*Microsoft.Getstarted*",
     "*Twitter*",
     "*ScreenSketch*",
     "*Microsoft3DViewer*",

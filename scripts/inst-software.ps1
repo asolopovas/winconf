@@ -17,5 +17,5 @@ $wingetApps = @(
 
 foreach($app in $wingetApps) {
     Write-Host "Installing $app"
-    winget install --id $app
+    winget install --id $app -h --disable-interactivity --accept-source-agreements --accept-package-agreements --force
 }

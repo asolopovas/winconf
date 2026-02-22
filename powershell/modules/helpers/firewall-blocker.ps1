@@ -115,7 +115,7 @@ function ExecutablesStore($action = "list", $item = $null, $status = "Blocked", 
         }
     }
 
-    if ($action -eq "add" -and $null -ne $item -and (! $executables | Where-Object { $_.FullPath -eq $item.FullName })) {
+    if ($action -eq "add" -and $null -ne $item -and -not ($executables | Where-Object { $_.FullPath -eq $item.FullName })) {
         $id = ($executables | Measure-Object).Count
         $object = @{
             ID       = $id
@@ -219,7 +219,7 @@ function firewallBlocker([string]$action, [string]$target = "*", [int]$depth = 0
         $executables = ExecutablesStore list
         if ($target -eq "*") {
             foreach ($exe in $executables) {
-                FBlocker removeById -id $exe.ID
+                firewallBlocker removeById -id $exe.ID
             }
             ExecutablesStore clear
             return
@@ -227,7 +227,7 @@ function firewallBlocker([string]$action, [string]$target = "*", [int]$depth = 0
 
         if (Test-Path -Path $target -PathType Leaf) {
             $selectedFile = $executables | Where-Object { $_.FullPath -eq $target.FullName }
-            FBlocker removeById -id $selectedFile.ID
+            firewallBlocker removeById -id $selectedFile.ID
             return
         }
 
