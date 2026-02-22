@@ -235,7 +235,6 @@ function Update-UserPath {
     Write-Host "User PATH has been updated."
 }
 
-. $PSScriptRoot\devtools-custom-devices.ps1
 . $PSScriptRoot\conversions.ps1
 . $PSScriptRoot\docker-compose.ps1
 . $PSScriptRoot\edit-hosts.ps1

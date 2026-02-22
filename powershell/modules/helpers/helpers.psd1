@@ -62,7 +62,6 @@
         'tail',
         'WslExport',
         'WslImport',
-        'WslRemove',
-        'Set-DevtoolDevices'
+        'WslRemove'
     )
 }
