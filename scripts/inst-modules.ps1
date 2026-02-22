@@ -15,11 +15,13 @@ foreach ($mod in $modules) {
     if ($installed) {
         if ($Update) {
             Write-Host "  Updating $mod..." -ForegroundColor DarkGray
-            if ($useResourceGet) {
-                Update-PSResource -Name $mod -ErrorAction SilentlyContinue
-            } else {
-                Update-Module -Name $mod -Force -ErrorAction SilentlyContinue
-            }
+            try {
+                if ($useResourceGet) {
+                    Update-PSResource -Name $mod -ErrorAction SilentlyContinue
+                } else {
+                    Update-Module -Name $mod -Force -ErrorAction SilentlyContinue
+                }
+            } catch {}
             $updated = Get-Module -Name $mod -ListAvailable | Select-Object -First 1
             Write-Host "  $mod $($updated.Version)" -ForegroundColor Green
         } else {
