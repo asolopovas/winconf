@@ -66,6 +66,28 @@ if ($removed -eq 0) {
     Write-Host "  No bloatware found to remove" -ForegroundColor DarkGray
 }
 
+$telemetryServices = @(
+    @{ Name = "ESRV_SVC_QUEENCREEK"; Display = "Intel Energy Server" },
+    @{ Name = "SystemUsageReportSvc_QUEENCREEK"; Display = "Intel System Usage Report" },
+    @{ Name = "IntelGraphicsSoftwareService"; Display = "Intel Graphics Software Service" },
+    @{ Name = "DiagTrack"; Display = "Connected User Experiences and Telemetry" },
+    @{ Name = "SysMain"; Display = "Superfetch" },
+    @{ Name = "Bonjour Service"; Display = "Bonjour Service" }
+)
+
+foreach ($svc in $telemetryServices) {
+    $service = Get-Service -Name $svc.Name -ErrorAction SilentlyContinue
+    if ($service -and $service.StartType -ne 'Manual' -and $service.StartType -ne 'Disabled') {
+        Set-Service -Name $svc.Name -StartupType Manual
+        Stop-Service -Name $svc.Name -Force -ErrorAction SilentlyContinue
+        Write-Host "  Disabled $($svc.Display)" -ForegroundColor Yellow
+    } elseif (-not $service) {
+        Write-Host "  $($svc.Display) not found, skipping" -ForegroundColor DarkGray
+    } else {
+        Write-Host "  $($svc.Display) already disabled" -ForegroundColor DarkGray
+    }
+}
+
 New-PSDrive -PSProvider registry -Root HKEY_CLASSES_ROOT -Name HKCR -ErrorAction SilentlyContinue | Out-Null
 
 $registryKeys = @(
