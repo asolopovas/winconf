@@ -1,11 +1,9 @@
 {
     "$help": "https://aka.ms/terminal-documentation",
     "$schema": "https://aka.ms/terminal-profiles-schema",
-    "actions": 
-    [
+    "actions": [
         {
-            "command": 
-            {
+            "command": {
                 "action": "copy"
             },
             "id": "User.copy.644BA8F2"
@@ -23,22 +21,19 @@
             "id": "User.closePane"
         },
         {
-            "command": 
-            {
+            "command": {
                 "action": "prevTab"
             },
             "id": "User.prevTab.0"
         },
         {
-            "command": 
-            {
+            "command": {
                 "action": "closeOtherTabs"
             },
             "id": "User.closeOtherTabs.0"
         },
         {
-            "command": 
-            {
+            "command": {
                 "action": "nextTab"
             },
             "id": "User.nextTab.0"
@@ -49,16 +44,14 @@
     "centerOnLaunch": true,
     "copyOnSelect": true,
     "defaultProfile": "{05b9d966-86e5-4a1f-a9df-d87cef4d716e}",
-    "disabledProfileSources": 
-    [
+    "disabledProfileSources": [
         "Windows.Terminal.Azure",
         "Windows.Terminal.PowershellCore"
     ],
     "firstWindowPreference": "defaultProfile",
     "initialCols": 127,
     "initialRows": 30,
-    "keybindings": 
-    [
+    "keybindings": [
         {
             "id": null,
             "keys": "ctrl+alt+5"
@@ -181,26 +174,22 @@
         }
     ],
     "launchMode": "default",
-    "newTabMenu": 
-    [
+    "newTabMenu": [
         {
             "type": "remainingProfiles"
         }
     ],
-    "profiles": 
-    {
-        "defaults": 
-        {
+    "profiles": {
+        "defaults": {
+            "bellStyle": "none",
             "colorScheme": "Legacy",
-            "font": 
-            {
+            "font": {
                 "face": "FiraMono Nerd Font Mono",
                 "size": 14
             },
             "startingDirectory": null
         },
-        "list": 
-        [
+        "list": [
             {
                 "commandline": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
                 "guid": "{05b9d966-86e5-4a1f-a9df-d87cef4d716e}",
@@ -276,8 +265,7 @@
             }
         ]
     },
-    "schemes": 
-    [
+    "schemes": [
         {
             "background": "#14191F",
             "black": "#000000",

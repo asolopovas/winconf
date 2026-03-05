@@ -35,7 +35,8 @@ ToggleDefender() {
         state := "OFF"
     }
     defenderOff := !defenderOff
-    TrayTip("Defender " . state, "Real-time protection is being turned " . state, defenderOff ? "2" : "1")
+    ToolTip("Defender " . state)
+    SetTimer(() => ToolTip(), -2000)
     cmd := 'powershell -Command "Start-Process powershell -ArgumentList '
         . "'-Command Set-MpPreference -DisableRealtimeMonitoring " . action . "' "
         . '-Verb RunAs -WindowStyle Hidden"'
@@ -43,7 +44,8 @@ ToggleDefender() {
         Run(cmd, , "Hide")
     } catch as err {
         defenderOff := !defenderOff
-        TrayTip("Defender Toggle Failed", "Error: " . err.Message, "3")
+        ToolTip("Defender Toggle Failed: " . err.Message)
+        SetTimer(() => ToolTip(), -3000)
     }
 }
 
