@@ -25,6 +25,28 @@ RestartExplorer(delay := -1) {
     }
 }
 
+ToggleDefender() {
+    static defenderOff := false
+    if defenderOff {
+        action := "$false"
+        state := "ON"
+    } else {
+        action := "$true"
+        state := "OFF"
+    }
+    defenderOff := !defenderOff
+    TrayTip("Defender " . state, "Real-time protection is being turned " . state, defenderOff ? "2" : "1")
+    cmd := 'powershell -Command "Start-Process powershell -ArgumentList '
+        . "'-Command Set-MpPreference -DisableRealtimeMonitoring " . action . "' "
+        . '-Verb RunAs -WindowStyle Hidden"'
+    try {
+        Run(cmd, , "Hide")
+    } catch as err {
+        defenderOff := !defenderOff
+        TrayTip("Defender Toggle Failed", "Error: " . err.Message, "3")
+    }
+}
+
 GetDefaultBrowserPath() {
     ; Direct fallback to installed browsers
     commonBrowsers := [

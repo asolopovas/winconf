@@ -194,6 +194,10 @@ F7::
     Send("{Enter}")
 }
 
+^+F12:: {
+    ToggleDefender()
+}
+
 ; Win+Ctrl+S - Show terminal status
 #^s::
 {
