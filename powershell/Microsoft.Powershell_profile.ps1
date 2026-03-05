@@ -20,6 +20,7 @@ function global:Initialize-Profile {
 
     try {
         Set-PSReadLineOption -EditMode Windows
+        Set-PSReadLineOption -BellStyle None
         Set-PSReadLineOption -PredictionSource HistoryAndPlugin
         Set-PSReadLineOption -PredictionViewStyle ListView
         Set-PSReadLineOption -HistorySearchCursorMovesToEnd
