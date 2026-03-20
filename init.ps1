@@ -7,6 +7,12 @@ $SCRIPTS_DIR = "$DOTFILES\scripts"
 $REPO_URL = 'https://github.com/asolopovas/winconf.git'
 $AUTOHOTKEYVERSION = 2
 $USER = $env:USERNAME
+$PINNED_SOFTWARE = @(
+    'ScreamingFrog.SEOSpider'
+    'Adobe.Acrobat.Reader.64-bit'
+    'Nvidia.CUDA'
+    'GPSoftware.DirectoryOpus'
+)
 $ESSENTIAL_SOFTWARE = @(
     'AutoHotkey.AutoHotkey'
     'Git.Git'
@@ -183,6 +189,17 @@ if (!(Test-Path -Path $SCRIPTS_DIR)) {
 Write-Host "`nRunning setup scripts..." -ForegroundColor Green
 foreach ($file in $SOURCE_FILES) {
     SourceFile $file
+}
+
+Write-Host "`nApplying winget pins..." -ForegroundColor Green
+$existingPins = winget pin list 2>$null | Out-String
+foreach ($pin in $PINNED_SOFTWARE) {
+    if ($existingPins -match [regex]::Escape($pin)) {
+        Write-Host "  Already pinned: $pin" -ForegroundColor DarkGray
+    } else {
+        Write-Host "  Pinning $pin..." -ForegroundColor DarkGray
+        winget pin add --id $pin --accept-source-agreements 2>$null
+    }
 }
 
 Write-Host "`n========================================" -ForegroundColor Green
