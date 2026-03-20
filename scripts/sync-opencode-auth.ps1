@@ -16,40 +16,45 @@ if (!$oauth) {
     exit 1
 }
 
-$anthropicEntry = @{
-    type    = "oauth"
-    refresh = $oauth.refreshToken
-    access  = $oauth.accessToken
-    expires = $oauth.expiresAt
-}
-
 Write-Host "Read Claude Code credentials (expires $($oauth.expiresAt))" -ForegroundColor Green
 
 function Update-AuthFile {
-    param([string]$Path, [hashtable]$Entry)
+    param([string]$Path, [string]$AccessToken, [string]$RefreshToken, [long]$ExpiresAt)
 
     if (Test-Path $Path) {
-        $auth = Get-Content $Path -Raw | ConvertFrom-Json
+        $raw = Get-Content $Path -Raw
     } else {
         $parentDir = Split-Path $Path -Parent
         if (!(Test-Path $parentDir)) { New-Item -ItemType Directory -Path $parentDir -Force | Out-Null }
-        $auth = [PSCustomObject]@{}
+        $raw = '{}'
     }
 
-    $auth | Add-Member -NotePropertyName "anthropic" -NotePropertyValue ([PSCustomObject]$Entry) -Force
-    $auth | ConvertTo-Json -Depth 10 | Set-Content $Path -Encoding UTF8
+    $pyScript = @"
+import sys, json
+auth = json.loads(sys.stdin.read())
+auth['anthropic'] = {
+    'type': 'oauth',
+    'access': sys.argv[1],
+    'refresh': sys.argv[2],
+    'expires': int(sys.argv[3])
+}
+with open(sys.argv[4], 'w', newline='\n') as f:
+    json.dump(auth, f, indent=2)
+    f.write('\n')
+"@
+    $raw | python -c $pyScript $AccessToken $RefreshToken $ExpiresAt $Path
 }
 
 Write-Host "Updating Windows opencode auth..." -ForegroundColor Cyan
-Update-AuthFile -Path $winAuthPath -Entry $anthropicEntry
+Update-AuthFile -Path $winAuthPath -AccessToken $oauth.accessToken -RefreshToken $oauth.refreshToken -ExpiresAt $oauth.expiresAt
 Write-Host "  $winAuthPath" -ForegroundColor DarkGray
 
 Write-Host "Updating WSL opencode auth..." -ForegroundColor Cyan
 $wslCheck = wsl bash -c "test -d ~/.local/share/opencode && echo exists" 2>$null
 if ($wslCheck -eq "exists") {
-    $jsonPayload = [PSCustomObject]$anthropicEntry | ConvertTo-Json -Depth 10 -Compress
-    $tmpScript = New-TemporaryFile
-    $winPath = $tmpScript.FullName -replace '\\', '/'
+    $jsonPayload = "{""type"":""oauth"",""access"":""$($oauth.accessToken)"",""refresh"":""$($oauth.refreshToken)"",""expires"":$($oauth.expiresAt)}"
+    $tmpScript = [System.IO.Path]::GetTempFileName()
+    $winPath = $tmpScript -replace '\\', '/'
     $wslTmpScript = wsl wslpath -u "$winPath"
     $scriptContent = @'
 #!/bin/bash
@@ -75,9 +80,9 @@ with open(sys.argv[1], "w") as f:
 mv "$tmpfile" "$authpath"
 chmod 600 "$authpath"
 '@
-    $scriptContent -replace "`r`n", "`n" | Set-Content $tmpScript.FullName -NoNewline -Encoding UTF8
+    [System.IO.File]::WriteAllText($tmpScript, ($scriptContent -replace "`r`n", "`n"))
     $jsonPayload | wsl bash $wslTmpScript
-    Remove-Item $tmpScript.FullName -Force
+    Remove-Item $tmpScript -Force
     Write-Host "  $wslAuthPath" -ForegroundColor DarkGray
 } else {
     Write-Host "  WSL opencode directory not found, skipping." -ForegroundColor Yellow
