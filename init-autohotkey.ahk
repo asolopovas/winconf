@@ -6,7 +6,7 @@
 ; ^ = ctrl
 ; # = win
 
-F8:: Reload
+!F8:: Reload
 
 #Include "autohotkey/runasuser.ahk"
 #Include "autohotkey/system.ahk"

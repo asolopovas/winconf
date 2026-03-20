@@ -228,7 +228,7 @@ F7::
 }
 
 
-F9:: ; Win + F9
+!F9:: ; Alt + F9
 {
     ahkId := GetActiveWindowID()
 
