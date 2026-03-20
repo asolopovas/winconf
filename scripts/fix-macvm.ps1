@@ -72,14 +72,6 @@ $requiredSettings = [ordered]@{
     "hw.model"                       = '"iMacPro1,1"'
     "serialNumber.reflectHost"       = '"FALSE"'
     "SMBIOS.use12CharSerialNumber"   = '"TRUE"'
-    "cpuid.0.eax"                    = '"0000:0000:0000:0000:0000:0000:0000:1011"'
-    "cpuid.0.ebx"                    = '"0111:0101:0110:1110:0110:0101:0100:0111"'
-    "cpuid.0.ecx"                    = '"0110:1100:0110:0101:0111:0100:0110:1110"'
-    "cpuid.0.edx"                    = '"0100:1001:0110:0101:0110:1110:0110:1001"'
-    "cpuid.1.eax"                    = '"0000:0000:0000:0001:0000:0110:0111:0001"'
-    "cpuid.1.ebx"                    = '"0000:0010:0000:0001:0000:1000:0000:0000"'
-    "cpuid.1.ecx"                    = '"1000:0010:1001:1000:0010:0010:0000:0011"'
-    "cpuid.1.edx"                    = '"0000:0111:1000:1011:1111:1011:1111:1111"'
 }
 
 $requiredEntries = [ordered]@{
@@ -173,11 +165,26 @@ foreach ($vmx in $selected) {
     $name = ($content | Where-Object { $_ -match '^displayName\s*=' }) -replace 'displayName\s*=\s*"(.*)"', '$1'
     if (-not $name) { $name = $vmx.BaseName }
 
-    $lockFile = Get-ChildItem -Path $vmx.DirectoryName -Filter "*.vmx.lck" -Directory -ErrorAction SilentlyContinue
-    if ($lockFile) {
-        Write-Host "  [$name] VM appears to be running - skipping" -ForegroundColor Red
+    $lockDir = Get-ChildItem -Path $vmx.DirectoryName -Filter "*.vmx.lck" -Directory -ErrorAction SilentlyContinue
+    $vmRunning = $false
+    if ($lockDir) {
+        $lockEntries = Get-ChildItem -Path $lockDir.FullName -ErrorAction SilentlyContinue
+        foreach ($entry in $lockEntries) {
+            if ($entry.Name -match '^M(\d+)\.lck$') {
+                $lockPid = [int]$Matches[1]
+                $proc = Get-Process -Id $lockPid -ErrorAction SilentlyContinue
+                if ($proc) { $vmRunning = $true; break }
+            }
+        }
+    }
+    if ($vmRunning) {
+        Write-Host "  [$name] VM is running - skipping" -ForegroundColor Red
         Write-Host "    Power off the VM first, then re-run this script" -ForegroundColor DarkGray
         continue
+    }
+    if ($lockDir) {
+        Remove-Item -Path $lockDir.FullName -Recurse -Force -ErrorAction SilentlyContinue
+        Write-Host "  [$name] Removed stale lock file" -ForegroundColor Yellow
     }
 
     Write-Host "  [$name] Applying macOS VM fixes..." -ForegroundColor Cyan
