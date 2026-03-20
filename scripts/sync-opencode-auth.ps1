@@ -49,12 +49,14 @@ $wslCheck = wsl bash -c "test -d ~/.local/share/opencode && echo exists" 2>$null
 if ($wslCheck -eq "exists") {
     $jsonPayload = [PSCustomObject]$anthropicEntry | ConvertTo-Json -Depth 10 -Compress
     $tmpScript = New-TemporaryFile
-    $wslTmpScript = wsl wslpath -u $tmpScript.FullName
+    $winPath = $tmpScript.FullName -replace '\\', '/'
+    $wslTmpScript = wsl wslpath -u "$winPath"
     $scriptContent = @'
 #!/bin/bash
 authpath=~/.local/share/opencode/auth.json
 tmpfile=$(mktemp)
 read -r jsonpayload
+jsonpayload=$(echo "$jsonpayload" | tr -d '\r')
 if [ -f "$authpath" ]; then
     cp "$authpath" "$tmpfile"
 else
