@@ -3,3 +3,4 @@ logs/
 tmp/
 *.log
 .claude/settings.local.json
+nul
