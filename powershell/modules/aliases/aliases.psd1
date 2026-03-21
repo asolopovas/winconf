@@ -32,7 +32,8 @@
         'pu',
         'pr',
         'lsChoco',
-        'lsModules'
+        'lsModules',
+        'rs'
     )
     AliasesToExport   = @(
         'which',
@@ -43,8 +44,7 @@
         'pbpaste',
         'ppaste',
         'pbcopy',
-        'pcopy',
-        'rs'
+        'pcopy'
     )
 
 }
