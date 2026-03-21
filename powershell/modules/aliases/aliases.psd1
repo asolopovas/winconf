@@ -43,7 +43,8 @@
         'pbpaste',
         'ppaste',
         'pbcopy',
-        'pcopy'
+        'pcopy',
+        'rs'
     )
 
 }

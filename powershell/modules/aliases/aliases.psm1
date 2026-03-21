@@ -19,4 +19,5 @@ New-Alias -Name pbcopy  -Scope Global -Value Set-Clipboard
 New-Alias -Name pcopy   -Scope Global -Value Set-Clipboard
 
 New-Alias -Name "pt" -Value poetry.exe
+New-Alias -Name "rs" -Scope Global -Value rsync.exe
 
