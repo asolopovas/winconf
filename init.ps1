@@ -35,6 +35,7 @@ $SOURCE_FILES = @(
     'inst-ahk'
     'wsl-exclusions'
     'inst-modules'
+    'inst-scoop'
 )
 
 if ($Software) {
