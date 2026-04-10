@@ -22,7 +22,7 @@ Describe "sync-ai.ps1" {
 
     Context "when credentials file is missing" {
         It "exits with error" {
-            $out = pwsh -NoProfile -File $script:scriptPath 2>&1
+            $out = pwsh -NoProfile -File $script:scriptPath -SkipMcp -SkipSkills 2>&1
             $LASTEXITCODE | Should -Be 1
         }
     }
@@ -35,7 +35,7 @@ Describe "sync-ai.ps1" {
         }
 
         It "exits with error" {
-            $out = pwsh -NoProfile -File $script:scriptPath 2>&1
+            $out = pwsh -NoProfile -File $script:scriptPath -SkipMcp -SkipSkills 2>&1
             $LASTEXITCODE | Should -Be 1
         }
     }
@@ -58,7 +58,7 @@ Describe "sync-ai.ps1" {
         }
 
         It "creates Windows opencode auth file with correct tokens" {
-            & $script:scriptPath
+            & $script:scriptPath -SkipMcp -SkipSkills
             $authPath = Join-Path $script:opencodeDir "auth.json"
             Test-Path $authPath | Should -BeTrue
             $auth = Get-Content $authPath -Raw | ConvertFrom-Json
@@ -71,14 +71,14 @@ Describe "sync-ai.ps1" {
         It "merges into existing opencode auth file" {
             $authPath = Join-Path $script:opencodeDir "auth.json"
             Set-Content $authPath '{"openai": {"key": "sk-existing"}}'
-            & $script:scriptPath
+            & $script:scriptPath -SkipMcp -SkipSkills
             $auth = Get-Content $authPath -Raw | ConvertFrom-Json
             $auth.openai.key | Should -Be "sk-existing"
             $auth.anthropic.access | Should -Be "test-access-token-123"
         }
 
         It "creates Claude settings with no attribution" {
-            & $script:scriptPath
+            & $script:scriptPath -SkipMcp -SkipSkills
             $settingsPath = Join-Path $script:claudeDir "settings.json"
             Test-Path $settingsPath | Should -BeTrue
             $settings = Get-Content $settingsPath -Raw | ConvertFrom-Json
@@ -91,7 +91,7 @@ Describe "sync-ai.ps1" {
         It "merges settings into existing Claude settings file" {
             $settingsPath = Join-Path $script:claudeDir "settings.json"
             Set-Content $settingsPath '{"model": "opus", "customSetting": true}'
-            & $script:scriptPath
+            & $script:scriptPath -SkipMcp -SkipSkills
             $settings = Get-Content $settingsPath -Raw | ConvertFrom-Json
             $settings.model | Should -Be "opus"
             $settings.customSetting | Should -BeTrue
@@ -111,27 +111,26 @@ Describe "sync-ai.ps1" {
                 }
             }
             Set-Content (Join-Path $credsDir ".credentials.json") ($creds | ConvertTo-Json -Depth 5)
-            & $script:scriptPath
+            & $script:scriptPath -SkipMcp -SkipSkills
             Test-Path (Join-Path $credsDir "settings.json") | Should -BeTrue
         }
 
         It "writes auth file with unix line endings" {
-            & $script:scriptPath
+            & $script:scriptPath -SkipMcp -SkipSkills
             $authPath = Join-Path $script:opencodeDir "auth.json"
             $raw = [System.IO.File]::ReadAllText($authPath)
             $raw | Should -Not -Match "`r`n"
         }
 
         It "writes settings file with unix line endings" {
-            & $script:scriptPath
+            & $script:scriptPath -SkipMcp -SkipSkills
             $settingsPath = Join-Path $script:claudeDir "settings.json"
             $raw = [System.IO.File]::ReadAllText($settingsPath)
             $raw | Should -Not -Match "`r`n"
         }
 
-        It "skips WSL when opencode directory not found" {
-            Mock wsl { return $null } -ParameterFilter { $args -match "test -d" }
-            & $script:scriptPath
+        It "skips WSL when wsl is not available" {
+            & $script:scriptPath -SkipMcp -SkipSkills
             Should -Invoke wsl -Exactly 1
         }
     }

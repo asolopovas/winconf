@@ -175,21 +175,25 @@ function Sync-Auth {
     # WSL sync (auth + settings) — access WSL filesystem directly via \\wsl.localhost
     Write-Host "Updating WSL (opencode auth + Claude settings)..." -ForegroundColor Cyan
     $wslHome = wsl bash -c 'echo $HOME' 2>$null
-    $wslHome = ($wslHome -replace "`r", "").Trim()
-    $wslDistro = (wsl bash -c 'cat /etc/os-release' 2>$null | Select-String '^ID=(.+)').Matches[0].Groups[1].Value
-    $wslRoot = "\\wsl.localhost\$wslDistro"
-    $wslAuthFile     = Join-Path $wslRoot "$wslHome/.local/share/opencode/auth.json"
-    $wslSettingsFile = Join-Path $wslRoot "$wslHome/.claude/settings.json"
+    if ($wslHome) {
+        $wslHome = ("$wslHome" -replace "`r", "").Trim()
+        $wslDistro = (wsl bash -c 'cat /etc/os-release' 2>$null | Select-String '^ID=(.+)').Matches[0].Groups[1].Value
+        $wslRoot = "\\wsl.localhost\$wslDistro"
+        $wslAuthFile     = Join-Path $wslRoot "$wslHome/.local/share/opencode/auth.json"
+        $wslSettingsFile = Join-Path $wslRoot "$wslHome/.claude/settings.json"
 
-    if (Test-Path (Split-Path $wslAuthFile -Parent)) {
-        Update-AuthFile -Path $wslAuthFile -AccessToken $oauth.accessToken -RefreshToken $oauth.refreshToken -ExpiresAt $oauth.expiresAt
-        Write-Host "  $wslAuthFile" -ForegroundColor DarkGray
+        if (Test-Path (Split-Path $wslAuthFile -Parent)) {
+            Update-AuthFile -Path $wslAuthFile -AccessToken $oauth.accessToken -RefreshToken $oauth.refreshToken -ExpiresAt $oauth.expiresAt
+            Write-Host "  $wslAuthFile" -ForegroundColor DarkGray
+        } else {
+            Write-Host "  WSL opencode directory not found, skipping auth." -ForegroundColor Yellow
+        }
+
+        Sync-ClaudeSettings -Path $wslSettingsFile
+        Write-Host "  $wslSettingsFile" -ForegroundColor DarkGray
     } else {
-        Write-Host "  WSL opencode directory not found, skipping auth." -ForegroundColor Yellow
+        Write-Host "  WSL not available, skipping WSL sync." -ForegroundColor Yellow
     }
-
-    Sync-ClaudeSettings -Path $wslSettingsFile
-    Write-Host "  $wslSettingsFile" -ForegroundColor DarkGray
 
     Write-Host "Auth and settings synced." -ForegroundColor Green
     return $true
@@ -436,9 +440,14 @@ function Sync-Skills {
 # Main
 # ---------------------------------------------------------------------------
 
-if (!$SkipAuth)   { Sync-Auth }
+$authOk = $true
+if (!$SkipAuth) {
+    if (!(Sync-Auth)) { $authOk = $false }
+}
 if (!$SkipMcp)    { Sync-Mcp }
 if (!$SkipSkills) { Sync-Skills }
 
 Write-Host ""
 Write-Host "Done. Restart Claude and OpenCode to pick up changes." -ForegroundColor Green
+
+if (!$authOk) { exit 1 }
