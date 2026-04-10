@@ -172,16 +172,7 @@ LWin & ,::ShiftAltTab
 
 F7::
 {
-    windowID := "ahk_class TAIMPMainForm ahk_exe AIMP.exe"
-    exePath := "C:\\Program Files\\AIMP\\AIMP.exe"
-    RunOrActivate(windowID, exePath, "")
-
-    WinWaitActive(windowID, , 2)
-
-    Send("!{Del}")
-    Send("{Enter}")
-    Sleep(1000)
-    Send("#m")
+    AIMPDeleteCurrentAndSkip()
 }
 
 ^+F11:: {

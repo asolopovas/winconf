@@ -5,6 +5,7 @@ on:
     paths:
       - 'scripts/**'
       - 'powershell/**'
+      - 'autohotkey/**'
       - 'functions.ps1'
       - 'init.ps1'
       - 'tests/**'
@@ -13,6 +14,7 @@ on:
     paths:
       - 'scripts/**'
       - 'powershell/**'
+      - 'autohotkey/**'
       - 'functions.ps1'
       - 'init.ps1'
       - 'tests/**'
