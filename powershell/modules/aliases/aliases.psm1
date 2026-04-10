@@ -9,6 +9,8 @@ function lsModules {
   (Get-Module -ListAvailable | Select-Object -ExpandProperty Name)
 }
 
+function cld { claude --dangerously-skip-permissions @args }
+
 New-Alias -Name which   -Scope Global -Value Get-Command
 New-Alias -Name l       -Scope Global -Value Get-ChildItem
 New-Alias -Name grep    -Scope Global -Value Select-String
