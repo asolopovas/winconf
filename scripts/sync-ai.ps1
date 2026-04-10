@@ -48,7 +48,7 @@ $claudeSettings = @{
 
 # MCP servers — matches the bash sync-ai.sh MCP_SERVERS map
 $mcpServers = [ordered]@{
-    context7 = @("npx", "@upstash/context7-mcp")
+    context7 = @("cmd", "/c", "npx", "@upstash/context7-mcp")
 }
 
 # Canonical skill location
