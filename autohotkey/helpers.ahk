@@ -26,7 +26,7 @@ GetAIMPCurrentFile() {
     }
 
     headerSize := NumGet(ptr, 0, "Int")
-    fileSize := NumGet(ptr, 24, "Int64")  ; AIMP2_FileInfo.FileSize
+    fileSize := NumGet(ptr, 20, "Int64")  ; AIMP2_FileInfo.FileSize (packed, so Int64 sits at offset 20, not 24)
     albumLen := NumGet(ptr, 40, "Int")
     artistLen := NumGet(ptr, 44, "Int")
     dateLen := NumGet(ptr, 48, "Int")
