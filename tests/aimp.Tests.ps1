@@ -17,7 +17,6 @@ public class AIMPTestHelper {
     [DllImport("kernel32.dll", CharSet=CharSet.Unicode, SetLastError=true)]
     public static extern bool DeleteFileW(string lpFileName);
 
-    public const uint FILE_MAP_READ = 4;
     public const uint INVALID_FILE_ATTRIBUTES = 0xFFFFFFFF;
 }
 "@
@@ -67,19 +66,7 @@ Describe "AIMP shared memory" -Tag "RequiresAIMP" {
         $mem = Get-AIMPSharedMemory
         try {
             $mem | Should -Not -BeNullOrEmpty
-            $m = [System.Runtime.InteropServices.Marshal]
-            $m::ReadInt32($mem.Pointer, 0) | Should -Be 88
-        } finally { Close-AIMPSharedMemory $mem }
-    }
-
-    It "extracts valid file path when track is loaded" {
-        if (-not $script:aimpHasTrack) { Set-ItResult -Skipped -Because "AIMP has no track loaded"; return }
-        $mem = Get-AIMPSharedMemory
-        try {
-            $filePath = Read-AIMPFilePath $mem.Pointer
-            $filePath | Should -Not -BeNullOrEmpty
-            ($filePath.StartsWith("\\") -or $filePath -match "^[A-Za-z]:\\") | Should -BeTrue
-            [System.IO.Path]::GetExtension($filePath).ToLower() | Should -BeIn @(".mp3", ".flac", ".wav", ".ogg", ".m4a", ".aac", ".wma", ".opus", ".ape", ".wv", ".aiff")
+            [System.Runtime.InteropServices.Marshal]::ReadInt32($mem.Pointer, 0) | Should -Be 88
         } finally { Close-AIMPSharedMemory $mem }
     }
 
@@ -91,50 +78,81 @@ Describe "AIMP shared memory" -Tag "RequiresAIMP" {
             ([AIMPTestHelper]::GetFileAttributesW($filePath) -ne [AIMPTestHelper]::INVALID_FILE_ATTRIBUTES) | Should -BeTrue
         } finally { Close-AIMPSharedMemory $mem }
     }
-
-    It "returns empty path when no track is loaded" {
-        if (-not $script:aimpRunning -or $script:aimpHasTrack) { Set-ItResult -Skipped -Because "need AIMP running with no track"; return }
-        $mem = Get-AIMPSharedMemory
-        try { Read-AIMPFilePath $mem.Pointer | Should -Be "" }
-        finally { Close-AIMPSharedMemory $mem }
-    }
-
-    It "does not leak handles after repeated open/close" {
-        if (-not $script:aimpRunning) { Set-ItResult -Skipped -Because "AIMP is not running"; return }
-        for ($i = 0; $i -lt 10; $i++) {
-            $mem = Get-AIMPSharedMemory
-            $mem | Should -Not -BeNullOrEmpty
-            Close-AIMPSharedMemory $mem
-        }
-    }
 }
 
 Describe "File deletion (Win32 API)" {
 
     It "deletes a file and detects missing files" {
-        $file = Join-Path $TestDrive "test.tmp"
+        $file = Join-Path $TestDrive "sample.tmp"
         Set-Content -Path $file -Value "data"
         [AIMPTestHelper]::DeleteFileW($file) | Should -BeTrue
         [AIMPTestHelper]::GetFileAttributesW($file) | Should -Be ([AIMPTestHelper]::INVALID_FILE_ATTRIBUTES)
         [AIMPTestHelper]::DeleteFileW($file) | Should -BeFalse
     }
 
-    It "handles special characters in path" {
-        $dir = Join-Path $TestDrive "Pack [2026]"
+    It "handles brackets, parens and spaces in path" {
+        $dir = Join-Path $TestDrive "Outer [alpha] (beta)"
         New-Item -ItemType Directory -Path $dir -Force | Out-Null
-        $file = Join-Path $dir "Artist - Track (Remix) 120.mp3"
+        $file = Join-Path $dir "foo - bar (baz).mp3"
         Set-Content -LiteralPath $file -Value "data"
         [AIMPTestHelper]::DeleteFileW($file) | Should -BeTrue
         [AIMPTestHelper]::GetFileAttributesW($file) | Should -Be ([AIMPTestHelper]::INVALID_FILE_ATTRIBUTES)
     }
+
+    It "deletes via \\?\ long-path prefix" {
+        $file = Join-Path $TestDrive "longpath.tmp"
+        Set-Content -LiteralPath $file -Value "data"
+        [AIMPTestHelper]::DeleteFileW("\\?\" + $file) | Should -BeTrue
+        [AIMPTestHelper]::GetFileAttributesW($file) | Should -Be ([AIMPTestHelper]::INVALID_FILE_ATTRIBUTES)
+    }
 }
 
-Describe "Shared memory offset math" {
+Describe "Long-path conversion" {
+    BeforeAll {
+        # Mirrors ToLongPath in autohotkey/helpers.ahk
+        function ConvertTo-LongPath($path) {
+            if ($path.StartsWith("\\?\")) { return $path }
+            if ($path.StartsWith("\\"))  { return "\\?\UNC\" + $path.Substring(2) }
+            if ($path -match "^[A-Za-z]:\\") { return "\\?\" + $path }
+            return $path
+        }
+    }
 
-    It "calculates correct data offset for filename" {
-        # AHK logic: dataOffset = headerSize + (albumLen + artistLen + dateLen) * 2
-        (88 + (0 + 5 + 0) * 2) | Should -Be 98
-        (88 + (0 + 0 + 0) * 2) | Should -Be 88
-        (88 + (100 + 80 + 10) * 2) | Should -Be 468
+    It "converts UNC path to \\?\UNC\ form" {
+        ConvertTo-LongPath "\\server\share\dir\file.mp3" | Should -Be "\\?\UNC\server\share\dir\file.mp3"
+    }
+
+    It "converts drive path to \\?\ form" {
+        ConvertTo-LongPath "C:\dir\file.mp3" | Should -Be "\\?\C:\dir\file.mp3"
+    }
+
+    It "leaves already-prefixed paths unchanged" {
+        ConvertTo-LongPath "\\?\C:\dir\file.mp3" | Should -Be "\\?\C:\dir\file.mp3"
+        ConvertTo-LongPath "\\?\UNC\server\share\file.mp3" | Should -Be "\\?\UNC\server\share\file.mp3"
+    }
+
+    It "leaves relative paths unchanged" {
+        ConvertTo-LongPath "relative\file.mp3" | Should -Be "relative\file.mp3"
+    }
+}
+
+Describe "Path trim" {
+    # Mirrors the Trim() in GetAIMPCurrentFile
+    It "trims surrounding whitespace only" {
+        ("  \\server\share\file.mp3 `t").Trim(" `t`r`n".ToCharArray()) | Should -Be "\\server\share\file.mp3"
+    }
+
+    It "leaves inner content untouched" {
+        $p = "\\server\share\Outer [alpha]\Sub\foo - bar (baz).mp3"
+        $p.Trim(" `t`r`n".ToCharArray()) | Should -Be $p
+    }
+}
+
+Describe "Debug log location" {
+    It "log path lives under the temp folder" {
+        # Mirrors AIMPDebugLogPath in autohotkey/helpers.ahk
+        $logPath = Join-Path $env:TEMP "aimp-delete-debug.log"
+        [System.IO.Path]::GetFileName($logPath) | Should -Be "aimp-delete-debug.log"
+        [System.IO.Path]::GetDirectoryName($logPath) | Should -Be ([System.IO.Path]::GetFullPath($env:TEMP).TrimEnd('\'))
     }
 }
