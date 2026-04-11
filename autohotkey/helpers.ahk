@@ -14,17 +14,19 @@ AIMPDebugLog(tag, info := "") {
 }
 
 GetAIMPCurrentFile() {
+    info := { path: "", sizeBytes: 0 }
     hMap := DllCall("OpenFileMapping", "UInt", 4, "Int", 0, "Str", "AIMP2_RemoteInfo", "Ptr")
     if (!hMap)
-        return ""
+        return info
 
     ptr := DllCall("MapViewOfFile", "Ptr", hMap, "UInt", 4, "UInt", 0, "UInt", 0, "UInt", 0, "Ptr")
     if (!ptr) {
         DllCall("CloseHandle", "Ptr", hMap)
-        return ""
+        return info
     }
 
     headerSize := NumGet(ptr, 0, "Int")
+    fileSize := NumGet(ptr, 24, "Int64")  ; AIMP2_FileInfo.FileSize
     albumLen := NumGet(ptr, 40, "Int")
     artistLen := NumGet(ptr, 44, "Int")
     dateLen := NumGet(ptr, 48, "Int")
@@ -37,7 +39,10 @@ GetAIMPCurrentFile() {
     DllCall("UnmapViewOfFile", "Ptr", ptr)
     DllCall("CloseHandle", "Ptr", hMap)
 
-    return Trim(filePath, " `t`r`n")
+    info.path := Trim(filePath, " `t`r`n")
+    if (fileSize > 0 && fileSize < 0x10000000000)  ; sanity: < 1 TB
+        info.sizeBytes := fileSize
+    return info
 }
 
 ToLongPath(path) {
@@ -59,42 +64,48 @@ Win32DeleteFile(path) {
     return DllCall("DeleteFileW", "Str", path, "Int") != 0
 }
 
+FormatTrackLabel(info) {
+    SplitPath(info.path, &trackName)
+    if (info.sizeBytes > 0)
+        return trackName . Format(" ({:.1f} MB)", info.sizeBytes / 1048576)
+    return trackName
+}
+
 AIMPDeleteCurrentAndSkip() {
-    filePath := GetAIMPCurrentFile()
-    if (filePath = "") {
+    info := GetAIMPCurrentFile()
+    if (info.path = "") {
         ToolTip("No track info from AIMP")
         SetTimer(() => ToolTip(), -2000)
         return
     }
 
+    label := FormatTrackLabel(info)
+
     ; Skip to next track first so AIMP releases the file
     Send("{Media_Next}")
 
     ; Delete file in background after a delay so AIMP releases it
-    SetTimer(() => DeleteTrackFile(filePath), -2000)
+    SetTimer(() => DeleteTrackFile(info.path, label), -2000)
 }
 
-DeleteTrackFile(filePath) {
-    lastErr := 0
+DeleteTrackFile(filePath, label) {
     for path in [filePath, ToLongPath(filePath)] {
-        if (!Win32FileExists(path))
-            continue
         if (Win32DeleteFile(path)) {
-            ToolTip("Deleted:`n" . filePath)
+            ToolTip("Deleted: " . label)
             SetTimer(() => ToolTip(), -3000)
             return
         }
-        lastErr := A_LastError
     }
+    lastErr := A_LastError
 
     ; Direct delete failed. When AHK runs elevated, UNC credentials cached in
-    ; the interactive token aren't available here, so GetFileAttributesW and
-    ; DeleteFileW against \\NAS fail. Re-run the delete as the interactive user.
+    ; the interactive token aren't available here, so DeleteFileW against
+    ; \\NAS fails. Re-run the delete as the interactive user.
     if (A_IsAdmin) {
         try {
             RunAsUser(A_ComSpec, '/c del /f /q "' . filePath . '"')
             AIMPDebugLog("fallback-runasuser", "path=" . filePath)
-            ToolTip("Delete via user session:`n" . filePath)
+            ToolTip("Deleted: " . label)
             SetTimer(() => ToolTip(), -3000)
             return
         } catch as err {
@@ -104,6 +115,6 @@ DeleteTrackFile(filePath) {
 
     AIMPDebugLog("delete-failed",
         "path=" . filePath . " lastError=" . lastErr . " isAdmin=" . A_IsAdmin)
-    ToolTip("Delete failed (log: " . AIMPDebugLogPath() . "):`n" . filePath)
+    ToolTip("Delete failed: " . label)
     SetTimer(() => ToolTip(), -5000)
 }
