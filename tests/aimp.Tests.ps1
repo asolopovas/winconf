@@ -153,6 +153,8 @@ Describe "Debug log location" {
         # Mirrors AIMPDebugLogPath in autohotkey/helpers.ahk
         $logPath = Join-Path $env:TEMP "aimp-delete-debug.log"
         [System.IO.Path]::GetFileName($logPath) | Should -Be "aimp-delete-debug.log"
-        [System.IO.Path]::GetDirectoryName($logPath) | Should -Be ([System.IO.Path]::GetFullPath($env:TEMP).TrimEnd('\'))
+        $expectedDir = (Get-Item -LiteralPath $env:TEMP).FullName.TrimEnd('\')
+        $actualDir   = (Get-Item -LiteralPath ([System.IO.Path]::GetDirectoryName($logPath))).FullName.TrimEnd('\')
+        $actualDir | Should -Be $expectedDir
     }
 }
