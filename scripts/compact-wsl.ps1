@@ -1,17 +1,30 @@
-$distros = wsl --list --quiet 2>$null | Where-Object { $_ -and $_.Trim() }
-if (-not $distros) {
-    Write-Host "  No WSL distributions found" -ForegroundColor Yellow
+$isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+if (-not $isAdmin) {
+    Write-Host "  compact-wsl.ps1 must be run as Administrator (diskpart requires elevation)" -ForegroundColor Red
     return
 }
 
-$running = wsl --list --verbose 2>$null |
-    Select-Object -Skip 1 |
-    Where-Object { $_ -match 'Running' }
+$prevEncoding = [Console]::OutputEncoding
+[Console]::OutputEncoding = [System.Text.Encoding]::Unicode
 
-if ($running) {
-    Write-Host "  Shutting down WSL..." -ForegroundColor DarkGray
-    wsl --shutdown
-    Start-Sleep -Seconds 3
+try {
+    $distros = (wsl --list --quiet 2>$null) | Where-Object { $_ -and $_.Trim() }
+    if (-not $distros) {
+        Write-Host "  No WSL distributions found" -ForegroundColor Yellow
+        return
+    }
+
+    $running = (wsl --list --verbose 2>$null) |
+        Select-Object -Skip 1 |
+        Where-Object { $_ -match 'Running' }
+
+    if ($running) {
+        Write-Host "  Shutting down WSL..." -ForegroundColor DarkGray
+        wsl --shutdown
+        Start-Sleep -Seconds 3
+    }
+} finally {
+    [Console]::OutputEncoding = $prevEncoding
 }
 
 $searchPaths = @(
@@ -59,7 +72,7 @@ foreach ($vhdx in $vhdxFiles) {
     $saved = [math]::Round($sizeBefore - $sizeAfter, 2)
 
     if ($saved -gt 0) {
-        Write-Host "  Compacted $relativePath: $sizeBefore GB -> $sizeAfter GB (saved $saved GB)" -ForegroundColor Green
+        Write-Host "  Compacted ${relativePath}: $sizeBefore GB -> $sizeAfter GB (saved $saved GB)" -ForegroundColor Green
     } else {
         Write-Host "  $relativePath already optimal ($sizeAfter GB)" -ForegroundColor DarkGray
     }
