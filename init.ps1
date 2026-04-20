@@ -51,8 +51,7 @@ try {
 
 function Test-CommandExists {
     Param ($command)
-    try { return [bool](Get-Command $command -ErrorAction Stop) }
-    Catch { return $false }
+    return [bool](Get-Command $command -ErrorAction SilentlyContinue)
 }
 
 function SourceFile {

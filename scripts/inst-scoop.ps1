@@ -9,9 +9,18 @@ if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) {
     $installerUrl = "https://raw.githubusercontent.com/ScoopInstaller/Install/master/install.ps1"
     $installerPath = Join-Path $env:TEMP "scoop-install.ps1"
     Invoke-WebRequest -Uri $installerUrl -OutFile $installerPath -UseBasicParsing
-    & $installerPath
+    $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+    if ($isAdmin) {
+        & $installerPath -RunAsAdmin
+    } else {
+        & $installerPath
+    }
     Remove-Item $installerPath -Force -ErrorAction SilentlyContinue
     $env:PATH = "$scoopShims;$env:PATH"
+    if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) {
+        Write-Host "  Scoop install failed, skipping scoop apps" -ForegroundColor Red
+        return
+    }
     Write-Host "  Scoop installed" -ForegroundColor Green
 } else {
     Write-Host "  Scoop already installed" -ForegroundColor DarkGray

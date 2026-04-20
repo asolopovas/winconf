@@ -10,6 +10,24 @@ $modules = @(
 
 $useResourceGet = [bool](Get-Command Install-PSResource -ErrorAction SilentlyContinue)
 
+if (-not $useResourceGet) {
+    if (-not (Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue)) {
+        Write-Host "  Bootstrapping NuGet provider..." -ForegroundColor DarkGray
+        Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -Scope CurrentUser | Out-Null
+    }
+    $pg = (Get-Module -Name PowerShellGet -ListAvailable | Sort-Object Version -Descending | Select-Object -First 1).Version
+    if (-not $pg -or $pg -lt [version]'2.0.0') {
+        Write-Host "  Updating PowerShellGet (found $pg)..." -ForegroundColor DarkGray
+        Install-Module -Name PowerShellGet -Force -AllowClobber -Scope CurrentUser -SkipPublisherCheck -WarningAction SilentlyContinue
+        Import-Module PowerShellGet -Force
+    }
+}
+
+$installParams = @{ Scope = 'CurrentUser'; Force = $true; AllowClobber = $true; ErrorAction = 'Stop' }
+if ((Get-Command Install-Module).Parameters.ContainsKey('AcceptLicense')) {
+    $installParams['AcceptLicense'] = $true
+}
+
 foreach ($mod in $modules) {
     $installed = Get-Module -Name $mod -ListAvailable -ErrorAction SilentlyContinue
     if ($installed) {
@@ -32,7 +50,7 @@ foreach ($mod in $modules) {
         if ($useResourceGet) {
             Install-PSResource -Name $mod -Scope CurrentUser -TrustRepository -AcceptLicense -ErrorAction Stop
         } else {
-            Install-Module -Name $mod -Scope CurrentUser -Force -AllowClobber -AcceptLicense -ErrorAction Stop
+            Install-Module -Name $mod @installParams
         }
         $new = Get-Module -Name $mod -ListAvailable | Select-Object -First 1
         Write-Host "  $mod $($new.Version) installed" -ForegroundColor Green

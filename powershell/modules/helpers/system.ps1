@@ -157,15 +157,8 @@ function Test-RegistryValue {
         [ValidateNotNullOrEmpty()]$Value
     )
 
-    try {
-        Get-ItemProperty -Path $Path | Select-Object -ExpandProperty $Value -ErrorAction Stop | Out-Null
-        return $true
-    }
-
-    catch {
-        return $false
-    }
-
+    $item = Get-ItemProperty -Path $Path -Name $Value -ErrorAction SilentlyContinue
+    return [bool]$item
 }
 function Test-ScheduledTask($name) {
     $tasks = @()
