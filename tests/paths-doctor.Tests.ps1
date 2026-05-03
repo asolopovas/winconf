@@ -86,6 +86,56 @@ Describe 'Get-SortedPath' {
         $second.Dupes  | Should -Be 0
     }
 
+    It 'normalizes path traversal segments' {
+        $r = Get-SortedPath -Raw 'C:\Program Files\Foo\..\Bar' -KeepMissing:$true
+        $r.Entries | Should -Contain 'C:\Program Files\Bar'
+    }
+
+    It 'relocates user-scoped Machine entries when -RelocateUserScoped is set' {
+        $userRoot = [Environment]::GetFolderPath('UserProfile').TrimEnd('\')
+        $raw = "C:\Tools;$userRoot\AppData\Local\Foo"
+        $r = Get-SortedPath -Raw $raw -KeepMissing:$true -RelocateUserScoped
+        $r.Relocated.Count | Should -Be 1
+        $r.Entries | Should -Not -Contain "$userRoot\AppData\Local\Foo"
+    }
+
+    It 'does not relocate without -RelocateUserScoped' {
+        $userRoot = [Environment]::GetFolderPath('UserProfile').TrimEnd('\')
+        $r = Get-SortedPath -Raw "$userRoot\AppData\Local\Foo" -KeepMissing:$true
+        $r.Relocated.Count | Should -Be 0
+    }
+}
+
+Describe 'Test-UserScopedPath' {
+    It 'flags paths under the user profile' {
+        $u = [Environment]::GetFolderPath('UserProfile').TrimEnd('\')
+        Test-UserScopedPath "$u\bin"             | Should -BeTrue
+        Test-UserScopedPath "$u\AppData\Local\x" | Should -BeTrue
+    }
+
+    It 'does not flag Program Files or Windows paths' {
+        Test-UserScopedPath 'C:\Program Files\Foo' | Should -BeFalse
+        Test-UserScopedPath 'C:\Windows\system32'  | Should -BeFalse
+    }
+}
+
+Describe 'Format-PathEntry' {
+    It 'resolves .. segments' {
+        Format-PathEntry 'C:\Program Files\Foo\..\Bar' | Should -Be 'C:\Program Files\Bar'
+    }
+
+    It 'trims trailing backslashes' {
+        Format-PathEntry 'C:\Foo\' | Should -Be 'C:\Foo'
+    }
+
+    It 'leaves clean paths untouched' {
+        Format-PathEntry 'C:\Foo\Bar' | Should -Be 'C:\Foo\Bar'
+    }
+}
+
+Describe 'Final invariants' {
+    BeforeEach { Mock Write-Host { } }
+
     It 'final output has no duplicates and no dead entries' {
         $live = (New-Item -ItemType Directory (Join-Path $TestDrive 'live')).FullName
         $dead = Join-Path $TestDrive 'ghost'
