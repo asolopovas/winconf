@@ -29,6 +29,7 @@ $ESSENTIAL_SOFTWARE = @(
 $SOURCE_FILES = @(
     'cleanup'
     'inst-paths'
+    'paths-doctor'
     'inst-fonts'
     'inst-pwsh'
     'inst-terminal'
