@@ -54,6 +54,38 @@ function Test-CommandExists {
     return [bool](Get-Command $command -ErrorAction SilentlyContinue)
 }
 
+function Wire-GitIntoUserPath {
+    Write-Host "Wiring Git into User PATH..." -ForegroundColor Yellow
+    $gitCmd = "$env:ProgramFiles\Git\cmd"
+    $gitUsrBin = "$env:ProgramFiles\Git\usr\bin"
+    if (-not (Test-Path $gitCmd)) {
+        Write-Host "  Git not found at $gitCmd, skipping" -ForegroundColor DarkYellow
+        return
+    }
+    $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
+    $rawParts = @()
+    if ($userPath) { $rawParts = $userPath -split ';' | Where-Object { $_ } | ForEach-Object { $_.TrimEnd('\') } }
+    $seen = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+    $userParts = foreach ($p in $rawParts) { if ($seen.Add($p)) { $p } }
+    $removed = $rawParts.Count - $userParts.Count
+    $added = @()
+    foreach ($p in @($gitCmd, $gitUsrBin)) {
+        $t = $p.TrimEnd('\')
+        if ($seen.Add($t)) {
+            $userParts = @($userParts) + $t
+            $added += $t
+        }
+    }
+    foreach ($p in $added) { Write-Host "  + $p" -ForegroundColor Green }
+    if ($removed -gt 0) { Write-Host "  Removed $removed duplicate User PATH entries" -ForegroundColor DarkYellow }
+    if ($added.Count -or $removed -gt 0) {
+        [Environment]::SetEnvironmentVariable('Path', ($userParts -join ';'), 'User')
+    } else {
+        Write-Host "  Already configured" -ForegroundColor DarkGray
+    }
+    $env:Path = [Environment]::GetEnvironmentVariable('Path', 'Machine') + ';' + [Environment]::GetEnvironmentVariable('Path', 'User')
+}
+
 function SourceFile {
     param ($file)
     Write-Host "`nSourcing $file ..." -ForegroundColor DarkCyan
@@ -87,6 +119,8 @@ if ($isUpdate) {
         Stop-Transcript
         exit 0
     }
+
+    Wire-GitIntoUserPath
 
     Write-Host "`nPulling latest changes..." -ForegroundColor Green
     Set-Location -Path $DOTFILES
@@ -149,32 +183,7 @@ if ($isUpdate) {
     }
     Write-Host "  Software installation complete" -ForegroundColor Green
 
-    # Ensure Git\cmd AND Git\usr\bin (awk/grep/sed/...) are on the User PATH
-    # immediately after install — before clone or any subsequent script that
-    # might need Unix tools. Idempotent + non-admin (User scope).
-    Write-Host "Wiring Git into User PATH..." -ForegroundColor Yellow
-    $gitCmd = "$env:ProgramFiles\Git\cmd"
-    $gitUsrBin = "$env:ProgramFiles\Git\usr\bin"
-    if (-not (Test-Path $gitCmd)) {
-        Write-Host "Git not found at $gitCmd. Install failed?" -ForegroundColor Red
-        exit 1
-    }
-    $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
-    $userParts = @()
-    if ($userPath) { $userParts = $userPath -split ';' | Where-Object { $_ } | ForEach-Object { $_.TrimEnd('\') } }
-    $changed = $false
-    foreach ($p in @($gitCmd, $gitUsrBin)) {
-        if ($userParts -notcontains $p.TrimEnd('\')) {
-            $userParts += $p
-            $changed = $true
-            Write-Host "  + $p" -ForegroundColor Green
-        }
-    }
-    if ($changed) {
-        [Environment]::SetEnvironmentVariable('Path', ($userParts -join ';'), 'User')
-    }
-    # Refresh current process so the rest of init can call git/awk/grep.
-    $env:Path = [Environment]::GetEnvironmentVariable('Path', 'Machine') + ';' + [Environment]::GetEnvironmentVariable('Path', 'User')
+    Wire-GitIntoUserPath
 
     if (-not (Test-CommandExists git)) {
         Write-Host "git still not resolvable on PATH after wiring. Aborting." -ForegroundColor Red
