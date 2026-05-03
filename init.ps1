@@ -149,17 +149,36 @@ if ($isUpdate) {
     }
     Write-Host "  Software installation complete" -ForegroundColor Green
 
-    if (!(Test-CommandExists git)) {
-        Write-Host "Adding git to Path" -ForegroundColor Yellow
-        $gitPath = "$env:ProgramFiles\Git\cmd"
-        if (Test-Path $gitPath) {
-            [System.Environment]::SetEnvironmentVariable("Path", $env:Path + ";$gitPath", [System.EnvironmentVariableTarget]::Machine)
-            $env:PATH += ";$gitPath"
-            Write-Host "Git added to PATH." -ForegroundColor Green
-        } else {
-            Write-Host "Git not found. Please install Git manually." -ForegroundColor Red
-            exit 1
+    # Ensure Git\cmd AND Git\usr\bin (awk/grep/sed/...) are on the User PATH
+    # immediately after install — before clone or any subsequent script that
+    # might need Unix tools. Idempotent + non-admin (User scope).
+    Write-Host "Wiring Git into User PATH..." -ForegroundColor Yellow
+    $gitCmd = "$env:ProgramFiles\Git\cmd"
+    $gitUsrBin = "$env:ProgramFiles\Git\usr\bin"
+    if (-not (Test-Path $gitCmd)) {
+        Write-Host "Git not found at $gitCmd. Install failed?" -ForegroundColor Red
+        exit 1
+    }
+    $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
+    $userParts = @()
+    if ($userPath) { $userParts = $userPath -split ';' | Where-Object { $_ } | ForEach-Object { $_.TrimEnd('\') } }
+    $changed = $false
+    foreach ($p in @($gitCmd, $gitUsrBin)) {
+        if ($userParts -notcontains $p.TrimEnd('\')) {
+            $userParts += $p
+            $changed = $true
+            Write-Host "  + $p" -ForegroundColor Green
         }
+    }
+    if ($changed) {
+        [Environment]::SetEnvironmentVariable('Path', ($userParts -join ';'), 'User')
+    }
+    # Refresh current process so the rest of init can call git/awk/grep.
+    $env:Path = [Environment]::GetEnvironmentVariable('Path', 'Machine') + ';' + [Environment]::GetEnvironmentVariable('Path', 'User')
+
+    if (-not (Test-CommandExists git)) {
+        Write-Host "git still not resolvable on PATH after wiring. Aborting." -ForegroundColor Red
+        exit 1
     }
 
     git config --global --add safe.directory "$DOTFILES"
