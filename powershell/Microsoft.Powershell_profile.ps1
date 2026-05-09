@@ -13,6 +13,45 @@ $ENV:STARSHIP_CONFIG = [System.IO.Path]::Combine($psdir, 'configs\starship.toml'
 $Host.UI.RawUI.WindowTitle = "PowerShell"
 try { $null = [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch {}
 
+# Lazy-load modules: stubs replace themselves on first call so the cost is
+# paid the first time the command is used, not on every shell start.
+
+function global:z {
+    Remove-Item Function:z -ErrorAction SilentlyContinue
+    Import-Module ZLocation -ErrorAction SilentlyContinue
+    z @args
+}
+
+function global:l {
+    Remove-Item Function:l -ErrorAction SilentlyContinue
+    Import-Module Terminal-Icons -ErrorAction SilentlyContinue
+    Get-ChildItem @args
+}
+
+function global:ls {
+    Remove-Item Function:ls -ErrorAction SilentlyContinue
+    Import-Module Terminal-Icons -ErrorAction SilentlyContinue
+    Get-ChildItem @args
+}
+
+# Aliases beat functions in PS resolution; remove the shadowing aliases so the
+# Terminal-Icons stubs above take effect on first invocation.
+Remove-Item Alias:l, Alias:ls -ErrorAction SilentlyContinue
+
+Register-ArgumentCompleter -Native -CommandName 'docker', 'docker.exe' -ScriptBlock {
+    param($wordToComplete, $commandAst, $cursorPosition)
+    Import-Module DockerCompletion -ErrorAction SilentlyContinue
+    [System.Management.Automation.CommandCompletion]::CompleteInput(
+        $commandAst.Extent.Text, $cursorPosition, $null
+    ).CompletionMatches
+}
+
+function global:refreshenv {
+    Remove-Item Function:refreshenv -ErrorAction SilentlyContinue
+    $cp = [System.IO.Path]::Combine($env:ChocolateyInstall, 'helpers\chocolateyProfile.psm1')
+    if ([System.IO.File]::Exists($cp)) { Import-Module $cp; refreshenv @args }
+}
+
 $global:_profileInitialized = $false
 function global:Initialize-Profile {
     if ($global:_profileInitialized) { return }
@@ -32,24 +71,33 @@ function global:Initialize-Profile {
         Set-PSReadLineKeyHandler -Key Alt+d -Function DeleteWord
     } catch {}
 
-    foreach ($mod in @('Terminal-Icons', 'ZLocation', 'DockerCompletion')) {
-        Import-Module $mod -ErrorAction SilentlyContinue
-    }
-
     . $psdir\modules\helpers\shortcuts.ps1
 
     foreach ($f in [System.IO.Directory]::GetFiles("$psdir\completions", '*.ps1')) {
         . $f
     }
 
-    $chocoProfile = [System.IO.Path]::Combine($env:ChocolateyInstall, 'helpers\chocolateyProfile.psm1')
-    if ([System.IO.File]::Exists($chocoProfile)) {
-        Import-Module $chocoProfile
-    }
-
+    # Cache starship init to a file; refresh when starship.exe or config changes.
     if (Test-CommandExists starship) {
-        try { Invoke-Expression (&starship init powershell) }
-        catch { Write-Warning "Error initializing Starship: $_" }
+        try {
+            $cacheDir = Join-Path $env:LOCALAPPDATA 'winconf'
+            if (-not [System.IO.Directory]::Exists($cacheDir)) {
+                New-Item -ItemType Directory -Path $cacheDir -Force | Out-Null
+            }
+            $cachePath = Join-Path $cacheDir 'starship-init.ps1'
+            $exePath = (Get-Command starship).Source
+            $needsRefresh = $true
+            if ([System.IO.File]::Exists($cachePath)) {
+                $cacheTime = (Get-Item $cachePath).LastWriteTime
+                $exeTime   = (Get-Item $exePath).LastWriteTime
+                $cfgTime   = if (Test-Path $env:STARSHIP_CONFIG) { (Get-Item $env:STARSHIP_CONFIG).LastWriteTime } else { [datetime]::MinValue }
+                if ($cacheTime -gt $exeTime -and $cacheTime -gt $cfgTime) { $needsRefresh = $false }
+            }
+            if ($needsRefresh) {
+                & starship init powershell --print-full-init | Set-Content -Path $cachePath -Encoding utf8
+            }
+            . $cachePath
+        } catch { Write-Warning "Error initializing Starship: $_" }
     }
 }
 
