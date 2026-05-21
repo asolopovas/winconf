@@ -28,13 +28,12 @@ GetAIMPCurrentFile() {
     }
 
     headerSize := NumGet(ptr, 0, "Int")
-    fileSize := NumGet(ptr, 20, "Int64")  ; AIMP2_FileInfo.FileSize (packed, so Int64 sits at offset 20, not 24)
+    fileSize := NumGet(ptr, 20, "Int64")
     albumLen := NumGet(ptr, 40, "Int")
     artistLen := NumGet(ptr, 44, "Int")
     dateLen := NumGet(ptr, 48, "Int")
     fileNameLen := NumGet(ptr, 52, "Int")
 
-    ; Data order: Album, Artist, Date, FileName (each char is 2 bytes UTF-16)
     dataOffset := headerSize + (albumLen + artistLen + dateLen) * 2
     filePath := StrGet(ptr + dataOffset, fileNameLen, "UTF-16")
 
@@ -42,7 +41,7 @@ GetAIMPCurrentFile() {
     DllCall("CloseHandle", "Ptr", hMap)
 
     info.path := Trim(filePath, " `t`r`n")
-    if (fileSize > 0 && fileSize < 0x10000000000)  ; sanity: < 1 TB
+    if (fileSize > 0 && fileSize < 0x10000000000)
         info.sizeBytes := fileSize
     return info
 }
@@ -62,6 +61,14 @@ Win32FileExists(path) {
     return attrs != 0xFFFFFFFF
 }
 
+Win32FileExistsAny(path) {
+    for candidate in [path, ToLongPath(path)] {
+        if Win32FileExists(candidate)
+            return true
+    }
+    return false
+}
+
 Win32DeleteFile(path) {
     return DllCall("DeleteFileW", "Str", path, "Int") != 0
 }
@@ -73,6 +80,22 @@ FormatTrackLabel(info) {
     return trackName
 }
 
+AIMPPostCommand(commandID) {
+    hwnd := WinExist(AIMPWindowID())
+    if (!hwnd)
+        return false
+    return DllCall("PostMessageW", "Ptr", hwnd, "UInt", 0x111, "UPtr", commandID, "Ptr", 0, "Int") != 0
+}
+
+AIMPNextTrack() {
+    if !AIMPPostCommand(0x0C50)
+        Send("{Media_Next}")
+}
+
+AIMPRemoveMissingFiles() {
+    AIMPPostCommand(0x0D48)
+}
+
 AIMPDeleteCurrentAndSkip() {
     info := GetAIMPCurrentFile()
     if (info.path = "") {
@@ -82,60 +105,22 @@ AIMPDeleteCurrentAndSkip() {
     }
 
     label := FormatTrackLabel(info)
-    if (AIMPDeleteCurrentWithPlayer()) {
-        SetTimer(() => VerifyAIMPDeleted(info.path, label), -2500)
+    AIMPNextTrack()
+    if Win32FileExistsAny(info.path) {
+        SetTimer(() => DeleteTrackFile(info.path, label), -2000)
         return
     }
 
-    Send("{Media_Next}")
-    SetTimer(() => DeleteTrackFile(info.path, label), -2000)
-}
-
-AIMPDeleteCurrentWithPlayer() {
-    windowID := AIMPWindowID()
-    if !WinExist(windowID)
-        return false
-
-    activeID := GetActiveWindowID()
-    try {
-        WinActivate(windowID)
-        if !WinWaitActive(windowID, , 2) {
-            AIMPRestoreActiveWindow(activeID)
-            return false
-        }
-        Send("!{Del}")
-        Sleep(150)
-        Send("{Enter}")
-        Sleep(300)
-        AIMPRestoreActiveWindow(activeID)
-        return true
-    } catch as err {
-        AIMPRestoreActiveWindow(activeID)
-        AIMPDebugLog("ui-delete-error", "err=" . err.Message)
-        return false
-    }
-}
-
-AIMPRestoreActiveWindow(activeID) {
-    if (activeID != "" && WinExist(activeID) && !WinActive(activeID))
-        WinActivate(activeID)
-}
-
-VerifyAIMPDeleted(filePath, label) {
-    if !Win32FileExists(filePath) {
-        ToolTip("Deleted: " . label)
-        SetTimer(() => ToolTip(), -3000)
-        return
-    }
-
-    AIMPDebugLog("ui-delete-fallback", "path=" . filePath)
-    Send("{Media_Next}")
-    SetTimer(() => DeleteTrackFile(filePath, label), -2000)
+    AIMPDebugLog("file-already-missing", "path=" . info.path)
+    AIMPRemoveMissingFiles()
+    ToolTip("Already missing: " . label)
+    SetTimer(() => ToolTip(), -3000)
 }
 
 DeleteTrackFile(filePath, label) {
     for path in [filePath, ToLongPath(filePath)] {
         if (Win32DeleteFile(path)) {
+            AIMPRemoveMissingFiles()
             ToolTip("Deleted: " . label)
             SetTimer(() => ToolTip(), -3000)
             return
@@ -143,13 +128,11 @@ DeleteTrackFile(filePath, label) {
     }
     lastErr := A_LastError
 
-    ; Direct delete failed. When AHK runs elevated, UNC credentials cached in
-    ; the interactive token aren't available here, so DeleteFileW against
-    ; \\NAS fails. Re-run the delete as the interactive user.
     if (A_IsAdmin) {
         try {
             Func("RunAsUser").Call(A_ComSpec, '/c del /f /q "' . filePath . '"')
             AIMPDebugLog("fallback-runasuser", "path=" . filePath)
+            SetTimer(() => AIMPRemoveMissingFiles(), -2000)
             ToolTip("Deleted: " . label)
             SetTimer(() => ToolTip(), -3000)
             return
