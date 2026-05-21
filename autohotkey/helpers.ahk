@@ -80,20 +80,19 @@ FormatTrackLabel(info) {
     return trackName
 }
 
-AIMPPostCommand(commandID) {
-    hwnd := WinExist(AIMPWindowID())
+AIMPNextTrack() {
+    Send("{Media_Next}")
+}
+
+AIMPPluginDeleteCurrent() {
+    hwnd := DllCall("FindWindowW", "Str", "winconf_aimp_delete_helper", "Str", "winconf_aimp_delete_helper", "Ptr")
     if (!hwnd)
         return false
-    return DllCall("PostMessageW", "Ptr", hwnd, "UInt", 0x111, "UPtr", commandID, "Ptr", 0, "Int") != 0
-}
-
-AIMPNextTrack() {
-    if !AIMPPostCommand(0x0C50)
-        Send("{Media_Next}")
-}
-
-AIMPRemoveMissingFiles() {
-    AIMPPostCommand(0x0D48)
+    msg := DllCall("RegisterWindowMessageW", "Str", "winconf_aimp_delete_current", "UInt")
+    if (!msg)
+        return false
+    result := DllCall("SendMessageW", "Ptr", hwnd, "UInt", msg, "Ptr", 0, "Ptr", 0, "Ptr")
+    return result != 0
 }
 
 AIMPDeleteCurrentAndSkip() {
@@ -105,6 +104,9 @@ AIMPDeleteCurrentAndSkip() {
     }
 
     label := FormatTrackLabel(info)
+    if AIMPPluginDeleteCurrent()
+        return
+
     AIMPNextTrack()
     if Win32FileExistsAny(info.path) {
         SetTimer(() => DeleteTrackFile(info.path, label), -2000)
@@ -112,27 +114,29 @@ AIMPDeleteCurrentAndSkip() {
     }
 
     AIMPDebugLog("file-already-missing", "path=" . info.path)
-    AIMPRemoveMissingFiles()
     ToolTip("Already missing: " . label)
     SetTimer(() => ToolTip(), -3000)
 }
 
-DeleteTrackFile(filePath, label) {
+DeleteTrackFile(filePath, label, attempt := 1) {
     for path in [filePath, ToLongPath(filePath)] {
         if (Win32DeleteFile(path)) {
-            AIMPRemoveMissingFiles()
             ToolTip("Deleted: " . label)
             SetTimer(() => ToolTip(), -3000)
             return
         }
     }
     lastErr := A_LastError
+    if (lastErr = 32 && attempt < 6) {
+        AIMPDebugLog("delete-retry", "path=" . filePath . " attempt=" . attempt)
+        SetTimer(() => DeleteTrackFile(filePath, label, attempt + 1), -1500)
+        return
+    }
 
     if (A_IsAdmin) {
         try {
             Func("RunAsUser").Call(A_ComSpec, '/c del /f /q "' . filePath . '"')
             AIMPDebugLog("fallback-runasuser", "path=" . filePath)
-            SetTimer(() => AIMPRemoveMissingFiles(), -2000)
             ToolTip("Deleted: " . label)
             SetTimer(() => ToolTip(), -3000)
             return
