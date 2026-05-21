@@ -1,16 +1,26 @@
 {
     "$help": "https://aka.ms/terminal-documentation",
     "$schema": "https://aka.ms/terminal-profiles-schema",
-    "actions": [
+    "actions":
+    [
         {
-            "command": {
+            "command": "closeWindow",
+            "id": "User.closeWindow"
+        },
+        {
+            "command":
+            {
                 "action": "copy"
             },
             "id": "User.copy.644BA8F2"
         },
         {
-            "command": "closeWindow",
-            "id": "User.closeWindow"
+            "command":
+            {
+                "action": "splitPane",
+                "split": "down"
+            },
+            "id": "User.splitPane.D5151347"
         },
         {
             "command": "paste",
@@ -21,22 +31,65 @@
             "id": "User.closePane"
         },
         {
-            "command": {
-                "action": "prevTab"
-            },
-            "id": "User.prevTab.0"
-        },
-        {
-            "command": {
+            "command":
+            {
                 "action": "closeOtherTabs"
             },
             "id": "User.closeOtherTabs.0"
         },
         {
-            "command": {
+            "command":
+            {
+                "action": "moveFocus",
+                "direction": "left"
+            },
+            "id": "User.moveFocus.2A0DA8E0"
+        },
+        {
+            "command":
+            {
+                "action": "prevTab"
+            },
+            "id": "User.prevTab.0"
+        },
+        {
+            "command":
+            {
                 "action": "nextTab"
             },
             "id": "User.nextTab.0"
+        },
+        {
+            "command":
+            {
+                "action": "splitPane",
+                "split": "right"
+            },
+            "id": "User.splitPane.864CD510"
+        },
+        {
+            "command":
+            {
+                "action": "moveFocus",
+                "direction": "down"
+            },
+            "id": "User.moveFocus.F747588A"
+        },
+        {
+            "command":
+            {
+                "action": "moveFocus",
+                "direction": "up"
+            },
+            "id": "User.moveFocus.6CD791B"
+        },
+        {
+            "command":
+            {
+                "action": "moveFocus",
+                "direction": "right"
+            },
+            "id": "User.moveFocus.87C324ED"
         }
     ],
     "alwaysOnTop": false,
@@ -44,37 +97,43 @@
     "centerOnLaunch": true,
     "copyOnSelect": true,
     "defaultProfile": "{05b9d966-86e5-4a1f-a9df-d87cef4d716e}",
-    "disabledProfileSources": [
+    "disabledProfileSources":
+    [
         "Windows.Terminal.Azure",
         "Windows.Terminal.PowershellCore"
     ],
     "firstWindowPreference": "defaultProfile",
     "initialCols": 127,
     "initialRows": 30,
-    "keybindings": [
-        {
-            "id": null,
-            "keys": "ctrl+alt+5"
-        },
+    "keybindings":
+    [
         {
             "id": "User.copy.644BA8F2",
             "keys": "ctrl+shift+c"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+alt+5"
         },
         {
             "id": "User.paste",
             "keys": "shift+insert"
         },
         {
-            "id": "User.closePane",
-            "keys": "ctrl+w"
+            "id": "User.splitPane.D5151347",
+            "keys": "alt+\\"
         },
         {
-            "id": null,
-            "keys": "ctrl+alt+2"
+            "id": "User.splitPane.864CD510",
+            "keys": "alt+shift+\\"
         },
         {
             "id": null,
             "keys": "ctrl+alt+9"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+alt+2"
         },
         {
             "id": null,
@@ -83,6 +142,10 @@
         {
             "id": null,
             "keys": "ctrl+shift+w"
+        },
+        {
+            "id": "User.moveFocus.6CD791B",
+            "keys": "ctrl+up"
         },
         {
             "id": null,
@@ -94,7 +157,7 @@
         },
         {
             "id": null,
-            "keys": "ctrl+alt+4"
+            "keys": "ctrl+shift+n"
         },
         {
             "id": null,
@@ -102,7 +165,7 @@
         },
         {
             "id": null,
-            "keys": "ctrl+shift+n"
+            "keys": "ctrl+alt+4"
         },
         {
             "id": null,
@@ -134,11 +197,11 @@
         },
         {
             "id": null,
-            "keys": "ctrl+shift+2"
+            "keys": "ctrl+shift+5"
         },
         {
             "id": null,
-            "keys": "ctrl+shift+5"
+            "keys": "ctrl+shift+2"
         },
         {
             "id": null,
@@ -146,11 +209,15 @@
         },
         {
             "id": null,
-            "keys": "ctrl+shift+4"
+            "keys": "alt+down"
         },
         {
             "id": null,
             "keys": "ctrl+shift+t"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+4"
         },
         {
             "id": null,
@@ -159,6 +226,10 @@
         {
             "id": null,
             "keys": "ctrl+shift+7"
+        },
+        {
+            "id": "User.moveFocus.87C324ED",
+            "keys": "ctrl+right"
         },
         {
             "id": null,
@@ -171,25 +242,54 @@
         {
             "id": null,
             "keys": "alt+up"
+        },
+        {
+            "id": "User.closePane",
+            "keys": "alt+q"
+        },
+        {
+            "id": "Terminal.MoveFocusDown",
+            "keys": "ctrl+down"
+        },
+        {
+            "id": "User.moveFocus.2A0DA8E0",
+            "keys": "ctrl+left"
+        },
+        {
+            "id": null,
+            "keys": "alt+left"
+        },
+        {
+            "id": null,
+            "keys": "alt+right"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+alt+left"
         }
     ],
     "launchMode": "default",
-    "newTabMenu": [
+    "newTabMenu":
+    [
         {
             "type": "remainingProfiles"
         }
     ],
-    "profiles": {
-        "defaults": {
+    "profiles":
+    {
+        "defaults":
+        {
             "bellStyle": "none",
             "colorScheme": "Legacy",
-            "font": {
+            "font":
+            {
                 "face": "FiraMono Nerd Font Mono",
                 "size": 14
             },
             "startingDirectory": null
         },
-        "list": [
+        "list":
+        [
             {
                 "commandline": "\"C:\\Program Files\\PowerShell\\7\\pwsh.exe\" -NoLogo",
                 "guid": "{05b9d966-86e5-4a1f-a9df-d87cef4d716e}",
@@ -222,36 +322,6 @@
                 "source": "CanonicalGroupLimited.Ubuntu_79rhkp1fndgsc"
             },
             {
-                "guid": "{2c4de342-38b7-51cf-b940-2309a097f518}",
-                "hidden": true,
-                "name": "Ubuntu",
-                "source": "Windows.Terminal.Wsl"
-            },
-            {
-                "guid": "{3dfa5583-b9ce-50bc-8fee-958c7e4deb3d}",
-                "hidden": false,
-                "name": "Developer Command Prompt for VS 2019",
-                "source": "Windows.Terminal.VisualStudio"
-            },
-            {
-                "guid": "{c2d8e0a9-a621-5206-aef6-7798f71b6ca8}",
-                "hidden": false,
-                "name": "Developer PowerShell for VS 2019",
-                "source": "Windows.Terminal.VisualStudio"
-            },
-            {
-                "guid": "{6ba3af2f-5de1-5ab2-8782-c015ff67826f}",
-                "hidden": false,
-                "name": "Developer Command Prompt for VS 2022",
-                "source": "Windows.Terminal.VisualStudio"
-            },
-            {
-                "guid": "{b99ba06a-6cfd-5593-81d6-c02563d1d4c7}",
-                "hidden": false,
-                "name": "Developer PowerShell for VS 2022",
-                "source": "Windows.Terminal.VisualStudio"
-            },
-            {
                 "guid": "{66e64fc1-a257-5edc-9d76-ca610117c3b3}",
                 "hidden": false,
                 "name": "Developer Command Prompt for VS 2022",
@@ -262,10 +332,17 @@
                 "hidden": false,
                 "name": "Developer PowerShell for VS 2022",
                 "source": "Windows.Terminal.VisualStudio"
+            },
+            {
+                "guid": "{2c4de342-38b7-51cf-b940-2309a097f518}",
+                "hidden": true,
+                "name": "Ubuntu",
+                "source": "Windows.Terminal.Wsl"
             }
         ]
     },
-    "schemes": [
+    "schemes":
+    [
         {
             "background": "#14191F",
             "black": "#000000",
