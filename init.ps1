@@ -42,6 +42,7 @@ $SOURCE_FILES = @(
 if ($Software) {
     $SOURCE_FILES += 'inst-software'
 }
+$SOURCE_FILES += 'inst-aimp-delete-helper'
 
 Write-Host "Setting execution policy to RemoteSigned..." -ForegroundColor Yellow
 try {

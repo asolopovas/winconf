@@ -107,15 +107,9 @@ AIMPDeleteCurrentAndSkip() {
     if AIMPPluginDeleteCurrent()
         return
 
-    AIMPNextTrack()
-    if Win32FileExistsAny(info.path) {
-        SetTimer(() => DeleteTrackFile(info.path, label), -2000)
-        return
-    }
-
-    AIMPDebugLog("file-already-missing", "path=" . info.path)
-    ToolTip("Already missing: " . label)
-    SetTimer(() => ToolTip(), -3000)
+    AIMPDebugLog("plugin-unavailable", "path=" . info.path)
+    ToolTip("AIMP delete helper not loaded")
+    SetTimer(() => ToolTip(), -4000)
 }
 
 DeleteTrackFile(filePath, label, attempt := 1) {
