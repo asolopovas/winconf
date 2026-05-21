@@ -13,6 +13,8 @@ AIMPDebugLog(tag, info := "") {
     try FileAppend(line, AIMPDebugLogPath(), "UTF-8")
 }
 
+AIMPWindowID() => "ahk_class TAIMPMainForm ahk_exe AIMP.exe"
+
 GetAIMPCurrentFile() {
     info := { path: "", sizeBytes: 0 }
     hMap := DllCall("OpenFileMapping", "UInt", 4, "Int", 0, "Str", "AIMP2_RemoteInfo", "Ptr")
@@ -80,12 +82,55 @@ AIMPDeleteCurrentAndSkip() {
     }
 
     label := FormatTrackLabel(info)
+    if (AIMPDeleteCurrentWithPlayer()) {
+        SetTimer(() => VerifyAIMPDeleted(info.path, label), -2500)
+        return
+    }
 
-    ; Skip to next track first so AIMP releases the file
     Send("{Media_Next}")
-
-    ; Delete file in background after a delay so AIMP releases it
     SetTimer(() => DeleteTrackFile(info.path, label), -2000)
+}
+
+AIMPDeleteCurrentWithPlayer() {
+    windowID := AIMPWindowID()
+    if !WinExist(windowID)
+        return false
+
+    activeID := GetActiveWindowID()
+    try {
+        WinActivate(windowID)
+        if !WinWaitActive(windowID, , 2) {
+            AIMPRestoreActiveWindow(activeID)
+            return false
+        }
+        Send("!{Del}")
+        Sleep(150)
+        Send("{Enter}")
+        Sleep(300)
+        AIMPRestoreActiveWindow(activeID)
+        return true
+    } catch as err {
+        AIMPRestoreActiveWindow(activeID)
+        AIMPDebugLog("ui-delete-error", "err=" . err.Message)
+        return false
+    }
+}
+
+AIMPRestoreActiveWindow(activeID) {
+    if (activeID != "" && WinExist(activeID) && !WinActive(activeID))
+        WinActivate(activeID)
+}
+
+VerifyAIMPDeleted(filePath, label) {
+    if !Win32FileExists(filePath) {
+        ToolTip("Deleted: " . label)
+        SetTimer(() => ToolTip(), -3000)
+        return
+    }
+
+    AIMPDebugLog("ui-delete-fallback", "path=" . filePath)
+    Send("{Media_Next}")
+    SetTimer(() => DeleteTrackFile(filePath, label), -2000)
 }
 
 DeleteTrackFile(filePath, label) {
@@ -103,7 +148,7 @@ DeleteTrackFile(filePath, label) {
     ; \\NAS fails. Re-run the delete as the interactive user.
     if (A_IsAdmin) {
         try {
-            RunAsUser(A_ComSpec, '/c del /f /q "' . filePath . '"')
+            Func("RunAsUser").Call(A_ComSpec, '/c del /f /q "' . filePath . '"')
             AIMPDebugLog("fallback-runasuser", "path=" . filePath)
             ToolTip("Deleted: " . label)
             SetTimer(() => ToolTip(), -3000)
