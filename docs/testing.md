@@ -1,6 +1,6 @@
 # Testing
 
-Pester tests run locally against the live Windows environment. Some touch registry, filesystem, symlinks, package managers, or apps.
+Pester runs against the live Windows profile. Tests may touch registry, filesystem, symlinks, package managers, or apps.
 
 ## Run
 
@@ -18,30 +18,31 @@ Pester tests run locally against the live Windows environment. Some touch regist
 | `functions.Tests.ps1` | root helpers |
 | `helpers.Tests.ps1` | helpers module exports |
 | `scripts.Tests.ps1` | script syntax and smoke behavior |
-| `sync-ai.Tests.ps1` | AI sync logic |
+| `sync-ai.Tests.ps1` | AI sync |
 | `aimp.Tests.ps1` | AIMP helper/hotkey glue |
 | `just-completion.Tests.ps1` | just completions |
 | `paths-doctor.Tests.ps1` | PATH diagnostics |
 
 ## Rules
 
-- Pattern: `tests/<target>.Tests.ps1`.
+- Name tests `tests/<target>.Tests.ps1`.
 - Use `BeforeAll`/`AfterAll` for state.
 - Use `It -Skip` when dependencies are missing.
 - Keep `make test` under one warm-machine minute.
-- Prefer integration checks; mock only for isolated pure functions.
-- Mention real system mutations in the handoff.
-
-## Missing by design
-
-No CI, PSScriptAnalyzer, `.editorconfig`, Docker harness, or clean-image bootstrap harness. Do not add them without approval.
+- Prefer integration checks; mock only pure isolated functions.
+- State real system mutations in handoff.
 
 ## Handoff checks
 
 | Changed area | Check |
 |---|---|
 | Any code | `make test` |
-| `init.ps1` or `scripts/inst-*.ps1` | clean-VM/fresh-run coverage or skipped note |
+| `init.ps1` or `scripts/inst-*.ps1` | fresh-run or clean-VM coverage, or skipped note |
 | AHK | reload `init-autohotkey.ahk`; verify affected hotkey when practical |
 | `powershell/modules/**` | `Import-Module -Force`; confirm `.psd1` exports |
-| Registry/system scripts | mention system-state changes |
+| Registry/system scripts | mention state changes |
+| Docs only | review links and affected contracts |
+
+## Missing by design
+
+No CI, PSScriptAnalyzer, `.editorconfig`, Docker, clean-image bootstrap, browser-control, or observability harness. Add only with approval.

@@ -1,6 +1,6 @@
 # winconf
 
-Personal Windows dotfiles and provisioning for PowerShell, AutoHotkey v2, Windows Terminal, WSL, desktop hotkeys, and dev tools.
+Windows dotfiles and provisioning for PowerShell, AutoHotkey v2, Windows Terminal, WSL, desktop hotkeys, AI tools, and dev utilities.
 
 ## Install
 
@@ -9,35 +9,35 @@ Run from elevated PowerShell.
 | Scope | Command |
 |---|---|
 | Core | `iwr https://raw.githubusercontent.com/asolopovas/winconf/main/init.ps1 | iex` |
-| Core plus extended apps | `iwr https://raw.githubusercontent.com/asolopovas/winconf/main/init-software.ps1 | iex` |
+| Core plus apps | `iwr https://raw.githubusercontent.com/asolopovas/winconf/main/init-software.ps1 | iex` |
 | Existing clone | `.\init.ps1` |
-| Existing clone plus extended apps | `.\init.ps1 -Software` |
+| Existing clone plus apps | `.\init.ps1 -Software` |
 
-Re-running is expected; installers check current state first.
+Re-run safely; scripts check current state first.
 
 ## Includes
 
 | Area | Examples |
 |---|---|
-| Core tools | PowerShell 7, AutoHotkey v2, Git, fzf, fd, Starship, Everything, PowerToys, VLC, WinSCP |
-| Extended apps | AIMP, CoreTemp, Calibre, GPG4Win, Android platform tools, FFmpeg, BCUninstaller, Sysinternals, qBittorrent, Rufus, ShareX |
-| Shell | profiles, completions, helpers, git/package aliases, Starship |
-| Desktop | virtual desktop switching, window movement, app launchers, terminal toggle |
-| AI tools | Claude/OpenCode auth, settings, MCP, skills sync |
+| Core | PowerShell 7, AutoHotkey v2, Git, fzf, fd, Starship, Everything, PowerToys, VLC, WinSCP |
+| Apps | AIMP, CoreTemp, Calibre, GPG4Win, Android tools, FFmpeg, BCUninstaller, Sysinternals, qBittorrent, Rufus, ShareX |
+| Shell | profiles, completions, helpers, git/package aliases |
+| Desktop | virtual desktops, window movement, app launchers, terminal toggle |
+| AI | Claude/OpenCode auth, settings, MCP, skills sync |
 
-## Reference
+## Docs
 
 | Need | Doc |
 |---|---|
-| Agent rules | `AGENTS.md` |
-| Repo structure | `docs/architecture.md` |
-| Bootstrap contract | `docs/bootstrap.md` |
+| Agent map | `AGENTS.md` |
+| Architecture and harness | `docs/architecture.md` |
+| Bootstrap | `docs/bootstrap.md` |
 | Shell/modules | `docs/shell-env.md` |
 | Tests | `docs/testing.md` |
 | AI sync | `docs/ai-sync.md` |
 | Hotkeys/aliases | `docs/help.md` |
 
-## Useful commands
+## Commands
 
 | Task | Command |
 |---|---|
@@ -46,17 +46,10 @@ Re-running is expected; installers check current state first.
 | Run installer | `& .\scripts\inst-<name>.ps1` |
 | Start AHK | `& .\init-autohotkey.ahk` |
 
-## Notes
-
-Set local password for Samba access with a Microsoft account:
+## Local notes
 
 ```powershell
 Set-LocalUser -Name $env:USERNAME -Password (Read-Host -AsSecureString "New password")
-```
-
-Set OpenSSH default shell to WSL:
-
-```powershell
 New-ItemProperty -Path "HKLM:\SOFTWARE\OpenSSH" -Name "DefaultShell" -PropertyType String -Value "$env:WINDIR\System32\wsl.exe" -Force | Out-Null
 Restart-Service sshd
 ```

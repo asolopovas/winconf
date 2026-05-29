@@ -1,41 +1,41 @@
 # Shell environment
 
-PowerShell state is split between profile startup, root helpers, and importable modules.
+PowerShell state lives in profile startup, root helpers, and importable modules.
 
-## PowerShell 7 load order
+## Load order
 
-1. `$PROFILE` at `powershell/Microsoft.Powershell_profile.ps1`
+PowerShell 7:
+
+1. `powershell/Microsoft.Powershell_profile.ps1`
 2. `powershell/Profile.ps1`
-3. repo modules added to `PSModulePath`
+3. repo modules in `PSModulePath`
 4. `helpers`
 5. `aliases`
 6. completions
 7. Starship
 
-Windows PowerShell 5.1 has a separate profile; keep 5.1 shims out of the 7 path.
+Keep Windows PowerShell 5.1 shims out of the 7 path.
 
 ## Root helpers
 
-`functions.ps1` stays small because setup scripts dot-source it.
+`functions.ps1` stays setup-safe because installers dot-source it. Load with `. .\functions.ps1`.
 
 | Helper | Purpose |
 |---|---|
-| `Test-CommandExists <cmd>` | Boolean command check |
-| `SetPermissions <dir>` | Grant current user full control |
-| `CreateSymLink <src> <target>` | Replace source path with symlink |
-| `Select-FromMenu` | Interactive picker |
-| `Mount-Btrfs` / `Dismount-Btrfs` | Elevated WSL disk mounts |
-
-Load with `. .\functions.ps1`.
+| `Test-CommandExists` | command check |
+| `SetPermissions` | grant current user full control |
+| `CreateSymLink` | replace source path with symlink |
+| `Select-FromMenu` | interactive picker |
+| `Mount-Btrfs` / `Dismount-Btrfs` | elevated WSL disk mounts |
 
 ## Modules
 
 | Module | Path | Owns |
 |---|---|---|
-| `helpers` | `powershell/modules/helpers/` | exported utility functions by topic |
+| `helpers` | `powershell/modules/helpers/` | exported utilities by topic |
 | `aliases` | `powershell/modules/aliases/` | git/package aliases and conflict removal |
 
-Each module has a `.psm1` loader and `.psd1` manifest. Keep exports in the manifest synced.
+Each module has a `.psm1` loader and `.psd1` manifest; keep exports synced.
 
 ## Placement
 
@@ -52,11 +52,13 @@ Do not use `tools.ps1` when a topical file exists.
 
 ## Rules
 
-- Build paths with `Join-Path`; root is `$env:USERPROFILE\winconf`.
+- Exported functions use `Verb-Noun`; internal helpers use PascalCase or camelCase.
+- Variables use camelCase; constants use `UPPER_SNAKE`.
+- Put `param()` first; type parameters; mark mandatory parameters.
+- Build paths with `Join-Path`; repo root is `$env:USERPROFILE\winconf`.
+- Use `Test-Path`, strict mode, stop-on-error, `try`/`catch`, and `$LASTEXITCODE` checks around external state.
+- Use existing `Write-Step`/`Write-OK`/`Write-Skip`/`Write-Fail` for setup output.
 - Keep repo constants in `init.ps1`.
-- Use strict mode and stop-on-error for scripts touching external systems.
-- Check `$LASTEXITCODE` after native tools.
-- Prefer shared helpers when behavior repeats.
 
 ## Refresh
 

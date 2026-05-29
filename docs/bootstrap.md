@@ -1,36 +1,24 @@
 # Bootstrap
 
-`init.ps1` is the elevated entry point and must work through remote `iwr | iex` before clone.
+`init.ps1` is the elevated entry and must work through remote `iwr | iex` before clone.
 
 ## Run
 
 | Scope | Command |
 |---|---|
 | Local | `.\init.ps1` |
-| Local plus extended apps | `.\init.ps1 -Software` |
+| Local plus apps | `.\init.ps1 -Software` |
 | Remote | `iwr https://raw.githubusercontent.com/asolopovas/winconf/main/init.ps1 | iex` |
-| Remote plus extended apps | `iwr https://raw.githubusercontent.com/asolopovas/winconf/main/init-software.ps1 | iex` |
+| Remote plus apps | `iwr https://raw.githubusercontent.com/asolopovas/winconf/main/init-software.ps1 | iex` |
 
 Transcript: `$env:TEMP\winconf.log`.
 
 ## Modes
 
-| Mode | Trigger | Behavior |
+| Mode | Trigger | Action |
 |---|---|---|
-| Fresh | repo missing | reset winget sources, install Git and essentials, clone, fix ACLs, run setup order |
-| Update | repo exists | prompt, pull, upgrade available essentials, run setup order |
-
-## Constants
-
-| Name | Meaning |
-|---|---|
-| `$DOTFILES` | repo root |
-| `$SCRIPTS_DIR` | setup script directory |
-| `$REPO_URL` | Git remote |
-| `$AUTOHOTKEYVERSION` | value passed to `inst-ahk.ps1` |
-| `$ESSENTIAL_SOFTWARE` | fresh install and update winget IDs |
-| `$PINNED_SOFTWARE` | winget pins |
-| `$SOURCE_FILES` | ordered setup scripts without `.ps1` |
+| Fresh | repo missing | reset winget, install essentials, clone, fix ACLs, run setup |
+| Update | repo exists | prompt, pull, upgrade available essentials, run setup |
 
 ## Setup order
 
@@ -47,26 +35,24 @@ Transcript: `$env:TEMP\winconf.log`.
 11. `inst-software` with `-Software`
 12. `inst-aimp-delete-helper`
 
-Add scripts only after their prerequisites.
+Add scripts only after prerequisites.
 
 ## Installer contract
 
-Every `scripts/inst-*.ps1` must:
-
 - Run directly and repeatedly.
-- Check existing state before work.
+- Check state before work.
 - Reinstall only with `-Force`.
-- Prefer exact winget IDs with noninteractive agreements.
-- Re-check `Get-Command` after PATH changes.
+- Prefer exact winget IDs and noninteractive agreements.
+- Re-check `Get-Command` after PATH edits.
 - Use `CreateSymLink` for repo-managed config links.
-- Avoid depending on the interactive profile.
+- Avoid interactive profile dependencies.
 
 ## Update contract
 
 - Upgrade only IDs present in `winget upgrade` output.
 - Pass `-Update` only to scripts that support it.
-- Make failures actionable with command, package ID, and path context.
+- Include command, package ID, path, and next action in failures.
 
 ## Validation
 
-Run `make test`. For bootstrap changes, state clean-VM/fresh-profile coverage or that it was skipped.
+Run `make test`. For bootstrap changes, state clean-VM or fresh-profile coverage, or say it was skipped.

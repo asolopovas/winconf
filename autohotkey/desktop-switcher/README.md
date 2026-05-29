@@ -1,6 +1,6 @@
 # Desktop switcher
 
-Vendored AutoHotkey virtual desktop helper loaded by `autohotkey/hotkeys.ahk` through `autohotkey/desktop-switcher/init.ahk`.
+Vendored AutoHotkey v2 virtual desktop helper loaded by `autohotkey/hotkeys.ahk` via `autohotkey/desktop-switcher/init.ahk`.
 
 ## Owns
 
@@ -8,13 +8,13 @@ Vendored AutoHotkey virtual desktop helper loaded by `autohotkey/hotkeys.ahk` th
 - Moving active windows between desktops.
 - `VirtualDesktopAccessor.dll` integration.
 
-Repo keybindings live in `autohotkey/hotkeys.ahk` and are listed in `docs/help.md`.
+Keybindings live in `autohotkey/hotkeys.ahk` and `docs/help.md`.
 
 ## Maintenance
 
-- Keep compatible with AutoHotkey v2 callers.
-- If a Windows update breaks desktop movement, update `VirtualDesktopAccessor.dll` from upstream.
-- Do not downgrade the DLL unless the current Windows build requires it.
+- Keep AutoHotkey v2 compatibility.
+- Update `VirtualDesktopAccessor.dll` from upstream when Windows breaks desktop movement.
+- Do not downgrade the DLL unless required by the current Windows build.
 
 ## Upstream
 
