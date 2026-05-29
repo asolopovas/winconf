@@ -1,22 +1,24 @@
-# Windows-only config repo — enforce CRLF for native Windows tooling,
-# LF for shell scripts, and mark binaries explicitly.
 * text=auto eol=crlf
+.gitattributes text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+Makefile text eol=lf
 
-*.ps1   text eol=crlf
-*.psm1  text eol=crlf
-*.psd1  text eol=crlf
-*.cmd   text eol=crlf
-*.bat   text eol=crlf
-*.ahk   text eol=crlf
-*.reg   text eol=crlf
+*.ps1 text eol=crlf
+*.psm1 text eol=crlf
+*.psd1 text eol=crlf
+*.cmd text eol=crlf
+*.bat text eol=crlf
+*.ahk text eol=crlf
+*.reg text eol=crlf
 
-*.sh    text eol=lf
+*.sh text eol=lf
 
-*.png   binary
-*.jpg   binary
-*.jpeg  binary
-*.gif   binary
-*.ico   binary
-*.exe   binary
-*.dll   binary
-*.zip   binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.exe binary
+*.dll binary
+*.zip binary

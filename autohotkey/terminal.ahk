@@ -7,14 +7,15 @@ previousToggleId := 0
 currentPowershellId := 0
 previousPowershellId := 0
 
-#Enter:: ToggleTerminal("Ubuntu")
-<^>!Enter:: ToggleTerminal("Powershell")
+if (!IsSet(REGISTER_TERMINAL_HOTKEYS) || REGISTER_TERMINAL_HOTKEYS) {
+    Hotkey("#Enter", (*) => ToggleTerminal("Ubuntu"))
+    Hotkey("<^>!Enter", (*) => ToggleTerminal("Powershell"))
+    Hotkey("#+Enter", (*) => OpenNewTab("Ubuntu"))
+    Hotkey("<^>!+Enter", (*) => OpenNewTab("Powershell"))
+    Hotkey("#F12", (*) => ActivateAnyTerminal())
+}
 
-#+Enter:: OpenNewTab('Ubuntu')
-<^>!+Enter:: OpenNewTab('Powershell')
-
-#F12::
-{
+ActivateAnyTerminal() {
     windowID := "ahk_class CASCADIA_HOSTING_WINDOW_CLASS"
     if (WinExist(windowID)) {
         WinActivate(windowID)
@@ -30,23 +31,51 @@ SetTimer(UpdateTerminalTracking, 500)
 UpdateTerminalTracking() {
     global currentToggleId, previousToggleId, currentPowershellId, previousPowershellId
 
-    if (currentToggleId && !WinExist("ahk_id " . currentToggleId)) {
+    if (currentToggleId && !TerminalWindowExists(currentToggleId)) {
         currentToggleId := previousToggleId
         previousToggleId := 0
     }
 
-    if (previousToggleId && !WinExist("ahk_id " . previousToggleId)) {
+    if (previousToggleId && !TerminalWindowExists(previousToggleId)) {
         previousToggleId := 0
     }
 
-    if (currentPowershellId && !WinExist("ahk_id " . currentPowershellId)) {
+    if (currentPowershellId && !TerminalWindowExists(currentPowershellId)) {
         currentPowershellId := previousPowershellId
         previousPowershellId := 0
     }
 
-    if (previousPowershellId && !WinExist("ahk_id " . previousPowershellId)) {
+    if (previousPowershellId && !TerminalWindowExists(previousPowershellId)) {
         previousPowershellId := 0
     }
+}
+
+TerminalWindowExists(hwnd) {
+    if (!hwnd) {
+        return false
+    }
+
+    oldDetectHiddenWindows := DetectHiddenWindows(true)
+    exists := WinExist("ahk_id " . hwnd)
+    DetectHiddenWindows(oldDetectHiddenWindows)
+    return exists
+}
+
+ActivateTerminalWindow(hwnd) {
+    if (!TerminalWindowExists(hwnd)) {
+        return false
+    }
+
+    windowID := "ahk_id " . hwnd
+
+    if (WinGetMinMax(windowID) = -1) {
+        WinRestore(windowID)
+    }
+
+    WinShow(windowID)
+    WinActivate(windowID)
+    WinWaitActive(windowID, , 2)
+    return WinActive(windowID)
 }
 
 ToggleTerminal(terminalType := "Ubuntu") {
@@ -54,41 +83,29 @@ ToggleTerminal(terminalType := "Ubuntu") {
 
     if (terminalType == "Powershell") {
 
-        if (currentPowershellId && WinExist("ahk_id " . currentPowershellId)) {
-            minMax := WinGetMinMax("ahk_id " . currentPowershellId)
-            isActive := WinActive("ahk_id " . currentPowershellId)
+        if (currentPowershellId && TerminalWindowExists(currentPowershellId)) {
+            windowID := "ahk_id " . currentPowershellId
 
-            if (isActive) {
-                WinMinimize(currentPowershellId)
-                return
-            } else if (minMax = -1) {
-                WinRestore(currentPowershellId)
-                WinActivate(currentPowershellId)
-                return
-            } else {
-                WinShow(currentPowershellId)
-                WinActivate(currentPowershellId)
+            if (WinActive(windowID)) {
+                WinMinimize(windowID)
                 return
             }
+
+            ActivateTerminalWindow(currentPowershellId)
+            return
         }
     } else {
 
-        if (currentToggleId && WinExist("ahk_id " . currentToggleId)) {
-            minMax := WinGetMinMax("ahk_id " . currentToggleId)
-            isActive := WinActive("ahk_id " . currentToggleId)
+        if (currentToggleId && TerminalWindowExists(currentToggleId)) {
+            windowID := "ahk_id " . currentToggleId
 
-            if (isActive) {
-                WinMinimize(currentToggleId)
-                return
-            } else if (minMax = -1) {
-                WinRestore(currentToggleId)
-                WinActivate(currentToggleId)
-                return
-            } else {
-                WinShow(currentToggleId)
-                WinActivate(currentToggleId)
+            if (WinActive(windowID)) {
+                WinMinimize(windowID)
                 return
             }
+
+            ActivateTerminalWindow(currentToggleId)
+            return
         }
     }
 
@@ -128,11 +145,11 @@ LaunchTerminal(terminal := 'Ubuntu') {
     terminal_path := "C:\Users\asolo\AppData\Local\Microsoft\WindowsApps\wt.exe"
 
     if (terminal == "Ubuntu") {
-        RunAsUser(terminal_path, "new-tab -p Ubuntu")
+        RunAsUser(terminal_path, "-w new new-tab -p Ubuntu")
     }
 
     if (terminal == 'Powershell') {
-        RunAsUser(terminal_path, "new-tab -p PowerShell")
+        RunAsUser(terminal_path, "-w new new-tab -p PowerShell")
     }
 
     loop 60 {
