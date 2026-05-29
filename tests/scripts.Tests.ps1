@@ -82,3 +82,72 @@ Describe "inst-ssh.ps1 copy-id" {
         Should -Invoke ssh -Exactly 0
     }
 }
+
+Describe "inst-pi.ps1" {
+    BeforeAll {
+        $script:path = Join-Path $script:scripts "inst-pi.ps1"
+        $script:origProfile = $env:USERPROFILE
+        $script:origPath = $env:Path
+    }
+
+    BeforeEach {
+        $script:tmpHome = Join-Path $TestDrive ([System.IO.Path]::GetRandomFileName())
+        New-Item -ItemType Directory $script:tmpHome | Out-Null
+        $env:USERPROFILE = $script:tmpHome
+        $env:Path = $script:origPath
+        $script:getCommandCalls = 0
+        Mock Write-Host { }
+        Mock winget { $global:LASTEXITCODE = 0 }
+        Mock bun { $global:LASTEXITCODE = 0 }
+    }
+
+    AfterEach {
+        $env:USERPROFILE = $script:origProfile
+        $env:Path = $script:origPath
+    }
+
+    It "installs bun first when missing and installs pi" {
+        Mock Get-Command {
+            param([string]$Name)
+
+            if ($Name -eq "bun") {
+                $script:getCommandCalls++
+                if ($script:getCommandCalls -eq 1) { return $null }
+                return [pscustomobject]@{ Name = "bun" }
+            }
+
+            if ($Name -eq "winget") {
+                return [pscustomobject]@{ Name = "winget" }
+            }
+
+            return Microsoft.PowerShell.Core\Get-Command @PSBoundParameters
+        }
+
+        & $script:path
+
+        Should -Invoke winget -Exactly 1 -ParameterFilter { $args -contains "Oven-sh.Bun" }
+        Should -Invoke bun -Exactly 1 -ParameterFilter { ($args -join " ") -eq "add -g --ignore-scripts @earendil-works/pi-coding-agent" }
+    }
+
+    It "updates pi on every run when bun is already installed" {
+        Mock Get-Command {
+            param([string]$Name)
+
+            if ($Name -eq "bun") {
+                return [pscustomobject]@{ Name = "bun" }
+            }
+
+            if ($Name -eq "winget") {
+                return [pscustomobject]@{ Name = "winget" }
+            }
+
+            return Microsoft.PowerShell.Core\Get-Command @PSBoundParameters
+        }
+
+        & $script:path
+        & $script:path
+
+        Should -Invoke winget -Exactly 0
+        Should -Invoke bun -Exactly 2 -ParameterFilter { ($args -join " ") -eq "add -g --ignore-scripts @earendil-works/pi-coding-agent" }
+    }
+}
