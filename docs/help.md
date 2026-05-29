@@ -74,12 +74,3 @@
 | `gw` | add all and prompt for commit message |
 | `bfg <args>` | run BFG, downloading jar if missing |
 
-## Paths
-
-| Path | Purpose |
-|---|---|
-| `functions.ps1` | root setup helpers |
-| `powershell/modules/helpers/` | exported utilities |
-| `powershell/modules/aliases/` | global aliases |
-| `autohotkey/` | AHK v2 modules |
-| `init-autohotkey.ahk` | AHK entry point |

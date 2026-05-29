@@ -1,8 +1,8 @@
 # AI sync
 
-`scripts/sync-ai.ps1` keeps Claude Code and OpenCode aligned across Windows and WSL: auth, settings, MCP servers, and skills.
+`scripts/sync-ai.ps1` aligns Claude Code and OpenCode across Windows and WSL: auth, settings, MCP servers, and skills.
 
-## Commands
+## Run
 
 | Task | Command |
 |---|---|
@@ -11,54 +11,48 @@
 | Skip MCP | `.\scripts\sync-ai.ps1 -SkipMcp` |
 | Skip skills | `.\scripts\sync-ai.ps1 -SkipSkills` |
 
-The script runs with strict mode and stops on unexpected errors.
+Strict mode is enabled; unexpected errors stop the sync.
 
 ## Flow
 
 | Step | Source | Destinations |
 |---|---|---|
-| Auth | `~/.claude/.credentials.json` | OpenCode auth on Windows and WSL |
-| Settings | `$claudeSettings` in script | Claude settings on Windows and WSL |
-| MCP | `$mcpServers` in script | `claude mcp` and OpenCode config |
-| Skills | `$skillSources` URLs | `~/.agents/skills`, Claude skills, OpenCode skills |
+| Auth | `~/.claude/.credentials.json` | OpenCode auth on Windows/WSL |
+| Settings | `$claudeSettings` | Claude settings on Windows/WSL |
+| MCP | `$mcpServers` | `claude mcp`, OpenCode config |
+| Skills | `$skillSources` | `~/.agents/skills`, Claude, OpenCode |
 
-Current MCP set: `context7` through `npx @upstash/context7-mcp`.
+Current MCP: `context7` via `npx @upstash/context7-mcp`.
 
-## Skill layout
+## Paths
 
 | Path | Role |
 |---|---|
-| `~/.agents/skills` | canonical skill store |
-| `~/.claude/skills` | Claude consumer copy |
-| `~/.config/opencode/skills` | OpenCode consumer copy |
+| `~/.agents/skills` | canonical skills |
+| `~/.claude/skills` | Claude copy |
+| `~/.config/opencode/skills` | OpenCode copy |
 | `\\wsl$\<distro>\home\<user>\...` | WSL auth/settings targets |
 
-Windows copies skill trees because some tools handle reparse points poorly. Leave existing symlink targets alone; do not introduce new ones.
+Windows copies skills because some tools handle reparse points poorly. Leave existing symlinks; do not add new ones.
 
-## Configuration surface
+## Configuration
 
 | Name | Purpose |
 |---|---|
 | `$claudeCredPath` | Claude OAuth source |
 | `$claudeSettingsPath` | Claude settings destination |
-| `$winAuthPath` | Windows OpenCode auth destination |
-| `$wslAuthPath` | WSL OpenCode auth destination |
+| `$winAuthPath` / `$wslAuthPath` | OpenCode auth destinations |
 | `$mcpServers` | ordered MCP server map |
 | `$agentsSkillsDir` | canonical skill directory |
 | `$skillSources` | GitHub tree URLs for skill subdirectories |
 
-## Re-run when
+## Re-run after
 
-- Claude OAuth changes after `claude login`.
+- `claude login` or OAuth refresh.
 - `$skillSources` changes.
 - `$mcpServers` changes.
-- A new machine has completed bootstrap.
+- New-machine bootstrap.
 
 ## Validation
 
-| Scope | Command |
-|---|---|
-| Full suite | `make test` |
-| Sync suite | `Invoke-Pester -Path .\tests\sync-ai.Tests.ps1 -Output Detailed` |
-
-The sync suite covers credential path resolution, MCP argument building, and skill-source parsing.
+`make test` or `Invoke-Pester -Path .\tests\sync-ai.Tests.ps1 -Output Detailed`.

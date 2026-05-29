@@ -1,85 +1,67 @@
 ---
 name: winconf
-description: Agent guide for the Windows dotfiles and provisioning repo
+description: Agent map for the Windows dotfiles and provisioning repo
 ---
 
 # AGENTS
 
-Use this file as the map. The source of truth lives in `docs/` and the scripts themselves.
+Map only. Source of truth lives in focused docs and scripts.
 
-## Repository contract
+## Contract
 
-- Personal Windows dotfiles and dev bootstrap.
-- Canonical path: `$env:USERPROFILE\winconf`.
-- Primary stack: PowerShell 7, Windows PowerShell 5.1 bootstrap fallback, AutoHotkey v2, Lua configs, Pester tests, winget/Scoop/Chocolatey.
-- Entry point: `init.ps1`, including remote `iwr | iex` bootstrap.
-
-## Non-negotiables
-
-- No comments in files. Allowed only: shebangs, `#Requires`, and interpreter pragmas.
-- No commits unless explicitly requested.
-- Scripts must be idempotent and safe to re-run.
-- `init.ps1` must work before repo-local helpers exist.
-- `scripts/inst-*.ps1` must be standalone, re-runnable, and reinstall only with explicit `-Force`.
-- Prefer winget. Use Chocolatey/Scoop only when winget is unsuitable. Do not use raw installers when winget has a package.
-- Symlink configs with `CreateSymLink`; investigate real files before replacing them.
+- Personal Windows dotfiles at `$env:USERPROFILE\winconf`.
+- Stack: PowerShell, AutoHotkey v2, Lua configs, Pester, winget/Scoop/Chocolatey.
+- Bootstrap: `init.ps1`, including remote `iwr | iex`.
+- No comments in files except shebangs, `#Requires`, and interpreter pragmas.
+- No commits unless requested.
+- Idempotent scripts only.
+- `init.ps1` must not need repo-local helpers before clone.
+- `scripts/inst-*.ps1` must be standalone and reinstall only with `-Force`.
+- Prefer winget over Chocolatey/Scoop; avoid raw installers when winget exists.
+- Symlink repo configs with `CreateSymLink`; inspect real targets before replacing.
 - Never commit secrets or local AI settings.
-- Do not reformat config files or introduce linters without approval.
-- Avoid elevation unless the operation requires it.
+- Do not reformat configs or add linters without approval.
+- Avoid elevation unless required.
 
 ## Commands
 
 | Task | Command |
 |---|---|
 | Bootstrap | `.\init.ps1` |
-| Bootstrap with extended software | `.\init.ps1 -Software` |
+| Extended bootstrap | `.\init.ps1 -Software` |
 | Remote bootstrap | `iwr https://raw.githubusercontent.com/asolopovas/winconf/main/init.ps1 | iex` |
 | Test | `make test` |
-| Filter tests | `Invoke-Pester -Path ./tests -FullNameFilter "*pattern*"` |
-| Load root helpers | `. .\functions.ps1` |
-| Reload helpers module | `Import-Module .\powershell\modules\helpers -Force` |
 | Sync AI tools | `.\scripts\sync-ai.ps1` |
-| Reload AHK | run `init-autohotkey.ahk` or save an AHK file in the configured editor |
+| Load root helpers | `. .\functions.ps1` |
 
-## Knowledge map
+## Docs
 
 | Need | Read |
 |---|---|
-| Repo layout and layer boundaries | `docs/architecture.md` |
-| Bootstrap flow, installer contract, source order | `docs/bootstrap.md` |
-| PowerShell profile, modules, aliases, manifests | `docs/shell-env.md` |
-| Tests and validation expectations | `docs/testing.md` |
-| AI credential/MCP/skill sync | `docs/ai-sync.md` |
-| Hotkeys and daily commands | `docs/help.md` |
-| User-facing setup overview | `README.md` |
+| Repo layers | `docs/architecture.md` |
+| Bootstrap/installers | `docs/bootstrap.md` |
+| PowerShell profile/modules | `docs/shell-env.md` |
+| Tests/handoff validation | `docs/testing.md` |
+| AI sync | `docs/ai-sync.md` |
+| Hotkeys/aliases | `docs/help.md` |
 
-## Implementation rules
+## PowerShell rules
 
-### PowerShell
+- Exported functions: `Verb-Noun`; internal helpers: PascalCase or camelCase; variables: camelCase; constants: `UPPER_SNAKE`.
+- Put `param()` first; type parameters; mark mandatory parameters.
+- Use `Test-Path`, `Join-Path`, `try`/`catch`, and `$LASTEXITCODE` checks around external state.
+- Keep module manifests in sync with exports.
+- Use existing `Write-Step`/`Write-OK`/`Write-Skip`/`Write-Fail`; otherwise use consistent `Write-Host -ForegroundColor`.
 
-- Exported functions: `Verb-Noun` PascalCase.
-- Internal helpers: PascalCase without dash or camelCase.
-- Variables: camelCase. Repo constants: `UPPER_SNAKE`.
-- Put `param()` at the top; type parameters; use `[Parameter(Mandatory)]` where required.
-- Guard file operations with `Test-Path`; build paths with `Join-Path`.
-- Check `$LASTEXITCODE` after native tools.
-- Use `try`/`catch` for registry, network, winget, git, WSL, and filesystem operations.
-- After adding/removing exported functions, update the matching `.psd1` `FunctionsToExport`.
-- Prefer `Write-Step`, `Write-OK`, `Write-Skip`, `Write-Fail` when already present; otherwise use `Write-Host -ForegroundColor` consistently.
-
-### AutoHotkey v2
+## AutoHotkey rules
 
 - Every `.ahk` starts with `#Requires AutoHotkey v2.0`.
-- Functions use PascalCase; variables use camelCase; globals are explicit.
-- Use `ahk_exe`, `ahk_class`, or `ahk_id` selectors.
-- Check `WinExist()` before `WinActivate()`; window operations need `try`/`catch`.
-- Do not kill arbitrary `WindowsTerminal`, `wt`, or `AutoHotkey` processes in tests.
-- When launching AHK from Git Bash/MSYS, set `MSYS2_ARG_CONV_EXCL='*'` before slash-prefixed switches.
+- Functions: PascalCase; variables: camelCase; globals explicit.
+- Select windows by `ahk_exe`, `ahk_class`, or `ahk_id`.
+- Check `WinExist()` before `WinActivate()` and wrap fragile window ops.
+- Tests must close only windows they create.
+- From Git Bash/MSYS, set `MSYS2_ARG_CONV_EXCL='*'` before slash-prefixed AHK switches.
 
-## Handoff checklist
+## Before handoff
 
-- Run `make test` unless impossible.
-- For bootstrap or installer changes, state whether a clean-VM run was performed.
-- For AHK changes, reload `init-autohotkey.ahk` and verify the affected hotkey when practical.
-- For PowerShell module exports, confirm the `.psd1` manifest is synced.
-- Mention skipped validation and any registry, sudo, package-manager, or system-state changes.
+Run `make test` unless impossible. Follow `docs/testing.md` for area-specific checks and note skipped validation or system-state changes.

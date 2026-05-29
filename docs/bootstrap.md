@@ -1,40 +1,38 @@
 # Bootstrap
 
-`init.ps1` is the admin entry point. It must also work through remote `iwr | iex`, before the repo is cloned.
+`init.ps1` is the elevated entry point and must work through remote `iwr | iex` before clone.
 
-## Invocation
+## Run
 
-| Mode | Command |
+| Scope | Command |
 |---|---|
-| Fresh install or update | `.\init.ps1` |
-| Include extended apps | `.\init.ps1 -Software` |
-| Remote install | `iwr https://raw.githubusercontent.com/asolopovas/winconf/main/init.ps1 | iex` |
-| Remote install with extended apps | `iwr https://raw.githubusercontent.com/asolopovas/winconf/main/init-software.ps1 | iex` |
+| Local | `.\init.ps1` |
+| Local plus extended apps | `.\init.ps1 -Software` |
+| Remote | `iwr https://raw.githubusercontent.com/asolopovas/winconf/main/init.ps1 | iex` |
+| Remote plus extended apps | `iwr https://raw.githubusercontent.com/asolopovas/winconf/main/init-software.ps1 | iex` |
 
-Requires elevated PowerShell. Transcript path: `$env:TEMP\winconf.log`.
+Transcript: `$env:TEMP\winconf.log`.
 
 ## Modes
 
 | Mode | Trigger | Behavior |
 |---|---|---|
-| Fresh | `$env:USERPROFILE\winconf` missing | reset winget sources, install Git, install essentials, clone repo, fix ACLs, run setup scripts |
-| Update | repo exists | prompt, `git pull`, upgrade essential winget IDs with available updates, run setup scripts |
+| Fresh | repo missing | reset winget sources, install Git and essentials, clone, fix ACLs, run setup order |
+| Update | repo exists | prompt, pull, upgrade available essentials, run setup order |
 
-## Bootstrap constants
+## Constants
 
 | Name | Meaning |
 |---|---|
-| `$DOTFILES` | canonical repo root |
+| `$DOTFILES` | repo root |
 | `$SCRIPTS_DIR` | setup script directory |
 | `$REPO_URL` | Git remote |
-| `$AUTOHOTKEYVERSION` | version passed to `inst-ahk.ps1` |
-| `$ESSENTIAL_SOFTWARE` | winget IDs installed on fresh run and upgraded on update |
-| `$PINNED_SOFTWARE` | winget IDs pinned after setup |
-| `$SOURCE_FILES` | ordered setup scripts, without `.ps1` |
+| `$AUTOHOTKEYVERSION` | value passed to `inst-ahk.ps1` |
+| `$ESSENTIAL_SOFTWARE` | fresh install and update winget IDs |
+| `$PINNED_SOFTWARE` | winget pins |
+| `$SOURCE_FILES` | ordered setup scripts without `.ps1` |
 
-## Source order
-
-Current order:
+## Setup order
 
 1. `cleanup`
 2. `inst-paths`
@@ -46,31 +44,29 @@ Current order:
 8. `wsl-exclusions`
 9. `inst-modules`
 10. `inst-scoop`
-11. `inst-software` when `-Software` is set
+11. `inst-software` with `-Software`
 12. `inst-aimp-delete-helper`
 
-Order is part of the contract. Add a script only where its prerequisites are already satisfied.
+Add scripts only after their prerequisites.
 
 ## Installer contract
 
 Every `scripts/inst-*.ps1` must:
 
-- Be runnable directly.
-- Be safe when run repeatedly.
-- Check existing state before install work.
-- Reinstall only with explicit `-Force`.
-- Prefer winget exact IDs and noninteractive agreements.
-- Re-check `Get-Command` after PATH-changing installers.
+- Run directly and repeatedly.
+- Check existing state before work.
+- Reinstall only with `-Force`.
+- Prefer exact winget IDs with noninteractive agreements.
+- Re-check `Get-Command` after PATH changes.
 - Use `CreateSymLink` for repo-managed config links.
-- Avoid assuming the interactive profile has loaded.
+- Avoid depending on the interactive profile.
 
 ## Update contract
 
-- Do not reinstall essentials blindly.
 - Upgrade only IDs present in `winget upgrade` output.
-- Pass `-Update` only to setup scripts that support it.
-- Keep failures actionable with command, package ID, and path context.
+- Pass `-Update` only to scripts that support it.
+- Make failures actionable with command, package ID, and path context.
 
 ## Validation
 
-Run `make test`. For bootstrap changes, also state whether a clean VM or fresh user-profile run was performed.
+Run `make test`. For bootstrap changes, state clean-VM/fresh-profile coverage or that it was skipped.

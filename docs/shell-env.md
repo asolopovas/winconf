@@ -1,71 +1,62 @@
 # Shell environment
 
-PowerShell state is split between the profile, root bootstrap helpers, and importable modules.
+PowerShell state is split between profile startup, root helpers, and importable modules.
 
-## Load order
-
-PowerShell 7 loads:
+## PowerShell 7 load order
 
 1. `$PROFILE` at `powershell/Microsoft.Powershell_profile.ps1`
 2. `powershell/Profile.ps1`
-3. repo module path appended to `PSModulePath`
-4. `helpers` module
-5. `aliases` module
+3. repo modules added to `PSModulePath`
+4. `helpers`
+5. `aliases`
 6. completions
 7. Starship
 
-Windows PowerShell 5.1 has a separate profile. Keep 5.1-only compatibility out of the PowerShell 7 path.
+Windows PowerShell 5.1 has a separate profile; keep 5.1 shims out of the 7 path.
 
 ## Root helpers
 
-`functions.ps1` is intentionally small because setup scripts dot-source it.
+`functions.ps1` stays small because setup scripts dot-source it.
 
 | Helper | Purpose |
 |---|---|
-| `Test-CommandExists <cmd>` | Boolean `Get-Command` check |
+| `Test-CommandExists <cmd>` | Boolean command check |
 | `SetPermissions <dir>` | Grant current user full control |
-| `CreateSymLink <src> <target>` | Replace source path with a symlink |
-| `Select-FromMenu` | Interactive list picker |
-| `Mount-Btrfs` / `Dismount-Btrfs` | Elevated WSL disk mount helpers |
+| `CreateSymLink <src> <target>` | Replace source path with symlink |
+| `Select-FromMenu` | Interactive picker |
+| `Mount-Btrfs` / `Dismount-Btrfs` | Elevated WSL disk mounts |
 
-Load manually with `. .\functions.ps1`.
+Load with `. .\functions.ps1`.
 
 ## Modules
 
-| Module | Path | Contract |
+| Module | Path | Owns |
 |---|---|---|
-| `helpers` | `powershell/modules/helpers/` | Exported utility functions split by topic |
-| `aliases` | `powershell/modules/aliases/` | Git, package-manager, and conflict-removal aliases |
+| `helpers` | `powershell/modules/helpers/` | exported utility functions by topic |
+| `aliases` | `powershell/modules/aliases/` | git/package aliases and conflict removal |
 
-Each module has:
+Each module has a `.psm1` loader and `.psd1` manifest. Keep exports in the manifest synced.
 
-- `.psm1` loader that dot-sources local `.ps1` files.
-- `.psd1` manifest that controls exported functions or aliases.
+## Placement
 
-After adding/removing an exported function or alias, update the manifest.
-
-## Helper placement
-
-| Need | Put it in |
+| Need | File |
 |---|---|
-| File/path utilities | `helpers/files.ps1` |
-| Docker Compose wrappers | `helpers/docker-compose.ps1` |
-| Hosts/firewall/security | matching helper file |
-| WSL helpers | `helpers/wsl.ps1` |
-| Git alias | `aliases/git-aliases.ps1` |
-| Package-manager alias | `aliases/package-managers.ps1` |
-| Built-in alias conflict | `aliases/remove-aliases.ps1` |
+| Files/paths | `helpers/files.ps1` |
+| Docker Compose | `helpers/docker-compose.ps1` |
+| Hosts/firewall/security/WSL | matching helper file |
+| Git aliases | `aliases/git-aliases.ps1` |
+| Package aliases | `aliases/package-managers.ps1` |
+| Alias conflicts | `aliases/remove-aliases.ps1` |
 
-Do not use `tools.ps1` as a dumping ground when a topical file exists.
+Do not use `tools.ps1` when a topical file exists.
 
 ## Rules
 
-- Build paths with `Join-Path`.
-- Root is `$env:USERPROFILE\winconf`.
-- Keep repo constants in `init.ps1`, not duplicated across installers.
-- Use `Set-StrictMode -Version Latest` and `$ErrorActionPreference = 'Stop'` for scripts that touch external systems.
+- Build paths with `Join-Path`; root is `$env:USERPROFILE\winconf`.
+- Keep repo constants in `init.ps1`.
+- Use strict mode and stop-on-error for scripts touching external systems.
 - Check `$LASTEXITCODE` after native tools.
-- Prefer topic-specific helpers over repeated one-off code when behavior is reused.
+- Prefer shared helpers when behavior repeats.
 
 ## Refresh
 
