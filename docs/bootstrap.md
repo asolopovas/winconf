@@ -1,53 +1,76 @@
-## Bootstrap (init.ps1)
+# Bootstrap
 
-Single-file entry — safe to `iwr | iex` before the repo is cloned. Re-runs detect an existing install and switch to update mode. Every `inst-*.ps1` checks for prior install before doing work.
+`init.ps1` is the admin entry point. It must also work through remote `iwr | iex`, before the repo is cloned.
 
-### Invocation
+## Invocation
 
-```powershell
-.\init.ps1                                   # fresh install or update (prompted)
-.\init.ps1 -Software                         # also run inst-software.ps1
-iwr https://raw.githubusercontent.com/asolopovas/winconf/main/init.ps1 | iex
-```
-
-Must run in an **elevated** PowerShell (admin). Transcript lands in `$env:TEMP\winconf.log`.
-
-### Modes
-
-| Mode | Trigger | Does |
-|---|---|---|
-| Fresh install | `$DOTFILES` missing | resets winget sources, installs `$ESSENTIAL_SOFTWARE` in parallel jobs, clones repo, fixes ACLs, runs `$SOURCE_FILES` |
-| Update | `$DOTFILES` present | prompts, `git pull`, `winget upgrade` only for essential IDs that actually have updates, re-runs `$SOURCE_FILES` with `-Update` for `inst-modules` |
-
-### Key variables (top of `init.ps1`)
-
-| Var | Purpose |
+| Mode | Command |
 |---|---|
-| `$DOTFILES` | `$env:USERPROFILE\winconf` — canonical root |
-| `$SCRIPTS_DIR` | `$DOTFILES\scripts` |
-| `$REPO_URL` | GitHub remote |
-| `$AUTOHOTKEYVERSION` | Pinned to `2` — passed to `inst-ahk.ps1` |
-| `$ESSENTIAL_SOFTWARE` | winget IDs installed on fresh, upgraded in update mode |
-| `$PINNED_SOFTWARE` | winget IDs pinned (held back from upgrades) |
-| `$SOURCE_FILES` | Ordered list of scripts run after bootstrap |
+| Fresh install or update | `.\init.ps1` |
+| Include extended apps | `.\init.ps1 -Software` |
+| Remote install | `iwr https://raw.githubusercontent.com/asolopovas/winconf/main/init.ps1 | iex` |
+| Remote install with extended apps | `iwr https://raw.githubusercontent.com/asolopovas/winconf/main/init-software.ps1 | iex` |
 
-Add a new installer by appending its name (without `.ps1`) to `$SOURCE_FILES` in the right spot. Order matters: paths → fonts → pwsh → terminal → ahk → wsl → modules → scoop.
+Requires elevated PowerShell. Transcript path: `$env:TEMP\winconf.log`.
 
-### Idempotency rules for `inst-*.ps1`
+## Modes
 
-- Guard with `Test-CommandExists`, `Test-Path`, or a winget `--exact` presence check before installing.
-- Reinstall only when an explicit `-Force` switch is passed in.
-- Don't assume PATH is set — recheck with `Get-Command` after any installer that modifies it.
-- Prefer `winget install --id <id> -h --accept-source-agreements --accept-package-agreements` with `2>$null` for noise suppression.
-- When symlinking, use `CreateSymLink` from `functions.ps1` (it removes the target first).
-- Log every step with colour: Cyan info / Green ok / Yellow warn / Red fail / DarkGray detail.
+| Mode | Trigger | Behavior |
+|---|---|---|
+| Fresh | `$env:USERPROFILE\winconf` missing | reset winget sources, install Git, install essentials, clone repo, fix ACLs, run setup scripts |
+| Update | repo exists | prompt, `git pull`, upgrade essential winget IDs with available updates, run setup scripts |
 
-### Software install contract
+## Bootstrap constants
 
-Fresh runs install Git first (needed to clone), then fan out the remaining essentials as background jobs (`Start-Job`) and `Wait-Job`. Update runs only upgrade IDs that appear in `winget upgrade` output — no blanket reinstall.
+| Name | Meaning |
+|---|---|
+| `$DOTFILES` | canonical repo root |
+| `$SCRIPTS_DIR` | setup script directory |
+| `$REPO_URL` | Git remote |
+| `$AUTOHOTKEYVERSION` | version passed to `inst-ahk.ps1` |
+| `$ESSENTIAL_SOFTWARE` | winget IDs installed on fresh run and upgraded on update |
+| `$PINNED_SOFTWARE` | winget IDs pinned after setup |
+| `$SOURCE_FILES` | ordered setup scripts, without `.ps1` |
 
-Winget pins are applied at the end (`winget pin add`) for every ID in `$PINNED_SOFTWARE` that isn't already pinned.
+## Source order
 
-### Test it
+Current order:
 
-`make test` runs the Pester suite, which includes `scripts.Tests.ps1` (syntax + smoke) and `functions.Tests.ps1` (shared helpers). See [testing.md](testing.md).
+1. `cleanup`
+2. `inst-paths`
+3. `paths-doctor`
+4. `inst-fonts`
+5. `inst-pwsh`
+6. `inst-terminal`
+7. `inst-ahk`
+8. `wsl-exclusions`
+9. `inst-modules`
+10. `inst-scoop`
+11. `inst-software` when `-Software` is set
+12. `inst-aimp-delete-helper`
+
+Order is part of the contract. Add a script only where its prerequisites are already satisfied.
+
+## Installer contract
+
+Every `scripts/inst-*.ps1` must:
+
+- Be runnable directly.
+- Be safe when run repeatedly.
+- Check existing state before install work.
+- Reinstall only with explicit `-Force`.
+- Prefer winget exact IDs and noninteractive agreements.
+- Re-check `Get-Command` after PATH-changing installers.
+- Use `CreateSymLink` for repo-managed config links.
+- Avoid assuming the interactive profile has loaded.
+
+## Update contract
+
+- Do not reinstall essentials blindly.
+- Upgrade only IDs present in `winget upgrade` output.
+- Pass `-Update` only to setup scripts that support it.
+- Keep failures actionable with command, package ID, and path context.
+
+## Validation
+
+Run `make test`. For bootstrap changes, also state whether a clean VM or fresh user-profile run was performed.

@@ -1,42 +1,75 @@
-## Shell Environment
+# Shell environment
 
-### Load order (PowerShell 7)
+PowerShell state is split between the profile, root bootstrap helpers, and importable modules.
 
-`$PROFILE` (`Microsoft.PowerShell_profile.ps1`) → `powershell/Profile.ps1` → `PSModulePath` augmented with `$env:USERPROFILE\winconf\powershell\modules` → `helpers` module → `aliases` module (which dot-sources `git-aliases.ps1`, `package-managers.ps1`, `remove-aliases.ps1`) → completions → Starship init.
+## Load order
 
-Windows PowerShell 5.1 uses its own profile path — keep 5.1-only shims out of the 7 profile.
+PowerShell 7 loads:
 
-### functions.ps1 (repo root) cheat sheet
+1. `$PROFILE` at `powershell/Microsoft.Powershell_profile.ps1`
+2. `powershell/Profile.ps1`
+3. repo module path appended to `PSModulePath`
+4. `helpers` module
+5. `aliases` module
+6. completions
+7. Starship
+
+Windows PowerShell 5.1 has a separate profile. Keep 5.1-only compatibility out of the PowerShell 7 path.
+
+## Root helpers
+
+`functions.ps1` is intentionally small because setup scripts dot-source it.
 
 | Helper | Purpose |
 |---|---|
-| `Test-CommandExists <cmd>` | `Get-Command` wrapper returning `[bool]` |
-| `SetPermissions <dir>` | Grants `$env:UserName` FullControl on `$dir` |
-| `CreateSymLink <src> <target>` | Deletes `$src`, creates symlink to `$target` |
+| `Test-CommandExists <cmd>` | Boolean `Get-Command` check |
+| `SetPermissions <dir>` | Grant current user full control |
+| `CreateSymLink <src> <target>` | Replace source path with a symlink |
+| `Select-FromMenu` | Interactive list picker |
+| `Mount-Btrfs` / `Dismount-Btrfs` | Elevated WSL disk mount helpers |
 
-Load in a session via `. .\functions.ps1`. These are intentionally tiny — heavier utilities live in the `helpers` module.
+Load manually with `. .\functions.ps1`.
 
-### Modules
+## Modules
 
-| Module | Path | Contents |
+| Module | Path | Contract |
 |---|---|---|
-| `helpers` | `powershell/modules/helpers/` | Split by topic: `conversions.ps1`, `docker-compose.ps1`, `edit-hosts.ps1`, `files.ps1`, `firewall-blocker.ps1`, `rm-pattern.ps1`, `security.ps1`, `shortcuts.ps1`, `system.ps1`, `tools.ps1`, `wsl.ps1` |
-| `aliases` | `powershell/modules/aliases/` | `git-aliases.ps1`, `package-managers.ps1`, `remove-aliases.ps1` |
+| `helpers` | `powershell/modules/helpers/` | Exported utility functions split by topic |
+| `aliases` | `powershell/modules/aliases/` | Git, package-manager, and conflict-removal aliases |
 
-Both use a `.psm1` loader that dot-sources the `.ps1` files and a `.psd1` manifest that declares `FunctionsToExport` / `AliasesToExport`. **After adding or removing a function, update the matching manifest** — otherwise it won't be visible to the importer.
+Each module has:
 
-Refresh a manifest programmatically:
+- `.psm1` loader that dot-sources local `.ps1` files.
+- `.psd1` manifest that controls exported functions or aliases.
+
+After adding/removing an exported function or alias, update the manifest.
+
+## Helper placement
+
+| Need | Put it in |
+|---|---|
+| File/path utilities | `helpers/files.ps1` |
+| Docker Compose wrappers | `helpers/docker-compose.ps1` |
+| Hosts/firewall/security | matching helper file |
+| WSL helpers | `helpers/wsl.ps1` |
+| Git alias | `aliases/git-aliases.ps1` |
+| Package-manager alias | `aliases/package-managers.ps1` |
+| Built-in alias conflict | `aliases/remove-aliases.ps1` |
+
+Do not use `tools.ps1` as a dumping ground when a topical file exists.
+
+## Rules
+
+- Build paths with `Join-Path`.
+- Root is `$env:USERPROFILE\winconf`.
+- Keep repo constants in `init.ps1`, not duplicated across installers.
+- Use `Set-StrictMode -Version Latest` and `$ErrorActionPreference = 'Stop'` for scripts that touch external systems.
+- Check `$LASTEXITCODE` after native tools.
+- Prefer topic-specific helpers over repeated one-off code when behavior is reused.
+
+## Refresh
 
 ```powershell
 UpdateModuleManifest -moduleManifestPath .\powershell\modules\helpers\helpers.psd1
+Import-Module .\powershell\modules\helpers -Force
 ```
-
-### Conventions
-
-- New shared utility → pick a file in `helpers/` by topic; don't dump everything into `tools.ps1`.
-- New alias → `powershell/modules/aliases/` (git-shaped → `git-aliases.ps1`; package managers → `package-managers.ps1`).
-- Built-in alias conflicts (e.g. `gc`, `gp`) are removed up-front via `Remove-Item -Force Alias:$name` in `remove-aliases.ps1`. Add to that list when a new clash appears.
-- Constants go in `init.ps1` (`$DOTFILES`, `$ESSENTIAL_SOFTWARE`) — don't redefine them in individual `inst-*.ps1` scripts.
-- Path construction: `Join-Path` always. Root: `$env:USERPROFILE\winconf`.
-- Coloured output: `Write-Host -ForegroundColor Cyan|Green|Yellow|Red|DarkGray`. Scripts that define `Write-Step`/`Write-OK`/`Write-Skip`/`Write-Fail` helpers should use those instead for consistency.
-- `Set-StrictMode -Version Latest` + `$ErrorActionPreference = 'Stop'` in scripts that touch external systems (winget, git, registry, network).
