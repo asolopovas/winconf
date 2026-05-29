@@ -5,17 +5,16 @@ description: Agent map for the Windows dotfiles and provisioning repo
 
 # AGENTS
 
-Use the repo as source of truth. Keep this file a map; put details in focused docs, scripts, tests, or checked plans.
+Repo is source of truth. Keep details in docs, scripts, tests, or checked plans.
 
 ## Contract
 
 - Personal Windows dotfiles at `$env:USERPROFILE\winconf`.
 - Stack: PowerShell, AutoHotkey v2, Lua, Pester, winget/Scoop/Chocolatey.
-- Idempotent by default; reinstall only with explicit `-Force`.
-- `init.ps1` must run locally and through remote `iwr | iex` before clone.
-- `scripts/inst-*.ps1` must be standalone after clone.
-- Prefer winget; avoid raw installers when winget exists.
-- Symlink repo-owned configs with `CreateSymLink`; inspect real targets first.
+- Idempotent unless `-Force`; prefer winget over raw installers.
+- `init.ps1` works locally and through remote `iwr | iex` before clone.
+- `scripts/inst-*.ps1` work standalone after clone.
+- Symlink repo configs with `CreateSymLink`; inspect targets first.
 - No comments except shebangs, `#Requires`, and interpreter pragmas.
 - Do not reformat configs or add linters/CI without approval.
 - Never commit secrets, local AI settings, or unrequested commits.
@@ -23,26 +22,17 @@ Use the repo as source of truth. Keep this file a map; put details in focused do
 
 ## Commands
 
-| Task | Command |
-|---|---|
-| Bootstrap | `.\init.ps1` |
-| Extended bootstrap | `.\init.ps1 -Software` |
-| Remote bootstrap | `iwr https://raw.githubusercontent.com/asolopovas/winconf/main/init.ps1 | iex` |
-| Test | `make test` |
-| Sync AI tools | `.\scripts\sync-ai.ps1` |
-| Load helpers | `. .\functions.ps1` |
+Bootstrap `.\init.ps1`; apps `.\init.ps1 -Software`; remote `iwr https://raw.githubusercontent.com/asolopovas/winconf/main/init.ps1 | iex`; test `make test`; sync AI `.\scripts\sync-ai.ps1`; helpers `. .\functions.ps1`.
 
 ## Docs
 
-| Need | Read |
-|---|---|
-| Layers, rules, task loop | `docs/architecture.md` |
-| Bootstrap/installers | `docs/bootstrap.md` |
-| PowerShell profile/modules | `docs/shell-env.md` |
-| Tests and handoff | `docs/testing.md` |
-| AI sync | `docs/ai-sync.md` |
-| Hotkeys/aliases | `docs/help.md` |
+- `docs/architecture.md`: layers, rules, plans.
+- `docs/bootstrap.md`: bootstrap and installers.
+- `docs/shell-env.md`: PowerShell and modules.
+- `docs/testing.md`: tests and handoff.
+- `docs/ai-sync.md`: AI tool sync.
+- `docs/help.md`: hotkeys and aliases.
 
 ## Loop
 
-Inspect repo -> plan -> change -> run checks -> review diff -> update docs/tests -> hand off with validation and skipped checks.
+Inspect -> plan -> change -> check -> review diff -> update docs/tests -> hand off validation and skipped checks.

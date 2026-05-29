@@ -1,6 +1,6 @@
 # Desktop switcher
 
-Vendored AutoHotkey v2 virtual desktop helper loaded by `autohotkey/hotkeys.ahk` via `autohotkey/desktop-switcher/init.ahk`.
+Vendored AutoHotkey v2 virtual desktop helper loaded by `autohotkey/hotkeys.ahk` through `autohotkey/desktop-switcher/init.ahk`.
 
 ## Owns
 

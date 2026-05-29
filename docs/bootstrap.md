@@ -1,6 +1,6 @@
 # Bootstrap
 
-`init.ps1` is the elevated entry and must work through remote `iwr | iex` before clone.
+`init.ps1` is the elevated entry and must work locally and through remote `iwr | iex` before clone.
 
 ## Run
 
@@ -20,28 +20,16 @@ Transcript: `$env:TEMP\winconf.log`.
 | Fresh | repo missing | reset winget, install essentials, clone, fix ACLs, run setup |
 | Update | repo exists | prompt, pull, upgrade available essentials, run setup |
 
-## Setup order
+## Order
 
-1. `cleanup`
-2. `inst-paths`
-3. `paths-doctor`
-4. `inst-fonts`
-5. `inst-pwsh`
-6. `inst-terminal`
-7. `inst-ahk`
-8. `wsl-exclusions`
-9. `inst-modules`
-10. `inst-scoop`
-11. `inst-software` with `-Software`
-12. `inst-aimp-delete-helper`
+`cleanup` -> `inst-paths` -> `paths-doctor` -> `inst-fonts` -> `inst-pwsh` -> `inst-terminal` -> `inst-ahk` -> `wsl-exclusions` -> `inst-modules` -> `inst-scoop` -> `inst-software` with `-Software` -> `inst-aimp-delete-helper`.
 
 Add scripts only after prerequisites.
 
 ## Installer contract
 
 - Run directly and repeatedly.
-- Check state before work.
-- Reinstall only with `-Force`.
+- Check state before work; reinstall only with `-Force`.
 - Prefer exact winget IDs and noninteractive agreements.
 - Re-check `Get-Command` after PATH edits.
 - Use `CreateSymLink` for repo-managed config links.
@@ -49,10 +37,10 @@ Add scripts only after prerequisites.
 
 ## Update contract
 
-- Upgrade only IDs present in `winget upgrade` output.
+- Upgrade only IDs in `winget upgrade` output.
 - Pass `-Update` only to scripts that support it.
-- Include command, package ID, path, and next action in failures.
+- Failures include command, package ID, path, and next action.
 
 ## Validation
 
-Run `make test`. For bootstrap changes, state clean-VM or fresh-profile coverage, or say it was skipped.
+Run `make test`. For bootstrap changes, state clean-VM/fresh-profile coverage or skipped reason.

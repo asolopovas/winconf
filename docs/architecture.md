@@ -7,27 +7,27 @@
 | Layer | Paths | Owns |
 |---|---|---|
 | Bootstrap | `init.ps1`, `init-software.ps1` | entry, clone/update, essentials, order |
-| Installers | `scripts/inst-*.ps1` | one idempotent setup unit |
+| Installers | `scripts/inst-*.ps1` | idempotent setup units |
 | System scripts | other `scripts/*.ps1` | cleanup, WSL, auth, diagnostics, repair |
 | Helpers | `functions.ps1` | setup-safe shared functions |
 | Shell | `powershell/` | profiles, modules, completions, configs |
 | AutoHotkey | `init-autohotkey.ahk`, `autohotkey/` | hotkeys, windows, app launchers |
-| Configs | `configs/`, `terminal/` | registry and Windows Terminal state |
+| Configs | `configs/`, `terminal/` | registry and Terminal state |
 | Tests | `tests/`, `Makefile` | Pester checks |
 | Docs | `README.md`, `AGENTS.md`, `docs/` | contracts and handoff guidance |
 
-## Boundaries
+## Rules
 
 - `AGENTS.md` is a map, not a manual.
 - `init.ps1` carries pre-clone helpers; later scripts may dot-source `functions.ps1`.
-- Installers run directly, repeatedly, and without interactive profiles.
+- Installers run directly, repeatedly, and without profile state.
 - Modules load without profiles; manifests match exports.
-- Tests may touch live Windows state; state side effects explicitly.
+- Tests may touch live Windows state; state side effects in handoff.
 - AHK files start with `#Requires AutoHotkey v2.0`; functions use PascalCase; globals are explicit.
-- AHK targets windows by `ahk_exe`, `ahk_class`, or `ahk_id`, checks `WinExist()` before activation, and closes only windows it creates.
+- AHK targets windows by `ahk_exe`, `ahk_class`, or `ahk_id`, checks `WinExist()`, and closes only windows it creates.
 - From Git Bash/MSYS, set `MSYS2_ARG_CONV_EXCL='*'` before slash-prefixed AHK switches.
 
-## Naming
+## Names
 
 | Pattern | Use |
 |---|---|
@@ -36,19 +36,20 @@
 | `sync-<name>.ps1` | sync/mirror workflow |
 | `fix-<name>.ps1` | repair workflow |
 
-## Planning and isolation
+## Plans and isolation
 
-- Use a short inline plan for small work.
-- For complex work, check an execution plan into `docs/exec-plans/active/` with goal, scope, acceptance criteria, progress, decisions, validation, and follow-up debt; move it to `completed/` when done.
-- Use isolated git worktrees for concurrent or risky tasks.
+- Small change: inline plan.
+- Complex change: checked plan in `docs/exec-plans/active/` with goal, scope, acceptance criteria, progress, decisions, validation, and follow-up debt; move to `completed/` when done.
+- Concurrent or risky change: isolated git worktree.
 
 ## Enforcement
 
-- Encode repeated review feedback as tests, guards, or docs.
-- Keep invariants mechanical when practical: Pester, manifests, smoke checks, and explicit failures.
+- Prefer mechanical checks: Pester, manifests, smoke checks, explicit failures.
 - Failure messages include command, package/path, and next action.
-- No CI, lint, Docker, browser, app runtime, or observability harness exists yet; do not add without approval.
+- Promote repeated review feedback into tests, guards, or docs.
+- Track harness gaps in `docs/exec-plans/tech-debt-tracker.md`.
+- No CI, lint, Docker, browser-control app harness, or local observability stack exists; add only with approval.
 
 ## Agent loop
 
-Inspect repo -> plan -> change -> run checks -> review diff -> update docs/tests -> hand off with validation, skipped checks, and state changes.
+Inspect -> plan -> change -> run checks -> review diff -> update docs/tests -> hand off validation, skipped checks, and state changes.

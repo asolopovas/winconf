@@ -4,21 +4,13 @@ PowerShell state lives in profile startup, root helpers, and importable modules.
 
 ## Load order
 
-PowerShell 7:
-
-1. `powershell/Microsoft.Powershell_profile.ps1`
-2. `powershell/Profile.ps1`
-3. repo modules in `PSModulePath`
-4. `helpers`
-5. `aliases`
-6. completions
-7. Starship
+PowerShell 7: `Microsoft.Powershell_profile.ps1` -> `Profile.ps1` -> repo modules in `PSModulePath` -> helpers -> aliases -> completions -> Starship.
 
 Keep Windows PowerShell 5.1 shims out of the 7 path.
 
 ## Root helpers
 
-`functions.ps1` stays setup-safe because installers dot-source it. Load with `. .\functions.ps1`.
+Installers dot-source `functions.ps1`; keep it setup-safe. Load manually with `. .\functions.ps1`.
 
 | Helper | Purpose |
 |---|---|
@@ -54,10 +46,10 @@ Do not use `tools.ps1` when a topical file exists.
 
 - Exported functions use `Verb-Noun`; internal helpers use PascalCase or camelCase.
 - Variables use camelCase; constants use `UPPER_SNAKE`.
-- Put `param()` first; type parameters; mark mandatory parameters.
+- Put typed `param()` first; mark mandatory parameters.
 - Build paths with `Join-Path`; repo root is `$env:USERPROFILE\winconf`.
 - Use `Test-Path`, strict mode, stop-on-error, `try`/`catch`, and `$LASTEXITCODE` checks around external state.
-- Use existing `Write-Step`/`Write-OK`/`Write-Skip`/`Write-Fail` for setup output.
+- Use existing `Write-Step`/`Write-OK`/`Write-Skip`/`Write-Fail` setup output.
 - Keep repo constants in `init.ps1`.
 
 ## Refresh

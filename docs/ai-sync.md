@@ -11,7 +11,7 @@
 | Skip MCP | `.\scripts\sync-ai.ps1 -SkipMcp` |
 | Skip skills | `.\scripts\sync-ai.ps1 -SkipSkills` |
 
-Strict mode is enabled; unexpected errors stop the sync.
+Strict mode stops unexpected errors.
 
 ## Flow
 

@@ -1,6 +1,6 @@
 # Testing
 
-Pester runs against the live Windows profile. Tests may touch registry, filesystem, symlinks, package managers, or apps.
+Pester runs against the live Windows profile and may touch registry, filesystem, symlinks, package managers, or apps.
 
 ## Run
 
@@ -17,7 +17,7 @@ Pester runs against the live Windows profile. Tests may touch registry, filesyst
 |---|---|
 | `functions.Tests.ps1` | root helpers |
 | `helpers.Tests.ps1` | helpers module exports |
-| `scripts.Tests.ps1` | script syntax and smoke behavior |
+| `scripts.Tests.ps1` | script syntax/smoke behavior |
 | `sync-ai.Tests.ps1` | AI sync |
 | `aimp.Tests.ps1` | AIMP helper/hotkey glue |
 | `just-completion.Tests.ps1` | just completions |
@@ -34,15 +34,17 @@ Pester runs against the live Windows profile. Tests may touch registry, filesyst
 
 ## Handoff checks
 
+Handoff includes summary, acceptance covered, validation commands/results, state changes, skipped checks, and follow-ups.
+
 | Changed area | Check |
 |---|---|
 | Any code | `make test` |
-| `init.ps1` or `scripts/inst-*.ps1` | fresh-run or clean-VM coverage, or skipped note |
+| `init.ps1` or `scripts/inst-*.ps1` | fresh-run/clean-VM coverage or skipped reason |
 | AHK | reload `init-autohotkey.ahk`; verify affected hotkey when practical |
 | `powershell/modules/**` | `Import-Module -Force`; confirm `.psd1` exports |
 | Registry/system scripts | mention state changes |
 | Docs only | review links and affected contracts |
 
-## Missing by design
+## Missing
 
 No CI, PSScriptAnalyzer, `.editorconfig`, Docker, clean-image bootstrap, browser-control, or observability harness. Add only with approval.

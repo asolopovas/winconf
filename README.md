@@ -1,10 +1,10 @@
 # winconf
 
-Windows dotfiles and provisioning for PowerShell, AutoHotkey v2, Windows Terminal, WSL, desktop hotkeys, AI tools, and dev utilities.
+Windows dotfiles and provisioning for PowerShell, AutoHotkey v2, Windows Terminal, WSL, AI tools, and dev utilities.
 
 ## Install
 
-Run from elevated PowerShell.
+Run from elevated PowerShell. Re-runs are state-aware.
 
 | Scope | Command |
 |---|---|
@@ -13,24 +13,20 @@ Run from elevated PowerShell.
 | Existing clone | `.\init.ps1` |
 | Existing clone plus apps | `.\init.ps1 -Software` |
 
-Re-run safely; scripts check current state first.
-
 ## Includes
 
-| Area | Examples |
-|---|---|
-| Core | PowerShell 7, AutoHotkey v2, Git, fzf, fd, Starship, Everything, PowerToys, VLC, WinSCP |
-| Apps | AIMP, CoreTemp, Calibre, GPG4Win, Android tools, FFmpeg, BCUninstaller, Sysinternals, qBittorrent, Rufus, ShareX |
-| Shell | profiles, completions, helpers, git/package aliases |
-| Desktop | virtual desktops, window movement, app launchers, terminal toggle |
-| AI | Claude/OpenCode auth, settings, MCP, skills sync |
+- Core tools: PowerShell 7, AutoHotkey v2, Git, fzf, fd, Starship, Everything, PowerToys, VLC, WinSCP.
+- Apps: AIMP, CoreTemp, Calibre, GPG4Win, Android tools, FFmpeg, BCUninstaller, Sysinternals, qBittorrent, Rufus, ShareX.
+- Shell: profiles, completions, helpers, git/package aliases.
+- Desktop: virtual desktops, window movement, app launchers, terminal toggle.
+- AI: Claude/OpenCode auth, settings, MCP, skills sync.
 
 ## Docs
 
 | Need | Doc |
 |---|---|
 | Agent map | `AGENTS.md` |
-| Architecture and harness | `docs/architecture.md` |
+| Harness/rules | `docs/architecture.md` |
 | Bootstrap | `docs/bootstrap.md` |
 | Shell/modules | `docs/shell-env.md` |
 | Tests | `docs/testing.md` |
@@ -42,7 +38,7 @@ Re-run safely; scripts check current state first.
 | Task | Command |
 |---|---|
 | Test | `make test` |
-| Sync AI tools | `.\scripts\sync-ai.ps1` |
+| Sync AI | `.\scripts\sync-ai.ps1` |
 | Run installer | `& .\scripts\inst-<name>.ps1` |
 | Start AHK | `& .\init-autohotkey.ahk` |
 
