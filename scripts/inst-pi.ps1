@@ -1,13 +1,16 @@
 $ErrorActionPreference = "Stop"
+$env:PNPM_HOME ??= Join-Path $env:LOCALAPPDATA "pnpm"
+$pnpmGlobalBin = Join-Path $env:PNPM_HOME "bin"
+New-Item -ItemType Directory $env:PNPM_HOME -Force | Out-Null
+New-Item -ItemType Directory $pnpmGlobalBin -Force | Out-Null
+$env:Path = @($pnpmGlobalBin, $env:PNPM_HOME, "$env:LOCALAPPDATA\Microsoft\WinGet\Links", $env:Path) -join ";"
 
-if (-not (Get-Command bun -ErrorAction SilentlyContinue)) {
+if (-not (Get-Command pnpm -ErrorAction SilentlyContinue)) {
     if (-not (Get-Command winget -ErrorAction SilentlyContinue)) { throw "winget required" }
-    winget install --id Oven-sh.Bun --exact -h --accept-source-agreements --accept-package-agreements
+    winget install --id pnpm.pnpm --exact --silent --accept-source-agreements --accept-package-agreements
     if ($LASTEXITCODE) { exit $LASTEXITCODE }
-    $bunPath = Join-Path $env:USERPROFILE ".bun\bin"
-    if (Test-Path $bunPath) { $env:Path = "$bunPath;$env:Path" }
-    if (-not (Get-Command bun -ErrorAction SilentlyContinue)) { throw "bun unavailable" }
+    if (-not (Get-Command pnpm -ErrorAction SilentlyContinue)) { throw "pnpm unavailable" }
 }
 
-bun add -g --ignore-scripts @earendil-works/pi-coding-agent
+pnpm add -g --ignore-scripts @earendil-works/pi-coding-agent
 if ($LASTEXITCODE) { exit $LASTEXITCODE }

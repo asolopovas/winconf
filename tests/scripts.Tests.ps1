@@ -88,32 +88,43 @@ Describe "inst-pi.ps1" {
         $script:path = Join-Path $script:scripts "inst-pi.ps1"
         $script:origProfile = $env:USERPROFILE
         $script:origPath = $env:Path
+        $script:origLocalAppData = $env:LOCALAPPDATA
+        $script:origPnpmHome = $env:PNPM_HOME
+        $script:origPnpmTestLog = $env:PNPM_TEST_LOG
     }
 
     BeforeEach {
         $script:tmpHome = Join-Path $TestDrive ([System.IO.Path]::GetRandomFileName())
         New-Item -ItemType Directory $script:tmpHome | Out-Null
         $env:USERPROFILE = $script:tmpHome
+        $env:LOCALAPPDATA = $script:tmpHome
+        $env:PNPM_HOME = $null
+        $env:PNPM_TEST_LOG = Join-Path $script:tmpHome "pnpm.log"
         $env:Path = $script:origPath
         $script:getCommandCalls = 0
+        $pnpmBin = Join-Path $script:tmpHome "pnpm\bin"
+        New-Item -ItemType Directory $pnpmBin -Force | Out-Null
+        Set-Content -Path (Join-Path $pnpmBin "pnpm.ps1") -Value '$args -join " " | Add-Content -LiteralPath $env:PNPM_TEST_LOG; $global:LASTEXITCODE = 0'
         Mock Write-Host { }
         Mock winget { $global:LASTEXITCODE = 0 }
-        Mock bun { $global:LASTEXITCODE = 0 }
     }
 
     AfterEach {
         $env:USERPROFILE = $script:origProfile
+        $env:LOCALAPPDATA = $script:origLocalAppData
+        $env:PNPM_HOME = $script:origPnpmHome
+        $env:PNPM_TEST_LOG = $script:origPnpmTestLog
         $env:Path = $script:origPath
     }
 
-    It "installs bun first when missing and installs pi" {
+    It "installs pnpm first when missing and installs pi" {
         Mock Get-Command {
             param([string]$Name)
 
-            if ($Name -eq "bun") {
+            if ($Name -eq "pnpm") {
                 $script:getCommandCalls++
                 if ($script:getCommandCalls -eq 1) { return $null }
-                return [pscustomobject]@{ Name = "bun" }
+                return [pscustomobject]@{ Name = "pnpm" }
             }
 
             if ($Name -eq "winget") {
@@ -125,16 +136,17 @@ Describe "inst-pi.ps1" {
 
         & $script:path
 
-        Should -Invoke winget -Exactly 1 -ParameterFilter { $args -contains "Oven-sh.Bun" }
-        Should -Invoke bun -Exactly 1 -ParameterFilter { ($args -join " ") -eq "add -g --ignore-scripts @earendil-works/pi-coding-agent" }
+        Should -Invoke winget -Exactly 1 -ParameterFilter { $args -contains "pnpm.pnpm" }
+        Get-Content -Path $env:PNPM_TEST_LOG | Should -Be @("add -g --ignore-scripts @earendil-works/pi-coding-agent")
+        ($env:Path -split ";")[0] | Should -Be (Join-Path $script:tmpHome "pnpm\bin")
     }
 
-    It "updates pi on every run when bun is already installed" {
+    It "updates pi on every run when pnpm is already installed" {
         Mock Get-Command {
             param([string]$Name)
 
-            if ($Name -eq "bun") {
-                return [pscustomobject]@{ Name = "bun" }
+            if ($Name -eq "pnpm") {
+                return [pscustomobject]@{ Name = "pnpm" }
             }
 
             if ($Name -eq "winget") {
@@ -148,6 +160,41 @@ Describe "inst-pi.ps1" {
         & $script:path
 
         Should -Invoke winget -Exactly 0
-        Should -Invoke bun -Exactly 2 -ParameterFilter { ($args -join " ") -eq "add -g --ignore-scripts @earendil-works/pi-coding-agent" }
+        Get-Content -Path $env:PNPM_TEST_LOG | Should -Be @("add -g --ignore-scripts @earendil-works/pi-coding-agent", "add -g --ignore-scripts @earendil-works/pi-coding-agent")
+    }
+}
+
+Describe "uninst-bun.ps1" {
+    BeforeAll {
+        $script:path = Join-Path $script:scripts "uninst-bun.ps1"
+        $script:origProfile = $env:USERPROFILE
+    }
+
+    BeforeEach {
+        $script:tmpHome = Join-Path $TestDrive ([System.IO.Path]::GetRandomFileName())
+        New-Item -ItemType Directory (Join-Path $script:tmpHome ".bun") | Out-Null
+        $env:USERPROFILE = $script:tmpHome
+        Mock winget { $global:LASTEXITCODE = 0 }
+        Mock Get-Command {
+            param([string]$Name)
+
+            if ($Name -eq "winget") {
+                return [pscustomobject]@{ Name = "winget" }
+            }
+
+            return Microsoft.PowerShell.Core\Get-Command @PSBoundParameters
+        }
+    }
+
+    AfterEach {
+        $env:USERPROFILE = $script:origProfile
+    }
+
+    It "uninstalls winget bun and removes bun home" {
+        & $script:path
+
+        Should -Invoke winget -Exactly 1 -ParameterFilter { ($args -join " ") -eq "list --id Oven-sh.Bun --exact" }
+        Should -Invoke winget -Exactly 1 -ParameterFilter { ($args -join " ") -eq "uninstall --id Oven-sh.Bun --exact --silent --accept-source-agreements" }
+        Test-Path (Join-Path $script:tmpHome ".bun") | Should -BeFalse
     }
 }
