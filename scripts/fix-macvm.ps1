@@ -116,7 +116,6 @@ function Update-VmxFile {
                 if ($_ -match "^$([regex]::Escape($key))\s*=") {
                     if ($_ -ne $expectedLine) {
                         $changes += "updated $key"
-                        $modified = $true
                         $expectedLine
                     } else { $_ }
                 } else { $_ }
@@ -136,7 +135,6 @@ function Update-VmxFile {
                 if ($_ -match "^$([regex]::Escape($key))\s*=") {
                     if ($_ -ne $expectedLine) {
                         $changes += "updated $key"
-                        $modified = $true
                         $expectedLine
                     } else { $_ }
                 } else { $_ }
