@@ -164,16 +164,21 @@ Describe "inst-pi.ps1" {
     }
 }
 
-Describe "uninst-bun.ps1" {
+Describe "inst-bun.ps1" {
     BeforeAll {
-        $script:path = Join-Path $script:scripts "uninst-bun.ps1"
+        $script:path = Join-Path $script:scripts "inst-bun.ps1"
         $script:origProfile = $env:USERPROFILE
+        $script:origUserPath = [Environment]::GetEnvironmentVariable("Path", "User")
+        $script:origProcessPath = $env:Path
+        $script:linkDir = Join-Path $env:LOCALAPPDATA "Microsoft\WinGet\Links"
     }
 
     BeforeEach {
         $script:tmpHome = Join-Path $TestDrive ([System.IO.Path]::GetRandomFileName())
+        $script:bunBin = Join-Path $script:tmpHome ".bun\bin"
         New-Item -ItemType Directory (Join-Path $script:tmpHome ".bun") | Out-Null
         $env:USERPROFILE = $script:tmpHome
+        [Environment]::SetEnvironmentVariable("Path", $script:bunBin, "User")
         Mock winget { $global:LASTEXITCODE = 0 }
         Mock Get-Command {
             param([string]$Name)
@@ -188,13 +193,38 @@ Describe "uninst-bun.ps1" {
 
     AfterEach {
         $env:USERPROFILE = $script:origProfile
+        [Environment]::SetEnvironmentVariable("Path", $script:origUserPath, "User")
+        $env:Path = $script:origProcessPath
     }
 
-    It "uninstalls winget bun and removes bun home" {
-        & $script:path
+    It "removes bun with <Flag>" -TestCases @(@{ Flag = "--uninstall" }, @{ Flag = "--remove" }, @{ Flag = "-rm" }) {
+        param($Flag)
+
+        & $script:path $Flag
 
         Should -Invoke winget -Exactly 1 -ParameterFilter { ($args -join " ") -eq "list --id Oven-sh.Bun --exact" }
         Should -Invoke winget -Exactly 1 -ParameterFilter { ($args -join " ") -eq "uninstall --id Oven-sh.Bun --exact --silent --accept-source-agreements" }
         Test-Path (Join-Path $script:tmpHome ".bun") | Should -BeFalse
+        ([Environment]::GetEnvironmentVariable("Path", "User") -split ";") -contains $script:bunBin | Should -BeFalse
+        ($env:Path -split ";") -contains $script:bunBin | Should -BeFalse
+    }
+
+    It "installs winget bun when requested" {
+        Mock winget {
+            if (($args -join " ") -eq "list --id Oven-sh.Bun --exact") {
+                $global:LASTEXITCODE = 1
+            } else {
+                $global:LASTEXITCODE = 0
+            }
+        }
+
+        & $script:path
+
+        Should -Invoke winget -Exactly 1 -ParameterFilter { ($args -join " ") -eq "list --id Oven-sh.Bun --exact" }
+        Should -Invoke winget -Exactly 1 -ParameterFilter { ($args -join " ") -eq "install --id Oven-sh.Bun --exact --silent --accept-source-agreements --accept-package-agreements" }
+        Test-Path (Join-Path $script:tmpHome ".bun") | Should -BeTrue
+        ([Environment]::GetEnvironmentVariable("Path", "User") -split ";") -contains $script:linkDir | Should -BeTrue
+        ($env:Path -split ";") -contains $script:linkDir | Should -BeTrue
+        ([Environment]::GetEnvironmentVariable("Path", "User") -split ";") -contains $script:bunBin | Should -BeFalse
     }
 }
