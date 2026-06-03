@@ -6,6 +6,8 @@ currentToggleId := 0
 previousToggleId := 0
 currentPowershellId := 0
 previousPowershellId := 0
+lastActivatedTerminalId := 0
+lastActivatedTerminalAt := 0
 
 if (!IsSet(REGISTER_TERMINAL_HOTKEYS) || REGISTER_TERMINAL_HOTKEYS) {
     Hotkey("#Enter", (*) => ToggleTerminal("Ubuntu"))
@@ -20,10 +22,77 @@ ActivateAnyTerminal() {
     if (WinExist(windowID)) {
         WinActivate(windowID)
     } else {
-        terminal_path := "C:\Users\asolo\AppData\Local\Microsoft\WindowsApps\wt.exe"
-
-        Run(terminal_path . " new-tab -p PowerShell")
+        RunTerminal("new-tab -p PowerShell")
     }
+}
+
+TerminalPath() => EnvGet("LOCALAPPDATA") . "\Microsoft\WindowsApps\wt.exe"
+
+RunTerminal(arguments) {
+    terminal_path := TerminalPath()
+
+    try {
+        Run('"' . terminal_path . '" ' . arguments)
+        return true
+    } catch {
+        return false
+    }
+}
+
+TrackTerminalWindow(hwnd, terminal) {
+    global currentToggleId, previousToggleId, currentPowershellId, previousPowershellId
+
+    if (terminal == "Powershell") {
+        if (currentPowershellId) {
+            previousPowershellId := currentPowershellId
+        }
+        currentPowershellId := hwnd
+    } else {
+        if (currentToggleId) {
+            previousToggleId := currentToggleId
+        }
+        currentToggleId := hwnd
+    }
+}
+
+TerminalMatchesProfile(hwnd, terminal) {
+    title := ""
+    try title := WinGetTitle("ahk_id " . hwnd)
+    isPowershell := RegExMatch(title, "i)PowerShell|pwsh")
+    return terminal == "Powershell" ? isPowershell : !isPowershell
+}
+
+FindTerminalWindow(terminal) {
+    global currentToggleId, currentPowershellId
+
+    targetId := terminal == "Powershell" ? currentPowershellId : currentToggleId
+    if (targetId && TerminalWindowExists(targetId)) {
+        return targetId
+    }
+
+    for hwnd in WinGetList("ahk_class CASCADIA_HOSTING_WINDOW_CLASS") {
+        if TerminalMatchesProfile(hwnd, terminal) {
+            TrackTerminalWindow(hwnd, terminal)
+            return hwnd
+        }
+    }
+
+    return 0
+}
+
+WaitForNewTerminalWindow(existingWindows, terminal, timeoutMs := 3000) {
+    deadline := A_TickCount + timeoutMs
+    while (A_TickCount < deadline) {
+        Sleep(50)
+        for hwnd in WinGetList("ahk_class CASCADIA_HOSTING_WINDOW_CLASS") {
+            if !existingWindows.Has(hwnd) {
+                ActivateTerminalWindow(hwnd)
+                TrackTerminalWindow(hwnd, terminal)
+                return hwnd
+            }
+        }
+    }
+    return 0
 }
 
 SetTimer(UpdateTerminalTracking, 500)
@@ -67,118 +136,76 @@ ActivateTerminalWindow(hwnd) {
     }
 
     windowID := "ahk_id " . hwnd
-
     if (WinGetMinMax(windowID) = -1) {
         WinRestore(windowID)
     }
-
     WinShow(windowID)
     WinActivate(windowID)
-    WinWaitActive(windowID, , 2)
-    return WinActive(windowID)
+    return true
 }
 
 ToggleTerminal(terminalType := "Ubuntu") {
-    global currentToggleId, previousToggleId, currentPowershellId, previousPowershellId
+    global lastActivatedTerminalId, lastActivatedTerminalAt
+    targetId := FindTerminalWindow(terminalType)
 
-    if (terminalType == "Powershell") {
+    if (targetId) {
+        windowID := "ahk_id " . targetId
+        justActivated := targetId == lastActivatedTerminalId && A_TickCount - lastActivatedTerminalAt < 700
 
-        if (currentPowershellId && TerminalWindowExists(currentPowershellId)) {
-            windowID := "ahk_id " . currentPowershellId
-
-            if (WinActive(windowID)) {
-                WinMinimize(windowID)
-                return
-            }
-
-            ActivateTerminalWindow(currentPowershellId)
+        if (WinActive(windowID) || justActivated) {
+            lastActivatedTerminalId := 0
+            WinMinimize(windowID)
+            KeyWait("Enter")
             return
         }
-    } else {
 
-        if (currentToggleId && TerminalWindowExists(currentToggleId)) {
-            windowID := "ahk_id " . currentToggleId
-
-            if (WinActive(windowID)) {
-                WinMinimize(windowID)
-                return
-            }
-
-            ActivateTerminalWindow(currentToggleId)
-            return
-        }
+        lastActivatedTerminalId := targetId
+        lastActivatedTerminalAt := A_TickCount
+        ActivateTerminalWindow(targetId)
+        KeyWait("Enter")
+        return
     }
 
     LaunchTerminal(terminalType)
+    KeyWait("Enter")
 }
 
 OpenNewTab(terminal := 'Ubuntu') {
-    global currentToggleId, currentPowershellId
-
-    terminal_path := "C:\Users\asolo\AppData\Local\Microsoft\WindowsApps\wt.exe"
-
     if (terminal == "Ubuntu") {
-        targetId := currentToggleId
         profile := "Ubuntu"
     } else {
-        targetId := currentPowershellId
         profile := "PowerShell"
     }
 
-    if (targetId && WinExist("ahk_id " . targetId)) {
+    targetId := FindTerminalWindow(terminal)
+    if (targetId) {
         WinActivate("ahk_id " . targetId)
         WinWaitActive("ahk_id " . targetId, , 2)
-        RunAsUser(terminal_path, "--window 0 new-tab -p " . profile)
+        RunTerminal("--window 0 new-tab -p " . profile)
     } else {
         LaunchTerminal(terminal)
     }
 }
 
 LaunchTerminal(terminal := 'Ubuntu') {
-    global currentToggleId, previousToggleId, currentPowershellId, previousPowershellId
-
+    global lastActivatedTerminalId, lastActivatedTerminalAt
     existingWindows := Map()
     for hwnd in WinGetList("ahk_class CASCADIA_HOSTING_WINDOW_CLASS") {
         existingWindows[hwnd] := true
     }
 
-    terminal_path := "C:\Users\asolo\AppData\Local\Microsoft\WindowsApps\wt.exe"
-
     if (terminal == "Ubuntu") {
-        RunAsUser(terminal_path, "-w new new-tab -p Ubuntu")
+        arguments := "-w new new-tab -p Ubuntu"
     }
 
     if (terminal == 'Powershell') {
-        RunAsUser(terminal_path, "-w new new-tab -p PowerShell")
+        arguments := "-w new new-tab -p PowerShell"
     }
 
-    loop 60 {
-        Sleep(50)
-        for hwnd in WinGetList("ahk_class CASCADIA_HOSTING_WINDOW_CLASS") {
-            if !existingWindows.Has(hwnd) {
-                if (terminal == "Powershell") {
-                    if (currentPowershellId) {
-                        previousPowershellId := currentPowershellId
-                    }
-                    currentPowershellId := hwnd
-                } else {
-                    if (currentToggleId) {
-                        previousToggleId := currentToggleId
-                    }
-                    currentToggleId := hwnd
-                }
-
-                WinActivate("ahk_id " . hwnd)
-                WinWaitActive("ahk_id " . hwnd, , 2)
-                if WinActive("ahk_id " . hwnd) {
-                    return
-                }
-
-                WinShow("ahk_id " . hwnd)
-                WinRestore("ahk_id " . hwnd)
-                WinActivate("ahk_id " . hwnd)
-                return
-            }
-        }
+    RunTerminal(arguments)
+    hwnd := WaitForNewTerminalWindow(existingWindows, terminal, 5000)
+    if (hwnd) {
+        lastActivatedTerminalId := hwnd
+        lastActivatedTerminalAt := A_TickCount
     }
 }
