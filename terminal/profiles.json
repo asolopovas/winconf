@@ -1,26 +1,26 @@
 {
     "$help": "https://aka.ms/terminal-documentation",
     "$schema": "https://aka.ms/terminal-profiles-schema",
-    "actions":
+    "actions": 
     [
         {
-            "command": "closeWindow",
-            "id": "User.closeWindow"
+            "command": 
+            {
+                "action": "splitPane",
+                "split": "down"
+            },
+            "id": "User.splitPane.D5151347"
         },
         {
-            "command":
+            "command": 
             {
                 "action": "copy"
             },
             "id": "User.copy.644BA8F2"
         },
         {
-            "command":
-            {
-                "action": "splitPane",
-                "split": "down"
-            },
-            "id": "User.splitPane.D5151347"
+            "command": "closeWindow",
+            "id": "User.closeWindow"
         },
         {
             "command": "paste",
@@ -31,14 +31,14 @@
             "id": "User.closePane"
         },
         {
-            "command":
+            "command": 
             {
-                "action": "closeOtherTabs"
+                "action": "prevTab"
             },
-            "id": "User.closeOtherTabs.0"
+            "id": "User.prevTab.0"
         },
         {
-            "command":
+            "command": 
             {
                 "action": "moveFocus",
                 "direction": "left"
@@ -46,21 +46,21 @@
             "id": "User.moveFocus.2A0DA8E0"
         },
         {
-            "command":
+            "command": 
             {
-                "action": "prevTab"
+                "action": "closeOtherTabs"
             },
-            "id": "User.prevTab.0"
+            "id": "User.closeOtherTabs.0"
         },
         {
-            "command":
+            "command": 
             {
                 "action": "nextTab"
             },
             "id": "User.nextTab.0"
         },
         {
-            "command":
+            "command": 
             {
                 "action": "splitPane",
                 "split": "right"
@@ -68,7 +68,7 @@
             "id": "User.splitPane.864CD510"
         },
         {
-            "command":
+            "command": 
             {
                 "action": "moveFocus",
                 "direction": "down"
@@ -76,7 +76,7 @@
             "id": "User.moveFocus.F747588A"
         },
         {
-            "command":
+            "command": 
             {
                 "action": "moveFocus",
                 "direction": "up"
@@ -84,7 +84,7 @@
             "id": "User.moveFocus.6CD791B"
         },
         {
-            "command":
+            "command": 
             {
                 "action": "moveFocus",
                 "direction": "right"
@@ -97,7 +97,7 @@
     "centerOnLaunch": true,
     "copyOnSelect": true,
     "defaultProfile": "{05b9d966-86e5-4a1f-a9df-d87cef4d716e}",
-    "disabledProfileSources":
+    "disabledProfileSources": 
     [
         "Windows.Terminal.Azure",
         "Windows.Terminal.PowershellCore"
@@ -105,8 +105,12 @@
     "firstWindowPreference": "defaultProfile",
     "initialCols": 127,
     "initialRows": 30,
-    "keybindings":
+    "keybindings": 
     [
+        {
+            "id": "User.paste",
+            "keys": "shift+insert"
+        },
         {
             "id": "User.copy.644BA8F2",
             "keys": "ctrl+shift+c"
@@ -114,10 +118,6 @@
         {
             "id": null,
             "keys": "ctrl+alt+5"
-        },
-        {
-            "id": "User.paste",
-            "keys": "shift+insert"
         },
         {
             "id": "User.splitPane.D5151347",
@@ -144,12 +144,12 @@
             "keys": "ctrl+shift+w"
         },
         {
-            "id": "User.moveFocus.6CD791B",
-            "keys": "ctrl+up"
-        },
-        {
             "id": null,
             "keys": "ctrl+alt+1"
+        },
+        {
+            "id": "User.moveFocus.6CD791B",
+            "keys": "ctrl+up"
         },
         {
             "id": null,
@@ -157,7 +157,7 @@
         },
         {
             "id": null,
-            "keys": "ctrl+shift+n"
+            "keys": "ctrl+alt+4"
         },
         {
             "id": null,
@@ -165,7 +165,7 @@
         },
         {
             "id": null,
-            "keys": "ctrl+alt+4"
+            "keys": "ctrl+shift+n"
         },
         {
             "id": null,
@@ -197,11 +197,11 @@
         },
         {
             "id": null,
-            "keys": "ctrl+shift+5"
+            "keys": "ctrl+shift+2"
         },
         {
             "id": null,
-            "keys": "ctrl+shift+2"
+            "keys": "ctrl+shift+5"
         },
         {
             "id": null,
@@ -209,7 +209,7 @@
         },
         {
             "id": null,
-            "keys": "alt+down"
+            "keys": "ctrl+shift+4"
         },
         {
             "id": null,
@@ -217,7 +217,7 @@
         },
         {
             "id": null,
-            "keys": "ctrl+shift+4"
+            "keys": "alt+down"
         },
         {
             "id": null,
@@ -228,12 +228,12 @@
             "keys": "ctrl+shift+7"
         },
         {
-            "id": "User.moveFocus.87C324ED",
-            "keys": "ctrl+right"
-        },
-        {
             "id": null,
             "keys": "ctrl+shift+8"
+        },
+        {
+            "id": "User.moveFocus.87C324ED",
+            "keys": "ctrl+right"
         },
         {
             "id": null,
@@ -269,26 +269,26 @@
         }
     ],
     "launchMode": "default",
-    "newTabMenu":
+    "newTabMenu": 
     [
         {
             "type": "remainingProfiles"
         }
     ],
-    "profiles":
+    "profiles": 
     {
-        "defaults":
+        "defaults": 
         {
             "bellStyle": "none",
             "colorScheme": "Legacy",
-            "font":
+            "font": 
             {
                 "face": "FiraMono Nerd Font Mono",
                 "size": 14
             },
             "startingDirectory": null
         },
-        "list":
+        "list": 
         [
             {
                 "commandline": "\"C:\\Program Files\\PowerShell\\7\\pwsh.exe\" -NoLogo",
@@ -338,10 +338,22 @@
                 "hidden": true,
                 "name": "Ubuntu",
                 "source": "Windows.Terminal.Wsl"
+            },
+            {
+                "guid": "{b924cde7-fe2f-5e90-a08e-eb70c41a51dc}",
+                "hidden": false,
+                "name": "Developer Command Prompt for VS 18",
+                "source": "Windows.Terminal.VisualStudio"
+            },
+            {
+                "guid": "{971ec15a-cee5-5d63-baff-abcaad78c2d1}",
+                "hidden": false,
+                "name": "Developer PowerShell for VS 18",
+                "source": "Windows.Terminal.VisualStudio"
             }
         ]
     },
-    "schemes":
+    "schemes": 
     [
         {
             "background": "#14191F",
