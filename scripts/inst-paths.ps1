@@ -7,8 +7,7 @@ function Write-Status {
         [ConsoleColor]$ForegroundColor
     )
 
-    $null = $ForegroundColor
-    Write-Information $Message -InformationAction Continue
+    Write-Information $Message -Tags $ForegroundColor -InformationAction Continue
 }
 
 $userPathsFile = "$env:USERPROFILE\winconf\.user-paths"
