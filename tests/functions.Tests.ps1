@@ -30,6 +30,43 @@ Describe "SetPermissions" {
     }
 }
 
+Describe "repo" {
+    BeforeEach {
+        $script:GitArgs = $null
+        $script:OldRepoOwner = $env:REPO_OWNER
+        $script:OldXdgCacheHome = $env:XDG_CACHE_HOME
+        $env:REPO_OWNER = $null
+        $env:XDG_CACHE_HOME = $null
+        function global:git { $script:GitArgs = $args; $global:LASTEXITCODE = 0 }
+    }
+
+    AfterEach {
+        if ($script:OldRepoOwner) { $env:REPO_OWNER = $script:OldRepoOwner } else { $env:REPO_OWNER = $null }
+        if ($script:OldXdgCacheHome) { $env:XDG_CACHE_HOME = $script:OldXdgCacheHome } else { $env:XDG_CACHE_HOME = $null }
+        Remove-Item Function:\git -ErrorAction SilentlyContinue
+    }
+
+    It "clones owner repo over ssh by default" {
+        Push-Location $TestDrive
+        try { repo dotfiles } finally { Pop-Location }
+        $script:GitArgs -join ' ' | Should -Be 'clone git@github.com:asolopovas/dotfiles.git'
+    }
+
+    It "clones owner repo over https when requested" {
+        Push-Location $TestDrive
+        try { repo --https asolopovas/winconf } finally { Pop-Location }
+        $script:GitArgs -join ' ' | Should -Be 'clone https://github.com/asolopovas/winconf.git'
+    }
+
+    It "lists cached repositories" {
+        $env:XDG_CACHE_HOME = Join-Path $TestDrive 'cache'
+        $cacheDir = Join-Path $env:XDG_CACHE_HOME 'dotfiles'
+        New-Item -ItemType Directory -Path $cacheDir -Force | Out-Null
+        Set-Content -Path (Join-Path $cacheDir 'repos-asolopovas') -Value "winconf`tWindows config"
+        repo --list | Should -Be "winconf`tWindows config"
+    }
+}
+
 Describe "CreateSymLink" {
     It "creates working symlink to file" {
         $target = Join-Path $TestDrive "target.txt"
