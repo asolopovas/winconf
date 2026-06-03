@@ -1,17 +1,12 @@
-. "$env:userprofile\winconf\functions.ps1"
+$root = Join-Path $env:USERPROFILE "winconf"
+. (Join-Path $root "functions.ps1")
 
-$terminal_conf_dir = @(
-    "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState",
-    "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminalPreview_8wekyb3d8bbwe\LocalState"
-) | Where-Object { Test-Path $_ } | Select-Object -First 1
+$terminalConfigDir = @(
+    (Join-Path $env:LOCALAPPDATA "Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState")
+    (Join-Path $env:LOCALAPPDATA "Packages\Microsoft.WindowsTerminalPreview_8wekyb3d8bbwe\LocalState")
+) | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
 
-if (-not $terminal_conf_dir) {
-    Write-Host "Windows Terminal config directory not found" -ForegroundColor Red
-    exit 1
-}
+if (-not $terminalConfigDir) { throw "Windows Terminal config directory not found" }
 
-$settingsFile = "$terminal_conf_dir\settings.json"
-Remove-Item $settingsFile -Force -ErrorAction SilentlyContinue
-
-SetPermissions $terminal_conf_dir
-CreateSymLink $settingsFile "$env:userprofile\winconf\terminal\profiles.json"
+SetPermissions $terminalConfigDir
+CreateSymLink (Join-Path $terminalConfigDir "settings.json") (Join-Path $root "terminal\profiles.json") | Out-Null

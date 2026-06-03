@@ -1,3 +1,5 @@
+$ErrorActionPreference = "Stop"
+
 $wingetApps = @(
     "AIMP.AIMP"
     "ALCPU.CoreTemp"
@@ -15,7 +17,16 @@ $wingetApps = @(
     "StrawberryPerl.StrawberryPerl"
 )
 
-foreach($app in $wingetApps) {
-    Write-Host "Installing $app"
-    winget install --id $app -h --disable-interactivity --accept-source-agreements --accept-package-agreements --force
+if (-not (Get-Command winget -ErrorAction SilentlyContinue)) { throw "winget required" }
+
+foreach ($app in $wingetApps) {
+    winget list --id $app --exact --accept-source-agreements 2>$null | Out-Null
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "  $app already installed" -ForegroundColor DarkGray
+        continue
+    }
+
+    Write-Host "  Installing $app" -ForegroundColor Cyan
+    winget install --id $app --exact --silent --disable-interactivity --accept-source-agreements --accept-package-agreements
+    if ($LASTEXITCODE -ne 0) { throw "Failed to install $app" }
 }

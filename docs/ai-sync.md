@@ -20,7 +20,7 @@ Strict mode stops unexpected errors.
 | Auth | `~/.claude/.credentials.json` | OpenCode Windows/WSL auth |
 | Settings | `$claudeSettings` | Claude Windows/WSL settings |
 | MCP | `$mcpServers` | `claude mcp`, OpenCode config |
-| Skills | `$skillSources` | `~/.agents/skills`, Claude, OpenCode |
+| Skills | WSL `~/dotfiles/.agents/skills` | Windows `~/.agents/skills`, Claude, OpenCode |
 
 Current MCP: `context7` via `npx @upstash/context7-mcp`.
 
@@ -28,17 +28,17 @@ Current MCP: `context7` via `npx @upstash/context7-mcp`.
 
 | Path | Role |
 |---|---|
-| `~/.agents/skills` | canonical skills |
-| `~/.claude/skills` | Claude copy |
-| `~/.config/opencode/skills` | OpenCode copy |
-| `\\wsl$\<distro>\home\<user>\...` | WSL targets |
+| WSL `~/dotfiles/.agents/skills` | source of truth for skills |
+| Windows `~/.agents/skills` | mirrored canonical skills |
+| Windows `~/.claude/skills` | junction to canonical skills |
+| Windows `~/.config/opencode/skills` | junction to canonical skills |
 
-Copy skills on Windows because some tools handle reparse points poorly. Leave existing symlinks; do not add new ones.
+Only WSL skill directories containing `SKILL.md` are copied. GitHub skill sources are not fetched.
 
 ## Re-run after
 
 - `claude login` or OAuth refresh.
-- `$skillSources` changes.
+- WSL `~/dotfiles/.agents/skills` changes.
 - `$mcpServers` changes.
 - New-machine bootstrap.
 

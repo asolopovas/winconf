@@ -30,7 +30,7 @@ if ($version -eq 2) {
     $taskName += "-v2"
 }
 
-if (!(Test-ScheduledTask $taskName)) {
+if (-not (Test-ScheduledTask $taskName)) {
     $A = New-ScheduledTaskAction -Execute $autohotkeyExec -WorkingDirectory $autohotkeyPath -Argument "$autohotkeyPath\init-autohotkey.ahk"
     $T = New-ScheduledTaskTrigger -AtLogon -User "$domain\$env:UserName"
     $P = New-ScheduledTaskPrincipal -GroupId "BUILTIN\Administrators" -RunLevel Highest

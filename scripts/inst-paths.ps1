@@ -1,16 +1,13 @@
 
 $userPathsFile = "$env:USERPROFILE\winconf\.user-paths"
 
-if (!(Test-Path $userPathsFile)) { return }
+if (-not (Test-Path -LiteralPath $userPathsFile)) { return }
 
 $additionalPaths = Get-Content $userPathsFile |
     Where-Object { $_ -and -not $_.StartsWith('#') } |
     ForEach-Object { $ExecutionContext.InvokeCommand.ExpandString($_.Trim()) } |
     Where-Object { $_ }
 
-# Operate on the User PATH scope only — not the merged process $env:Path,
-# otherwise Machine entries leak into User and entries already in Machine
-# are wrongly skipped.
 $userPathRaw = [Environment]::GetEnvironmentVariable('Path', 'User')
 $userPaths = @()
 if ($userPathRaw) {
@@ -19,7 +16,6 @@ if ($userPathRaw) {
         ForEach-Object { $_.TrimEnd('\') }
 }
 
-# Deduplicate existing User PATH (case-insensitive) while preserving order.
 $seen = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
 $dedupedUser = foreach ($p in $userPaths) { if ($seen.Add($p)) { $p } }
 
@@ -44,5 +40,4 @@ if ($dedupedUser.Count -ne $userPaths.Count) {
 $updatedPath = (@($dedupedUser) + @($newPaths)) -join ';'
 [Environment]::SetEnvironmentVariable('Path', $updatedPath, 'User')
 
-# Refresh current session so subsequent scripts in this run see the change.
 $env:Path = [Environment]::GetEnvironmentVariable('Path', 'Machine') + ';' + $updatedPath

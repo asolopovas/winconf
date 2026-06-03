@@ -1,23 +1,19 @@
+$ErrorActionPreference = "Stop"
+
 $cert = New-SelfSignedCertificate -DnsName Barrier -KeyExportPolicy Exportable
-
-$CertBase64 = [System.Convert]::ToBase64String($cert.RawData, 'InsertLineBreaks')
-
-$RSACng = [System.Security.Cryptography.X509Certificates.RSACertificateExtensions]::GetRSAPrivateKey($cert)
-$KeyBytes = $RSACng.Key.Export([System.Security.Cryptography.CngKeyBlobFormat]::Pkcs8PrivateBlob)
-$KeyBase64 = [System.Convert]::ToBase64String($KeyBytes, [System.Base64FormattingOptions]::InsertLineBreaks)
-
-$Pem = @"
+$certBase64 = [Convert]::ToBase64String($cert.RawData, [Base64FormattingOptions]::InsertLineBreaks)
+$key = [System.Security.Cryptography.X509Certificates.RSACertificateExtensions]::GetRSAPrivateKey($cert)
+$keyBytes = $key.Key.Export([System.Security.Cryptography.CngKeyBlobFormat]::Pkcs8PrivateBlob)
+$keyBase64 = [Convert]::ToBase64String($keyBytes, [Base64FormattingOptions]::InsertLineBreaks)
+$pem = @"
 -----BEGIN PRIVATE KEY-----
-$KeyBase64
+$keyBase64
 -----END PRIVATE KEY-----
 -----BEGIN CERTIFICATE-----
-$CertBase64
+$certBase64
 -----END CERTIFICATE-----
 "@
-$dirPath = "$env:LOCALAPPDATA\Barrier\SSL"
 
-
-if (-not (Test-Path -Path $dirPath -PathType Container)) {
-    New-Item -Path $dirPath -ItemType Directory
-}
-$Pem | Out-File -FilePath $dirPath\Barrier.pem -Encoding Ascii
+$dirPath = Join-Path $env:LOCALAPPDATA "Barrier\SSL"
+New-Item -Path $dirPath -ItemType Directory -Force | Out-Null
+$pem | Out-File -FilePath (Join-Path $dirPath "Barrier.pem") -Encoding Ascii

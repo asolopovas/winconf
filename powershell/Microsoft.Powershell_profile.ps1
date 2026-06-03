@@ -13,8 +13,6 @@ $ENV:STARSHIP_CONFIG = [System.IO.Path]::Combine($psdir, 'configs\starship.toml'
 $Host.UI.RawUI.WindowTitle = "PowerShell"
 try { $null = [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch {}
 
-# Lazy-load modules: stubs replace themselves on first call so the cost is
-# paid the first time the command is used, not on every shell start.
 
 function global:z {
     Remove-Item Function:z -ErrorAction SilentlyContinue
@@ -34,8 +32,6 @@ function global:ls {
     Get-ChildItem @args
 }
 
-# Aliases beat functions in PS resolution; remove the shadowing aliases so the
-# Terminal-Icons stubs above take effect on first invocation.
 Remove-Item Alias:l, Alias:ls -ErrorAction SilentlyContinue
 
 Register-ArgumentCompleter -Native -CommandName 'docker', 'docker.exe' -ScriptBlock {
@@ -77,7 +73,6 @@ function global:Initialize-Profile {
         . $f
     }
 
-    # Cache starship init to a file; refresh when starship.exe or config changes.
     if (Test-CommandExists starship) {
         try {
             $cacheDir = Join-Path $env:LOCALAPPDATA 'winconf'

@@ -1,31 +1,28 @@
-$hostname = $env:COMPUTERNAME
-$username = $env:USERNAME
-$sshFolder = "$env:USERPROFILE\.ssh"
-$sshKeyRSA = "$sshFolder\id_rsa"
-$repoPath = "$env:USERPROFILE\winconf"
+$ErrorActionPreference = "Stop"
+
+$sshFolder = Join-Path $env:USERPROFILE ".ssh"
+$sshKey = Join-Path $sshFolder "id_ed25519"
+$repoPath = Join-Path $env:USERPROFILE "winconf"
 $githubUser = "asolopovas"
-$repoSSH = "git@github.com:$githubUser/winconf.git"
+$repoSsh = "git@github.com:$githubUser/winconf.git"
 
-if (!(Test-Path $sshFolder)) { New-Item -ItemType Directory -Path $sshFolder | Out-Null }
+New-Item -ItemType Directory -Path $sshFolder -Force | Out-Null
 
-if (!(Get-Command gh -ErrorAction SilentlyContinue)) {
-    Write-Host "Installing GitHub CLI..."
-    winget install --id GitHub.cli -e --silent
-    $env:Path += ";$env:ProgramFiles\GitHub CLI"
+if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
+    Write-Host "Installing GitHub CLI"
+    winget install --id GitHub.cli --exact --silent --accept-source-agreements --accept-package-agreements
+    $env:Path = @($env:Path, (Join-Path $env:ProgramFiles "GitHub CLI")) -join ";"
 }
 
-if (!(Get-Command gh -ErrorAction SilentlyContinue)) {
-    Write-Host "GitHub CLI not recognized. Restart PowerShell and rerun."; exit 1
-}
-
-if (!(Test-Path $sshKeyRSA)) { ssh-keygen -t rsa -b 4096 -C "$username@$hostname" -f $sshKeyRSA -N "" }
+if (-not (Get-Command gh -ErrorAction SilentlyContinue)) { throw "GitHub CLI not found" }
+if (-not (Test-Path -LiteralPath $sshKey)) { ssh-keygen -t ed25519 -C "$env:USERNAME@$env:COMPUTERNAME" -f $sshKey -N "" }
 
 gh auth login --web --git-protocol ssh
 gh auth setup-git
 
-if (!(Test-Path $repoPath)) { git clone "https://github.com/$githubUser/winconf.git" $repoPath }
+if (-not (Test-Path -LiteralPath $repoPath)) { git clone "https://github.com/$githubUser/winconf.git" $repoPath }
 
-Set-Location $repoPath
-if ((git remote get-url origin) -match "^https://") { git remote set-url origin $repoSSH }
+Set-Location -Path $repoPath
+if ((git remote get-url origin) -match '^https://') { git remote set-url origin $repoSsh }
 
-Write-Host "Setup complete! You can now use SSH for GitHub."
+Write-Host "GitHub SSH auth configured" -ForegroundColor Green

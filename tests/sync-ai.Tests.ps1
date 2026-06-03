@@ -129,7 +129,7 @@ Describe "sync-ai.ps1" {
             $raw | Should -Not -Match "`r`n"
         }
 
-        It "skips WSL when wsl is not available" {
+        It "handles missing WSL" {
             & $script:scriptPath -SkipMcp -SkipSkills
             Should -Invoke wsl -Exactly 1
         }

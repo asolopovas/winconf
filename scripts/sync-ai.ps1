@@ -1,27 +1,3 @@
-<#
-.SYNOPSIS
-    Sync AI CLI credentials, settings, MCP servers, and skills across Claude and OpenCode.
-
-.DESCRIPTION
-    - Reads Claude Code OAuth credentials and propagates to OpenCode (Windows + WSL)
-    - Syncs Claude settings (Windows + WSL)
-    - Syncs MCP servers to Claude (via `claude mcp`) and OpenCode (via config JSON)
-    - Installs skills from GitHub to ~/.agents/skills and copies to Claude + OpenCode skill dirs
-
-.PARAMETER SkipAuth
-    Skip credential/auth sync.
-
-.PARAMETER SkipMcp
-    Skip MCP server sync.
-
-.PARAMETER SkipSkills
-    Skip skills sync.
-
-.EXAMPLE
-    .\sync-ai.ps1
-    .\sync-ai.ps1 -SkipAuth
-    .\sync-ai.ps1 -SkipSkills
-#>
 param(
     [switch]$SkipAuth,
     [switch]$SkipMcp,
@@ -31,14 +7,10 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-# ---------------------------------------------------------------------------
-# Configuration
-# ---------------------------------------------------------------------------
 
 $claudeCredPath     = Join-Path $env:USERPROFILE ".claude\.credentials.json"
 $claudeSettingsPath = Join-Path $env:USERPROFILE ".claude\settings.json"
 $winAuthPath        = Join-Path $env:USERPROFILE ".local\share\opencode\auth.json"
-$wslAuthPath        = "~/.local/share/opencode/auth.json"
 
 $claudeSettings = @{
     includeCoAuthoredBy      = $false
@@ -46,61 +18,24 @@ $claudeSettings = @{
     attribution              = @{ commit = ""; pr = "" }
 }
 
-# MCP servers — matches the bash sync-ai.sh MCP_SERVERS map
 $mcpServers = [ordered]@{
     context7 = @("cmd", "/c", "npx", "@upstash/context7-mcp")
 }
 
-# Canonical skill location
 $agentsSkillsDir = Join-Path $env:USERPROFILE ".agents\skills"
 
-# Skill dirs for each CLI — skills are copied from canonical location
 $claudeSkillsDir   = Join-Path $env:USERPROFILE ".claude\skills"
 $opencodeSkillsDir = Join-Path $env:USERPROFILE ".config\opencode\skills"
 
-# Skill sources — mirrors SKILL_SOURCES in bash sync-ai.sh
-$skillSources = @(
-    # Core dev tools
-    "https://github.com/github/awesome-copilot/tree/main/skills/chrome-devtools"
-    "https://github.com/microsoft/playwright-cli/tree/main/skills/playwright-cli"
-    "https://github.com/lackeyjb/playwright-skill/tree/main/skills/playwright-skill"
-    "https://github.com/davila7/claude-code-templates/tree/main/cli-tool/components/skills/development/error-resolver"
-
-    # Language & framework patterns
-    "https://github.com/affaan-m/everything-claude-code/tree/main/skills/laravel-security"
-    "https://github.com/affaan-m/everything-claude-code/tree/main/skills/laravel-patterns"
-    "https://github.com/affaan-m/everything-claude-code/tree/main/skills/laravel-tdd"
-    "https://github.com/affaan-m/everything-claude-code/tree/main/skills/golang-testing"
-    "https://github.com/affaan-m/everything-claude-code/tree/main/skills/golang-patterns"
-    "https://github.com/affaan-m/everything-claude-code/tree/main/skills/docker-patterns"
-    "https://github.com/affaan-m/everything-claude-code/tree/main/skills/database-migrations"
-    "https://github.com/affaan-m/everything-claude-code/tree/main/skills/verification-loop"
-
-    # Scripting & web
-    "https://github.com/sickn33/antigravity-awesome-skills/tree/main/skills/bash-scripting"
-    "https://github.com/sickn33/antigravity-awesome-skills/tree/main/skills/progressive-web-app"
-
-    # WordPress
-    "https://github.com/sickn33/antigravity-awesome-skills/tree/main/skills/wordpress"
-    "https://github.com/sickn33/antigravity-awesome-skills/tree/main/skills/wordpress-plugin-development"
-    "https://github.com/sickn33/antigravity-awesome-skills/tree/main/skills/wordpress-theme-development"
-    "https://github.com/sickn33/antigravity-awesome-skills/tree/main/skills/wordpress-woocommerce-development"
-    "https://github.com/sickn33/antigravity-awesome-skills/tree/main/skills/wordpress-penetration-testing"
-)
-
-# OpenCode config file
 $opencodeConfigPath = Join-Path $env:USERPROFILE ".config\opencode\opencode.json"
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
 
 function Write-JsonFile {
     param([string]$Path, [string]$Json)
     $Json = $Json -replace "`r`n", "`n"
-    if (!$Json.EndsWith("`n")) { $Json += "`n" }
+    if (-not $Json.EndsWith("`n")) { $Json += "`n" }
     $dir = Split-Path $Path -Parent
-    if (!(Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
+    if (-not (Test-Path -LiteralPath $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
     [System.IO.File]::WriteAllText($Path, $Json)
 }
 
@@ -139,14 +74,11 @@ function Update-AuthFile {
     Write-JsonFile -Path $Path -Json ($auth | ConvertTo-Json -Depth 10)
 }
 
-# ---------------------------------------------------------------------------
-# Auth + settings sync
-# ---------------------------------------------------------------------------
 
 function Sync-Auth {
     Write-Host "--- Auth + Settings ---" -ForegroundColor Cyan
 
-    if (!(Test-Path $claudeCredPath)) {
+    if (-not (Test-Path -LiteralPath $claudeCredPath)) {
         Write-Host "Claude Code credentials not found at $claudeCredPath" -ForegroundColor Red
         Write-Host "Run 'claude' and authenticate first." -ForegroundColor Yellow
         return $false
@@ -155,34 +87,36 @@ function Sync-Auth {
     $claude = Get-Content $claudeCredPath -Raw | ConvertFrom-Json
     $oauth = $claude.claudeAiOauth
 
-    if (!$oauth) {
+    if (-not $oauth) {
         Write-Host "No claudeAiOauth found in credentials file." -ForegroundColor Red
         return $false
     }
 
     Write-Host "Read Claude Code credentials (expires $($oauth.expiresAt))" -ForegroundColor Green
 
-    # Claude settings (Windows)
     Write-Host "Syncing Claude settings (Windows)..." -ForegroundColor Cyan
     Sync-ClaudeSettings -Path $claudeSettingsPath
     Write-Host "  $claudeSettingsPath" -ForegroundColor DarkGray
 
-    # OpenCode auth (Windows)
     Write-Host "Updating Windows opencode auth..." -ForegroundColor Cyan
     Update-AuthFile -Path $winAuthPath -AccessToken $oauth.accessToken -RefreshToken $oauth.refreshToken -ExpiresAt $oauth.expiresAt
     Write-Host "  $winAuthPath" -ForegroundColor DarkGray
 
-    # WSL sync (auth + settings) — access WSL filesystem directly via \\wsl.localhost
     Write-Host "Updating WSL (opencode auth + Claude settings)..." -ForegroundColor Cyan
     $wslHome = wsl bash -c 'echo $HOME' 2>$null
     if ($wslHome) {
         $wslHome = ("$wslHome" -replace "`r", "").Trim()
-        $wslDistro = (wsl bash -c 'cat /etc/os-release' 2>$null | Select-String '^ID=(.+)').Matches[0].Groups[1].Value
+        $release = wsl bash -c 'cat /etc/os-release' 2>$null | Select-String '^ID=(.+)' | Select-Object -First 1
+        if (-not $release) {
+            Write-Host "  Could not detect WSL distro, skipping WSL sync." -ForegroundColor Yellow
+            return $true
+        }
+        $wslDistro = $release.Matches[0].Groups[1].Value.Trim('"')
         $wslRoot = "\\wsl.localhost\$wslDistro"
-        $wslAuthFile     = Join-Path $wslRoot "$wslHome/.local/share/opencode/auth.json"
+        $wslAuthFile = Join-Path $wslRoot "$wslHome/.local/share/opencode/auth.json"
         $wslSettingsFile = Join-Path $wslRoot "$wslHome/.claude/settings.json"
 
-        if (Test-Path (Split-Path $wslAuthFile -Parent)) {
+        if (Test-Path -LiteralPath (Split-Path $wslAuthFile -Parent)) {
             Update-AuthFile -Path $wslAuthFile -AccessToken $oauth.accessToken -RefreshToken $oauth.refreshToken -ExpiresAt $oauth.expiresAt
             Write-Host "  $wslAuthFile" -ForegroundColor DarkGray
         } else {
@@ -199,17 +133,13 @@ function Sync-Auth {
     return $true
 }
 
-# ---------------------------------------------------------------------------
-# MCP server sync
-# ---------------------------------------------------------------------------
 
 function Sync-McpClaude {
-    if (!(Get-Command claude -ErrorAction SilentlyContinue)) {
+    if (-not (Get-Command claude -ErrorAction SilentlyContinue)) {
         Write-Host "  claude CLI not found, skipping." -ForegroundColor Yellow
         return
     }
 
-    # Discover installed servers
     $installed = @()
     $lines = claude mcp list 2>$null | Where-Object { $_ -match '^\S.*:' }
     foreach ($line in $lines) {
@@ -217,15 +147,13 @@ function Sync-McpClaude {
         if ($name) { $installed += $name }
     }
 
-    # Remove servers not in $mcpServers
     foreach ($name in $installed) {
-        if (!$mcpServers.Contains($name)) {
+        if (-not $mcpServers.Contains($name)) {
             claude mcp remove $name -s user 2>$null | Out-Null
             Write-Host "  Removed $name from claude" -ForegroundColor DarkGray
         }
     }
 
-    # Add/update servers
     foreach ($name in $mcpServers.Keys) {
         $cmd = $mcpServers[$name]
         claude mcp remove $name -s user 2>$null | Out-Null
@@ -237,7 +165,7 @@ function Sync-McpClaude {
 function Sync-McpOpenCode {
     param([string]$ConfigPath)
 
-    if (!(Test-Path $ConfigPath)) { return }
+    if (-not (Test-Path -LiteralPath $ConfigPath)) { return }
 
     $raw = Get-Content $ConfigPath -Raw
     if ($ConfigPath -like "*.jsonc") {
@@ -250,13 +178,13 @@ function Sync-McpOpenCode {
         return
     }
 
-    if (!($config.PSObject.Properties.Name -contains 'mcp')) {
+    if (-not ($config.PSObject.Properties.Name -contains 'mcp')) {
         $config | Add-Member -NotePropertyName 'mcp' -NotePropertyValue ([PSCustomObject]@{}) -Force
     }
 
     $existingNames = @($config.mcp.PSObject.Properties.Name)
     foreach ($name in $existingNames) {
-        if (!$mcpServers.Contains($name)) {
+        if (-not $mcpServers.Contains($name)) {
             $config.mcp.PSObject.Properties.Remove($name)
             Write-Host "  Removed $name from $ConfigPath" -ForegroundColor DarkGray
         }
@@ -291,143 +219,67 @@ function Sync-Mcp {
     Write-Host "MCP servers synced." -ForegroundColor Green
 }
 
-# ---------------------------------------------------------------------------
-# Skills sync
-# ---------------------------------------------------------------------------
 
-function Get-SkillNameFromUrl {
-    param([string]$Url)
-    # Extract the last path segment (skill name) from a GitHub tree URL
-    $path = $Url -replace '^https://github\.com/[^/]+/[^/]+/tree/[^/]+/', ''
-    $path = $path.TrimEnd('/')
-    $path = $path -replace '/SKILL\.md$', '' -replace '/skill\.md$', ''
-    return $path.Split('/')[-1]
-}
+function Get-WslDotfilesSkillsPath {
+    if (-not (Get-Command wsl.exe -ErrorAction SilentlyContinue)) { return $null }
 
-function Install-SkillFromGitHub {
-    param(
-        [string]$Url,
-        [string]$DestRoot,
-        [string]$Name
-    )
-
-    if (!(Get-Command git -ErrorAction SilentlyContinue)) {
-        Write-Host "  git not found, cannot install $Name" -ForegroundColor Red
-        return $false
-    }
-
-    # Parse URL: https://github.com/{owner}/{repo}/tree/{ref}/{subpath}
-    $path = $Url -replace '^https://github\.com/', ''
-    $parts = $path -split '/'
-    if ($parts.Count -lt 5) {
-        Write-Host "  Invalid skill URL: $Url" -ForegroundColor Red
-        return $false
-    }
-
-    $owner   = $parts[0]
-    $repo    = $parts[1]
-    # $parts[2] = "tree"
-    $ref     = $parts[3]
-    $subpath = ($parts[4..($parts.Count - 1)]) -join '/'
-
-    $tmpDir  = Join-Path ([System.IO.Path]::GetTempPath()) "skill-$Name-$([System.Guid]::NewGuid().ToString('N').Substring(0,8))"
-    $destDir = Join-Path $DestRoot $Name
-
-    try {
-        $cloneOutput = git clone --depth 1 --filter=blob:none --sparse --branch $ref `
-            "https://github.com/$owner/$repo.git" $tmpDir 2>&1
-        if ($LASTEXITCODE -ne 0) {
-            Write-Host "  Failed to clone $owner/$repo : $cloneOutput" -ForegroundColor Red
-            return $false
-        }
-
-        $sparseOutput = git -C $tmpDir sparse-checkout set $subpath 2>&1
-        if ($LASTEXITCODE -ne 0) {
-            Write-Host "  Failed sparse-checkout for $subpath : $sparseOutput" -ForegroundColor Red
-            return $false
-        }
-
-        $srcDir = Join-Path $tmpDir $subpath
-        if (!(Test-Path $srcDir)) {
-            Write-Host "  Skill path not found in repo: $subpath" -ForegroundColor Red
-            return $false
-        }
-
-        if (Test-Path $destDir) { Remove-Item -Recurse -Force $destDir }
-        Copy-Item -Recurse -Force $srcDir $destDir
-
-        # Normalize skill.md -> SKILL.md
-        $skillMdLower = Join-Path $destDir "skill.md"
-        $skillMdUpper = Join-Path $destDir "SKILL.md"
-        if ((Test-Path $skillMdLower) -and !(Test-Path $skillMdUpper)) {
-            Move-Item $skillMdLower $skillMdUpper
-        }
-
-        if (!(Test-Path $skillMdUpper)) {
-            Write-Host "  Warning: $Name missing SKILL.md" -ForegroundColor Yellow
-        }
-
-        return $true
-    } finally {
-        if (Test-Path $tmpDir) { Remove-Item -Recurse -Force $tmpDir -ErrorAction SilentlyContinue }
-    }
+    $path = wsl.exe bash -lc 'if [ -d "$HOME/dotfiles/.agents/skills" ]; then wslpath -w "$HOME/dotfiles/.agents/skills"; fi' 2>$null |
+        Where-Object { $_ -and $_.Trim() } |
+        Select-Object -Last 1
+    if (-not $path) { return $null }
+    return $path.Trim()
 }
 
 function Sync-Skills {
     Write-Host "--- Skills ---" -ForegroundColor Cyan
 
-    # Build desired skill map
-    $desired = [ordered]@{}
-    foreach ($src in $skillSources) {
-        $name = Get-SkillNameFromUrl $src
-        if ($name) { $desired[$name] = $src }
+    $sourceDir = Get-WslDotfilesSkillsPath
+    if (-not $sourceDir -or -not (Test-Path -LiteralPath $sourceDir)) {
+        Write-Host "  WSL ~/dotfiles/.agents/skills not found, skipping." -ForegroundColor Yellow
+        return
     }
 
-    # Install to canonical location (~/.agents/skills)
-    if (!(Test-Path $agentsSkillsDir)) {
-        New-Item -ItemType Directory -Path $agentsSkillsDir -Force | Out-Null
+    $sourceSkills = @(Get-ChildItem -LiteralPath $sourceDir -Directory -ErrorAction SilentlyContinue |
+        Where-Object { Test-Path -LiteralPath (Join-Path $_.FullName "SKILL.md") })
+    if (-not $sourceSkills -or $sourceSkills.Count -eq 0) {
+        Write-Host "  No WSL skills found in $sourceDir" -ForegroundColor Yellow
+        return
     }
 
-    # Remove skills not in desired set
-    $installedDirs = Get-ChildItem -Path $agentsSkillsDir -Directory -ErrorAction SilentlyContinue
-    foreach ($dir in $installedDirs) {
-        if ($dir.Name.StartsWith('.')) { continue }
-        if (!(Test-Path (Join-Path $dir.FullName "SKILL.md"))) { continue }
-        if (!$desired.Contains($dir.Name)) {
-            Remove-Item -Recurse -Force $dir.FullName
-            Write-Host "  Removed $($dir.Name)" -ForegroundColor DarkGray
-        }
+    $agentsRoot = Split-Path $agentsSkillsDir -Parent
+    if (-not (Test-Path -LiteralPath $agentsRoot)) {
+        New-Item -ItemType Directory -Path $agentsRoot -Force | Out-Null
     }
 
-    # Install missing skills
-    foreach ($name in $desired.Keys) {
-        $destDir = Join-Path $agentsSkillsDir $name
-        $skillMd = Join-Path $destDir "SKILL.md"
-        if ((Test-Path $destDir) -and (Test-Path $skillMd)) {
-            Write-Host "  -> $name already installed" -ForegroundColor DarkGray
-            continue
+    $tempDir = Join-Path $agentsRoot "skills.tmp.$PID"
+    if (Test-Path -LiteralPath $tempDir) { Remove-Item -LiteralPath $tempDir -Recurse -Force }
+    New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
+
+    try {
+        foreach ($skill in $sourceSkills) {
+            Copy-Item -LiteralPath $skill.FullName -Destination (Join-Path $tempDir $skill.Name) -Recurse -Force
         }
 
-        Write-Host "  Installing $name..." -ForegroundColor White
-        $ok = Install-SkillFromGitHub -Url $desired[$name] -DestRoot $agentsSkillsDir -Name $name
-        if ($ok) {
-            Write-Host "  -> $name installed" -ForegroundColor DarkGray
+        if (Test-Path -LiteralPath $agentsSkillsDir) {
+            Remove-Item -LiteralPath $agentsSkillsDir -Recurse -Force
         }
+        Move-Item -LiteralPath $tempDir -Destination $agentsSkillsDir
+    } finally {
+        if (Test-Path -LiteralPath $tempDir) { Remove-Item -LiteralPath $tempDir -Recurse -Force -ErrorAction SilentlyContinue }
     }
 
-    # Symlink Claude and OpenCode skill dirs -> canonical location
+    Write-Host "  Synced $($sourceSkills.Count) WSL skill(s) from $sourceDir" -ForegroundColor Green
+
     foreach ($targetDir in @($claudeSkillsDir, $opencodeSkillsDir)) {
-        # Already a correct symlink/junction — skip
-        $item = Get-Item $targetDir -ErrorAction SilentlyContinue
-        if ($item -and $item.LinkType -and $item.Target -contains $agentsSkillsDir) {
+        $item = Get-Item -LiteralPath $targetDir -ErrorAction SilentlyContinue
+        if ($item -and $item.LinkType -and (@($item.Target) -contains $agentsSkillsDir)) {
             Write-Host "  -> $targetDir already linked" -ForegroundColor DarkGray
             continue
         }
 
-        # Remove stale symlink, junction, or directory
-        if (Test-Path $targetDir) { Remove-Item -Recurse -Force $targetDir }
+        if (Test-Path -LiteralPath $targetDir) { Remove-Item -LiteralPath $targetDir -Recurse -Force }
         $parentDir = Split-Path $targetDir -Parent
-        if (!(Test-Path $parentDir)) { New-Item -ItemType Directory -Path $parentDir -Force | Out-Null }
+        if (-not (Test-Path -LiteralPath $parentDir)) { New-Item -ItemType Directory -Path $parentDir -Force | Out-Null }
 
         New-Item -ItemType Junction -Path $targetDir -Target $agentsSkillsDir | Out-Null
         Write-Host "  -> junction: $targetDir -> $agentsSkillsDir" -ForegroundColor DarkGray
@@ -436,18 +288,15 @@ function Sync-Skills {
     Write-Host "Skills synced." -ForegroundColor Green
 }
 
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
 
 $authOk = $true
-if (!$SkipAuth) {
-    if (!(Sync-Auth)) { $authOk = $false }
+if (-not $SkipAuth) {
+    if (-not (Sync-Auth)) { $authOk = $false }
 }
-if (!$SkipMcp)    { Sync-Mcp }
-if (!$SkipSkills) { Sync-Skills }
+if (-not $SkipMcp) { Sync-Mcp }
+if (-not $SkipSkills) { Sync-Skills }
 
 Write-Host ""
 Write-Host "Done. Restart Claude and OpenCode to pick up changes." -ForegroundColor Green
 
-if (!$authOk) { exit 1 }
+if (-not $authOk) { exit 1 }

@@ -1,16 +1,14 @@
-$claudeDir = "$env:USERPROFILE\.claude"
-
-if (-not (Test-Path $claudeDir)) {
-    New-Item -ItemType Directory -Path $claudeDir | Out-Null
-}
+$ErrorActionPreference = "Stop"
+$claudeDir = Join-Path $env:USERPROFILE ".claude"
+New-Item -ItemType Directory -Path $claudeDir -Force | Out-Null
 
 npm install -g @anthropic-ai/claude-code
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 $settings = @{
     includeCoAuthoredBy    = $false
     includeGitInstructions = $false
-} | ConvertTo-Json
+} | ConvertTo-Json -Depth 5
 
-Set-Content -Path "$claudeDir\settings.json" -Value $settings -Encoding UTF8
-
-Write-Host "Claude Code installation complete!" -ForegroundColor Green
+Set-Content -Path (Join-Path $claudeDir "settings.json") -Value $settings -Encoding UTF8
+Write-Host "Claude Code installation complete" -ForegroundColor Green

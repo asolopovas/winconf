@@ -7,6 +7,28 @@ function Test-CommandExists {
     [bool](Get-Command $Command -ErrorAction SilentlyContinue)
 }
 
+function Test-RegistryValue {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Path,
+
+        [Parameter(Mandatory)]
+        [string]$Value
+    )
+
+    $property = Get-ItemProperty -Path $Path -Name $Value -ErrorAction SilentlyContinue
+    return [bool]$property
+}
+
+function Test-ScheduledTask {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Name
+    )
+
+    [bool](Get-ScheduledTask -TaskName $Name -ErrorAction SilentlyContinue)
+}
+
 function global:repo {
     param(
         [Parameter(ValueFromRemainingArguments = $true)]
@@ -159,17 +181,16 @@ function SetPermissions {
         [string]$Dir
     )
 
-    if (-not (Test-Path $Dir)) {
+    if (-not (Test-Path -LiteralPath $Dir)) {
         Write-Error "Path '$Dir' does not exist"
         return
     }
 
-    $acl = Get-Acl $Dir
-    $accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule(
-        $env:UserName, "FullControl", "Allow"
-    )
+    $acl = Get-Acl -LiteralPath $Dir
+    $user = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
+    $accessRule = [System.Security.AccessControl.FileSystemAccessRule]::new($user, 'FullControl', 'ContainerInherit,ObjectInherit', 'None', 'Allow')
     $acl.SetAccessRule($accessRule)
-    Set-Acl $Dir $acl
+    Set-Acl -LiteralPath $Dir -AclObject $acl
 }
 
 function Select-FromMenu {
@@ -291,6 +312,17 @@ function CreateSymLink {
         [string]$Target
     )
 
-    Remove-Item -Force -Recurse -Confirm:$false $Src -ErrorAction SilentlyContinue
+    $item = Get-Item -LiteralPath $Src -Force -ErrorAction SilentlyContinue
+    if ($item -and $item.LinkType -and ($item.Target -contains $Target)) { return $item }
+
+    if ($item) {
+        Remove-Item -LiteralPath $Src -Force -Recurse -Confirm:$false
+    }
+
+    $parent = Split-Path $Src -Parent
+    if ($parent -and -not (Test-Path -LiteralPath $parent)) {
+        New-Item -ItemType Directory -Path $parent -Force | Out-Null
+    }
+
     New-Item -ItemType SymbolicLink -Path $Src -Target $Target -Force
 }

@@ -1,9 +1,9 @@
 $ErrorActionPreference = "Stop"
-$env:PNPM_HOME ??= Join-Path $env:LOCALAPPDATA "pnpm"
+if (-not $env:PNPM_HOME) { $env:PNPM_HOME = Join-Path $env:LOCALAPPDATA "pnpm" }
 $pnpmGlobalBin = Join-Path $env:PNPM_HOME "bin"
-New-Item -ItemType Directory $env:PNPM_HOME -Force | Out-Null
-New-Item -ItemType Directory $pnpmGlobalBin -Force | Out-Null
-$env:Path = @($pnpmGlobalBin, $env:PNPM_HOME, "$env:LOCALAPPDATA\Microsoft\WinGet\Links", $env:Path) -join ";"
+New-Item -ItemType Directory -Path $env:PNPM_HOME -Force | Out-Null
+New-Item -ItemType Directory -Path $pnpmGlobalBin -Force | Out-Null
+$env:Path = @($pnpmGlobalBin, $env:PNPM_HOME, (Join-Path $env:LOCALAPPDATA "Microsoft\WinGet\Links"), $env:Path) -join ";"
 
 if (-not (Get-Command pnpm -ErrorAction SilentlyContinue)) {
     if (-not (Get-Command winget -ErrorAction SilentlyContinue)) { throw "winget required" }

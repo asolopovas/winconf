@@ -211,7 +211,7 @@ if (Test-Path $modulePath) {
     Write-Host "Added $modulePath to PSModulePath." -ForegroundColor Green
 }
 
-if (!(Test-Path -Path $SCRIPTS_DIR)) {
+if (-not (Test-Path -Path $SCRIPTS_DIR)) {
     Write-Host "Scripts directory not found. Cloning might have failed." -ForegroundColor Red
     exit 1
 }
