@@ -20,7 +20,7 @@ Strict mode stops unexpected errors.
 | Auth | `~/.claude/.credentials.json` | OpenCode Windows/WSL auth |
 | Settings | `$claudeSettings` | Claude Windows/WSL settings |
 | MCP | `$mcpServers` | `claude mcp`, OpenCode config |
-| Skills | WSL `~/dotfiles/.agents/skills` | Windows `~/.agents/skills`, `~/.claude/skills`, `~/.config/opencode/skills`, `~/.copilot/skills` |
+| Skills | WSL `~/dotfiles/.agents/skills` | `~/winconf/.agents/skills`, linked Windows agent skill paths |
 
 Current MCP: `context7` via `npx @upstash/context7-mcp`.
 
@@ -29,12 +29,13 @@ Current MCP: `context7` via `npx @upstash/context7-mcp`.
 | Path | Role |
 |---|---|
 | WSL `~/dotfiles/.agents/skills` | source of truth for skills |
-| Windows `~/.agents/skills` | mirrored canonical skills for Codex and VS Code/Copilot-compatible agents |
-| Windows `~/.claude/skills` | Claude Code personal skills copy |
-| Windows `~/.config/opencode/skills` | OpenCode global skills copy |
-| Windows `~/.copilot/skills` | Copilot personal skills copy |
+| Windows `~/winconf/.agents/skills` | mirrored canonical Windows skills |
+| Windows `~/.agents` | junction to `~/winconf/.agents` for Codex and VS Code/Copilot-compatible agents |
+| Windows `~/.claude/skills` | junction to canonical skills for Claude Code |
+| Windows `~/.config/opencode/skills` | junction to canonical skills for OpenCode |
+| Windows `~/.copilot/skills` | junction to canonical skills for Copilot |
 
-Only WSL skill directories containing `SKILL.md` and listed in `$windowsSkillNames` are copied. GitHub skill sources are not fetched. Linux-only stacks such as Laravel and WordPress stay in WSL. Destination paths are real directory copies, not junctions, because only Codex explicitly documents symlinked skill support.
+Only WSL skill directories containing `SKILL.md` and listed in `$windowsSkillNames` are copied. GitHub skill sources are not fetched. Linux-only stacks such as Laravel and WordPress stay in WSL.
 
 ## Re-run after
 

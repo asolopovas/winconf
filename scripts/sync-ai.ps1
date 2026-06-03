@@ -11,7 +11,9 @@ $claudeCredPath = Join-Path $env:USERPROFILE '.claude\.credentials.json'
 $claudeSettingsPath = Join-Path $env:USERPROFILE '.claude\settings.json'
 $winAuthPath = Join-Path $env:USERPROFILE '.local\share\opencode\auth.json'
 $opencodeConfigPath = Join-Path $env:USERPROFILE '.config\opencode\opencode.json'
-$agentsSkillsDir = Join-Path $env:USERPROFILE '.agents\skills'
+$homeAgentsDir = Join-Path $env:USERPROFILE '.agents'
+$winconfAgentsDir = Join-Path $env:USERPROFILE 'winconf\.agents'
+$agentsSkillsDir = Join-Path $winconfAgentsDir 'skills'
 $claudeSkillsDir = Join-Path $env:USERPROFILE '.claude\skills'
 $opencodeSkillsDir = Join-Path $env:USERPROFILE '.config\opencode\skills'
 $copilotSkillsDir = Join-Path $env:USERPROFILE '.copilot\skills'
@@ -33,6 +35,20 @@ $mcpServers = [ordered]@{ context7 = @('cmd', '/c', 'npx', '@upstash/context7-mc
 
 function Out-Status([string]$Message) { Write-Information $Message -InformationAction Continue }
 function Read-Json($Path) { if (Test-Path -LiteralPath $Path) { Get-Content -LiteralPath $Path -Raw | ConvertFrom-Json } else { [pscustomobject]@{} } }
+function Set-DirectoryLink {
+    [CmdletBinding(SupportsShouldProcess)]
+    param($Path, $Target)
+    if (-not $PSCmdlet.ShouldProcess($Path, "Link to $Target")) { return }
+    $item = Get-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
+    if ($item -and $item.LinkType -and (@($item.Target) -contains $Target)) { return }
+    if ($item) {
+        if ($item.LinkType) { Remove-Item -LiteralPath $Path -Force }
+        else { Remove-Item -LiteralPath $Path -Recurse -Force }
+    }
+    $parent = Split-Path $Path -Parent
+    if (-not (Test-Path -LiteralPath $parent)) { New-Item -ItemType Directory -Path $parent -Force | Out-Null }
+    New-Item -ItemType Junction -Path $Path -Target $Target | Out-Null
+}
 function Out-JsonFile($Path, $Value) {
     $dir = Split-Path $Path -Parent
     if (-not (Test-Path -LiteralPath $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
@@ -121,15 +137,9 @@ function Sync-Skill {
     } finally {
         if (Test-Path -LiteralPath $tmp) { Remove-Item -LiteralPath $tmp -Recurse -Force -ErrorAction SilentlyContinue }
     }
+    Set-DirectoryLink $homeAgentsDir $winconfAgentsDir
     foreach ($target in @($claudeSkillsDir, $opencodeSkillsDir, $copilotSkillsDir)) {
-        $item = Get-Item -LiteralPath $target -Force -ErrorAction SilentlyContinue
-        if ($item) {
-            if ($item.LinkType) { Remove-Item -LiteralPath $target -Force }
-            else { Remove-Item -LiteralPath $target -Recurse -Force }
-        }
-        $parent = Split-Path $target -Parent
-        if (-not (Test-Path -LiteralPath $parent)) { New-Item -ItemType Directory -Path $parent -Force | Out-Null }
-        Copy-Item -LiteralPath $agentsSkillsDir -Destination $target -Recurse -Force
+        Set-DirectoryLink $target $agentsSkillsDir
     }
     Out-Status ("Synced {0} Windows skill(s)" -f $skills.Count)
 }

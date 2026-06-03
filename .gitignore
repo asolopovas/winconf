@@ -3,4 +3,5 @@ logs/
 tmp/
 *.log
 .claude/settings.local.json
+.agents/
 nul
