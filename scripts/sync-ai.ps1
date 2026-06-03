@@ -85,8 +85,9 @@ function Sync-McpClaude {
 function Sync-McpOpenCode {
     if (-not (Test-Path -LiteralPath $opencodeConfigPath)) { return }
     try { $config = Get-Content -LiteralPath $opencodeConfigPath -Raw | ConvertFrom-Json } catch { return }
-    if (-not ($config.PSObject.Properties.Name -contains 'mcp')) { $config | Add-Member -NotePropertyName mcp -NotePropertyValue ([pscustomobject]@{}) -Force }
-    foreach ($name in @($config.mcp.PSObject.Properties.Name)) { if (-not $mcpServers.Contains($name)) { $config.mcp.PSObject.Properties.Remove($name) } }
+    if (-not ($config.PSObject.Properties.Name -contains 'mcp') -or -not $config.mcp) { $config | Add-Member -NotePropertyName mcp -NotePropertyValue ([pscustomobject]@{}) -Force }
+    $mcpNames = @($config.mcp.PSObject.Properties | ForEach-Object Name)
+    foreach ($name in $mcpNames) { if (-not $mcpServers.Contains($name)) { $config.mcp.PSObject.Properties.Remove($name) } }
     foreach ($name in $mcpServers.Keys) { $config.mcp | Add-Member -NotePropertyName $name -NotePropertyValue ([pscustomobject]@{ type = 'local'; command = $mcpServers[$name]; enabled = $true }) -Force }
     Out-JsonFile $opencodeConfigPath $config
 }
