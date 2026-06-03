@@ -1,3 +1,15 @@
+function Write-Status {
+    param(
+        [Parameter(Position = 0)]
+        [AllowEmptyString()]
+        [string]$Message = '',
+
+        [ConsoleColor]$ForegroundColor
+    )
+
+    $null = $ForegroundColor
+    Write-Information $Message -InformationAction Continue
+}
 
 $userPathsFile = "$env:USERPROFILE\winconf\.user-paths"
 
@@ -25,16 +37,16 @@ $newPaths = foreach ($p in $additionalPaths) {
 }
 
 if (-not $newPaths -and ($dedupedUser.Count -eq $userPaths.Count)) {
-    Write-Host "  All custom paths already configured" -ForegroundColor DarkGray
+    Write-Status "  All custom paths already configured" -ForegroundColor DarkGray
     return
 }
 
 foreach ($path in $newPaths) {
-    Write-Host "  Adding Path - $path" -ForegroundColor Green
+    Write-Status "  Adding Path - $path" -ForegroundColor Green
 }
 
 if ($dedupedUser.Count -ne $userPaths.Count) {
-    Write-Host ("  Removing {0} duplicate User PATH entries" -f ($userPaths.Count - $dedupedUser.Count)) -ForegroundColor DarkYellow
+    Write-Status ("  Removing {0} duplicate User PATH entries" -f ($userPaths.Count - $dedupedUser.Count)) -ForegroundColor DarkYellow
 }
 
 $updatedPath = (@($dedupedUser) + @($newPaths)) -join ';'

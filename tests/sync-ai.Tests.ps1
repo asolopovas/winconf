@@ -22,7 +22,7 @@ Describe "sync-ai.ps1" {
 
     Context "when credentials file is missing" {
         It "exits with error" {
-            $out = pwsh -NoProfile -File $script:scriptPath -SkipMcp -SkipSkills 2>&1
+            $null = pwsh -NoProfile -File $script:scriptPath -SkipMcp -SkipSkills 2>&1
             $LASTEXITCODE | Should -Be 1
         }
     }
@@ -35,7 +35,7 @@ Describe "sync-ai.ps1" {
         }
 
         It "exits with error" {
-            $out = pwsh -NoProfile -File $script:scriptPath -SkipMcp -SkipSkills 2>&1
+            $null = pwsh -NoProfile -File $script:scriptPath -SkipMcp -SkipSkills 2>&1
             $LASTEXITCODE | Should -Be 1
         }
     }
