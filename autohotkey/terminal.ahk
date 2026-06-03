@@ -8,10 +8,13 @@ currentPowershellId := 0
 previousPowershellId := 0
 lastActivatedTerminalId := 0
 lastActivatedTerminalAt := 0
+terminalActivationGraceMs := 2500
+terminalToggleQueue := []
+terminalToggleProcessing := false
 
 if (!IsSet(REGISTER_TERMINAL_HOTKEYS) || REGISTER_TERMINAL_HOTKEYS) {
-    Hotkey("#Enter", (*) => ToggleTerminal("Ubuntu"))
-    Hotkey("<^>!Enter", (*) => ToggleTerminal("Powershell"))
+    Hotkey("#Enter", (*) => QueueTerminalToggle("Ubuntu"), "T5 B")
+    Hotkey("<^>!Enter", (*) => QueueTerminalToggle("Powershell"), "T5 B")
     Hotkey("#+Enter", (*) => OpenNewTab("Ubuntu"))
     Hotkey("<^>!+Enter", (*) => OpenNewTab("Powershell"))
     Hotkey("#F12", (*) => ActivateAnyTerminal())
@@ -141,33 +144,60 @@ ActivateTerminalWindow(hwnd) {
     }
     WinShow(windowID)
     WinActivate(windowID)
+    WinWaitActive(windowID, , 1)
     return true
 }
 
+QueueTerminalToggle(terminalType) {
+    global terminalToggleQueue, terminalToggleProcessing
+
+    terminalToggleQueue.Push(terminalType)
+    if (!terminalToggleProcessing) {
+        SetTimer(ProcessTerminalToggleQueue, -1)
+    }
+}
+
+ProcessTerminalToggleQueue() {
+    global terminalToggleQueue, terminalToggleProcessing
+
+    if (terminalToggleProcessing) {
+        return
+    }
+
+    terminalToggleProcessing := true
+    try {
+        while (terminalToggleQueue.Length) {
+            ToggleTerminal(terminalToggleQueue.RemoveAt(1))
+        }
+    } finally {
+        terminalToggleProcessing := false
+        if (terminalToggleQueue.Length) {
+            SetTimer(ProcessTerminalToggleQueue, -1)
+        }
+    }
+}
+
 ToggleTerminal(terminalType := "Ubuntu") {
-    global lastActivatedTerminalId, lastActivatedTerminalAt
+    global lastActivatedTerminalId, lastActivatedTerminalAt, terminalActivationGraceMs
     targetId := FindTerminalWindow(terminalType)
 
     if (targetId) {
         windowID := "ahk_id " . targetId
-        justActivated := targetId == lastActivatedTerminalId && A_TickCount - lastActivatedTerminalAt < 700
+        justActivated := targetId == lastActivatedTerminalId && A_TickCount - lastActivatedTerminalAt < terminalActivationGraceMs
 
         if (WinActive(windowID) || justActivated) {
             lastActivatedTerminalId := 0
             WinMinimize(windowID)
-            KeyWait("Enter")
             return
         }
 
+        ActivateTerminalWindow(targetId)
         lastActivatedTerminalId := targetId
         lastActivatedTerminalAt := A_TickCount
-        ActivateTerminalWindow(targetId)
-        KeyWait("Enter")
         return
     }
 
     LaunchTerminal(terminalType)
-    KeyWait("Enter")
 }
 
 OpenNewTab(terminal := 'Ubuntu') {
