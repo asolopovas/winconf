@@ -161,6 +161,7 @@ Describe "sync-ai.ps1" {
             Test-Path (Join-Path $script:tmpHome ".agents\skills\powershell-windows\SKILL.md") | Should -BeTrue
             Test-Path (Join-Path $script:tmpHome ".pi\agent\prompts\gw.md") | Should -BeTrue
             Test-Path (Join-Path $script:tmpHome ".codex\prompts\gw.md") | Should -BeTrue
+            Test-Path (Join-Path $script:tmpHome ".codex\commands\gw.md") | Should -BeTrue
             Test-Path (Join-Path $script:tmpHome ".claude\commands\gw.md") | Should -BeTrue
             Test-Path (Join-Path $script:tmpHome ".config\opencode\commands\gw.md") | Should -BeTrue
             Test-Path (Join-Path $script:tmpHome ".opencode\commands\gw.md") | Should -BeTrue
@@ -170,7 +171,8 @@ Describe "sync-ai.ps1" {
             Test-Path (Join-Path $script:tmpHome ".config\opencode\agents\review.md") | Should -BeTrue
             Test-Path (Join-Path $script:tmpHome ".config\opencode\agent\review.md") | Should -BeTrue
             (Get-Item -LiteralPath (Join-Path $script:tmpHome ".agents") -Force).LinkType | Should -Not -BeNullOrEmpty
-            (Get-Item -LiteralPath (Join-Path $script:tmpHome ".codex\prompts") -Force).LinkType | Should -Not -BeNullOrEmpty
+            (Get-Item -LiteralPath (Join-Path $script:tmpHome ".codex\prompts\gw.md") -Force).LinkType | Should -Not -BeNullOrEmpty
+            (Get-Item -LiteralPath (Join-Path $script:tmpHome ".codex\commands\gw.md") -Force).LinkType | Should -Not -BeNullOrEmpty
             (Get-Item -LiteralPath (Join-Path $script:tmpHome ".claude\commands") -Force).LinkType | Should -Not -BeNullOrEmpty
             (Get-Item -LiteralPath (Join-Path $script:tmpHome ".config\opencode\commands") -Force).LinkType | Should -Not -BeNullOrEmpty
             (Get-Item -LiteralPath (Join-Path $script:tmpHome ".codex\agents") -Force).LinkType | Should -Not -BeNullOrEmpty

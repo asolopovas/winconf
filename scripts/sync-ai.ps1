@@ -28,6 +28,7 @@ $piPromptsDir = Join-Path $piAgentDir 'prompts'
 $piSettingsPath = Join-Path $piAgentDir 'settings.json'
 $piNpmPackagePath = Join-Path $piAgentDir 'npm\package.json'
 $codexPromptsDir = Join-Path $env:USERPROFILE '.codex\prompts'
+$codexCommandsDir = Join-Path $env:USERPROFILE '.codex\commands'
 $claudeCommandsDir = Join-Path $env:USERPROFILE '.claude\commands'
 $opencodeCommandsDir = Join-Path $env:USERPROFILE '.config\opencode\commands'
 $homeOpenCodeCommandsDir = Join-Path $env:USERPROFILE '.opencode\commands'
@@ -57,20 +58,6 @@ $mcpServers = [ordered]@{ context7 = @('cmd', '/c', 'npx', '@upstash/context7-mc
 
 function Out-Status([string]$Message) { Write-Information $Message -InformationAction Continue }
 function Read-Json($Path) { if (Test-Path -LiteralPath $Path) { Get-Content -LiteralPath $Path -Raw | ConvertFrom-Json } else { [pscustomobject]@{} } }
-function Set-DirectoryLink {
-    [CmdletBinding(SupportsShouldProcess)]
-    param($Path, $Target)
-    if (-not $PSCmdlet.ShouldProcess($Path, "Link to $Target")) { return }
-    $item = Get-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
-    if ($item -and $item.LinkType -and (@($item.Target) -contains $Target)) { return }
-    if ($item) {
-        if ($item.LinkType) { Remove-Item -LiteralPath $Path -Force }
-        else { Remove-Item -LiteralPath $Path -Recurse -Force }
-    }
-    $parent = Split-Path $Path -Parent
-    if (-not (Test-Path -LiteralPath $parent)) { New-Item -ItemType Directory -Path $parent -Force | Out-Null }
-    New-Item -ItemType Junction -Path $Path -Target $Target | Out-Null
-}
 function Out-JsonFile($Path, $Value) {
     $dir = Split-Path $Path -Parent
     if (-not (Test-Path -LiteralPath $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
@@ -78,22 +65,42 @@ function Out-JsonFile($Path, $Value) {
     if (-not $json.EndsWith("`n")) { $json += "`n" }
     [IO.File]::WriteAllText($Path, $json)
 }
-function Set-FileLink {
+function Set-Link {
     [CmdletBinding(SupportsShouldProcess)]
-    param($Path, $Target)
+    param(
+        [Parameter(Mandatory)][string]$Path,
+        [Parameter(Mandatory)][string]$Target,
+        [ValidateSet('Junction', 'SymbolicLink')][string]$ItemType = 'Junction'
+    )
     if (-not (Test-Path -LiteralPath $Target)) { return }
     if (-not $PSCmdlet.ShouldProcess($Path, "Link to $Target")) { return }
     $item = Get-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
     if ($item -and $item.LinkType -and (@($item.Target) -contains $Target)) { return }
     if ($item) { Remove-Item -LiteralPath $Path -Recurse -Force }
     $parent = Split-Path $Path -Parent
-    if (-not (Test-Path -LiteralPath $parent)) { New-Item -ItemType Directory -Path $parent -Force | Out-Null }
-    New-Item -ItemType SymbolicLink -Path $Path -Target $Target -Force | Out-Null
+    if ($parent -and -not (Test-Path -LiteralPath $parent)) { New-Item -ItemType Directory -Path $parent -Force | Out-Null }
+    New-Item -ItemType $ItemType -Path $Path -Target $Target -Force | Out-Null
+}
+function New-Link($Path, $Target) { @{ Path = $Path; Target = $Target } }
+function Set-LinkMap($Links, [string]$ItemType = 'Junction') {
+    foreach ($link in $Links) { Set-Link -Path $link.Path -Target $link.Target -ItemType $ItemType }
+}
+function Set-MarkdownFileLinks($Path, $Target) {
+    if (-not (Test-Path -LiteralPath $Target)) { return }
+    $item = Get-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
+    if ($item -and $item.LinkType) { Remove-Item -LiteralPath $Path -Force }
+    if (-not (Test-Path -LiteralPath $Path)) { New-Item -ItemType Directory -Path $Path -Force | Out-Null }
+    Get-ChildItem -LiteralPath $Path -Filter '*.md' -File -ErrorAction SilentlyContinue | Where-Object LinkType | Remove-Item -Force
+    foreach ($source in Get-ChildItem -LiteralPath $Target -Filter '*.md' -File) {
+        Set-Link -Path (Join-Path $Path $source.Name) -Target $source.FullName -ItemType SymbolicLink
+    }
 }
 function Remove-LinkToTarget($Path, $Target) {
     $item = Get-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
     if ($item -and $item.LinkType -and (@($item.Target) -contains $Target)) { Remove-Item -LiteralPath $Path -Force }
 }
+function Set-DirectoryLink($Path, $Target) { Set-Link -Path $Path -Target $Target -ItemType Junction }
+function Set-FileLink($Path, $Target) { Set-Link -Path $Path -Target $Target -ItemType SymbolicLink }
 function Sync-ClaudeSetting($Path) {
     $settings = Read-Json $Path
     $settings | Add-Member -NotePropertyName includeCoAuthoredBy -NotePropertyValue $false -Force
@@ -147,28 +154,27 @@ function Sync-McpOpenCode {
 }
 function Sync-Mcp { Sync-McpClaude; Sync-McpOpenCode }
 function Sync-AgentConfig {
-    if (Test-Path -LiteralPath $winconfAgentsDir) { Set-DirectoryLink $homeAgentsDir $winconfAgentsDir }
-    if (Test-Path -LiteralPath $agentsSkillsDir) {
-        Remove-LinkToTarget $codexSkillsDir $agentsSkillsDir
-        foreach ($target in @($claudeSkillsDir, $opencodeSkillsDir, $copilotSkillsDir)) {
-            Set-DirectoryLink $target $agentsSkillsDir
-        }
-    }
-    if (Test-Path -LiteralPath $agentsPromptsDir) {
-        Set-DirectoryLink $piPromptsDir $agentsPromptsDir
-        Set-DirectoryLink $codexPromptsDir $agentsPromptsDir
-        Set-DirectoryLink $claudeCommandsDir $agentsPromptsDir
-        Set-DirectoryLink $opencodeCommandsDir $agentsPromptsDir
-        Set-DirectoryLink $homeOpenCodeCommandsDir $agentsPromptsDir
-    }
-    if (Test-Path -LiteralPath $agentsCodexDir) { Set-DirectoryLink $codexAgentsDir $agentsCodexDir }
-    if (Test-Path -LiteralPath $agentsClaudeDir) { Set-DirectoryLink $claudeAgentsDir $agentsClaudeDir }
-    if (Test-Path -LiteralPath $agentsOpenCodeDir) {
-        Set-DirectoryLink $opencodeAgentsDir $agentsOpenCodeDir
-        Set-DirectoryLink $opencodeAgentDir $agentsOpenCodeDir
-    }
-    Set-FileLink $piSettingsPath $agentsPiSettingsPath
-    Set-FileLink $piNpmPackagePath $agentsPiNpmPackagePath
+    Set-LinkMap @(
+        (New-Link $homeAgentsDir $winconfAgentsDir)
+        (New-Link $claudeSkillsDir $agentsSkillsDir)
+        (New-Link $opencodeSkillsDir $agentsSkillsDir)
+        (New-Link $copilotSkillsDir $agentsSkillsDir)
+        (New-Link $piPromptsDir $agentsPromptsDir)
+        (New-Link $claudeCommandsDir $agentsPromptsDir)
+        (New-Link $opencodeCommandsDir $agentsPromptsDir)
+        (New-Link $homeOpenCodeCommandsDir $agentsPromptsDir)
+        (New-Link $codexAgentsDir $agentsCodexDir)
+        (New-Link $claudeAgentsDir $agentsClaudeDir)
+        (New-Link $opencodeAgentsDir $agentsOpenCodeDir)
+        (New-Link $opencodeAgentDir $agentsOpenCodeDir)
+    )
+    Remove-LinkToTarget $codexSkillsDir $agentsSkillsDir
+    Set-MarkdownFileLinks $codexPromptsDir $agentsPromptsDir
+    Set-MarkdownFileLinks $codexCommandsDir $agentsPromptsDir
+    Set-LinkMap @(
+        (New-Link $piSettingsPath $agentsPiSettingsPath)
+        (New-Link $piNpmPackagePath $agentsPiNpmPackagePath)
+    ) SymbolicLink
 }
 function Get-WslSkillsPath {
     if (-not (Get-Command wsl.exe -ErrorAction SilentlyContinue)) { return $null }
