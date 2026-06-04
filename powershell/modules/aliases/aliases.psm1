@@ -10,6 +10,7 @@ function lsModules {
 }
 
 function cld { claude --dangerously-skip-permissions @args }
+function cdx { codex --dangerously-bypass-approvals-and-sandbox @args }
 
 New-Alias -Name which   -Scope Global -Value Get-Command
 New-Alias -Name l       -Scope Global -Value Get-ChildItem

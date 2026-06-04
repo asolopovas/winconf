@@ -34,7 +34,8 @@
         'lsChoco',
         'lsModules',
         'rs',
-        'cld'
+        'cld',
+        'cdx'
     )
     AliasesToExport   = @(
         'which',

@@ -40,6 +40,13 @@
 | `RightAlt+Shift+Enter` | New PowerShell tab |
 | `Win+F12` | Activate Windows Terminal |
 
+## Shell aliases
+
+| Alias | Action |
+|---|---|
+| `cld <args>` | run Claude with permission prompts skipped |
+| `cdx <args>` | run Codex with approvals and sandbox bypassed |
+
 ## Git aliases
 
 | Alias | Action |
