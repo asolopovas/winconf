@@ -1,5 +1,6 @@
 $env:LOCALAPPDATA\Microsoft\WinGet\Links
 $env:LOCALAPPDATA\Microsoft\WindowsApps
+$env:USERPROFILE\.cargo\bin
 $env:LOCALAPPDATA\Programs\Microsoft VS Code
 $env:LOCALAPPDATA\pnpm
 $env:LOCALAPPDATA\pnpm\bin
