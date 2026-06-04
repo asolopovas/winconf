@@ -1,19 +1,14 @@
 $env:LOCALAPPDATA\Microsoft\WinGet\Links
 $env:LOCALAPPDATA\Microsoft\WindowsApps
+$env:LOCALAPPDATA\Programs\Microsoft VS Code
+$env:LOCALAPPDATA\pnpm
+$env:LOCALAPPDATA\pnpm\bin
 $env:LOCALAPPDATA\Programs\OpenAI\Codex\bin
 $env:USERPROFILE\winconf\bin
-$env:USERPROFILE\gdrive\bin
-$env:USERPROFILE\miniconda3
-$env:USERPROFILE\src\redlined-pdf
 $env:USERPROFILE\src\news-search
 $env:USERPROFILE\src\excel-to-pdf
 $env:USERPROFILE\winconf\scripts
-$env:USERPROFILE\toc-gen
-$env:ProgramFiles\Git\cmd
 $env:ProgramFiles\Git\usr\bin
-$env:ProgramFiles\starship\bin
 $env:ProgramFiles\AutoHotkey\v2
-$env:ProgramFiles\MiKTeX\miktex\bin\x64
-$env:USERPROFILE\src\toc-gen
 $env:LOCALAPPDATA\Programs\WinSCP
 $env:USERPROFILE\scoop\shims

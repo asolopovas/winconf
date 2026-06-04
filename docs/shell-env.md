@@ -58,3 +58,12 @@ Do not use `tools.ps1` when a topical file exists.
 UpdateModuleManifest -moduleManifestPath .\powershell\modules\helpers\helpers.psd1
 Import-Module .\powershell\modules\helpers -Force
 ```
+
+## PATH doctor
+
+| Need | Command |
+|---|---|
+| Audit only | `.\scripts\paths-doctor.ps1 -WhatIf` |
+| Clean User and Machine PATH | `.\scripts\paths-doctor.ps1` |
+| Keep missing entries | `.\scripts\paths-doctor.ps1 -KeepMissing` |
+| User only | `.\scripts\paths-doctor.ps1 -Scope User` |

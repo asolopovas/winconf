@@ -164,4 +164,13 @@ Describe 'paths-doctor.ps1 script invocation' {
     It 'exposes -KeepMissing switch' {
         (Get-Command $script:path).Parameters.Keys | Should -Contain 'KeepMissing'
     }
+
+    It 'exposes -Scope selector' {
+        $command = Get-Command $script:path
+        $command.Parameters.Keys | Should -Contain 'Scope'
+        $values = $command.Parameters.Scope.Attributes |
+            Where-Object { $_ -is [System.Management.Automation.ValidateSetAttribute] } |
+            Select-Object -ExpandProperty ValidValues
+        $values | Should -Be @('All', 'Machine', 'User')
+    }
 }

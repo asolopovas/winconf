@@ -1,6 +1,8 @@
 [CmdletBinding(SupportsShouldProcess)]
 param(
-    [switch]$KeepMissing
+    [switch]$KeepMissing,
+    [ValidateSet('All', 'Machine', 'User')]
+    [string]$Scope = 'All'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -93,15 +95,18 @@ function Get-SortedPath {
 function Update-PathScope {
     param(
         [ValidateSet('Machine', 'User')][string]$Scope,
-        [string[]]$ExcludeFromMachine = @()
+        [string[]]$ExcludeFromMachine = @(),
+        [switch]$ReadOnly
     )
 
     Write-Host "[$Scope PATH]" -ForegroundColor Cyan
     $raw = [Environment]::GetEnvironmentVariable('Path', $Scope)
 
-    $backup = Join-Path $backupDir "$Scope-$stamp.txt"
-    Set-Content -LiteralPath $backup -Value $raw -NoNewline -Encoding UTF8
-    Write-Host "  Backup  - $backup" -ForegroundColor DarkGray
+    if (-not $ReadOnly) {
+        $backup = Join-Path $backupDir "$Scope-$stamp.txt"
+        Set-Content -LiteralPath $backup -Value $raw -NoNewline -Encoding UTF8
+        Write-Host "  Backup  - $backup" -ForegroundColor DarkGray
+    }
 
     $result = Get-SortedPath -Raw $raw -ExcludeFromMachine $ExcludeFromMachine -KeepMissing:$script:KeepMissing -RelocateUserScoped:($Scope -eq 'Machine')
     Write-Host ("  Entries - {0} kept, {1} dupes, {2} cross-scope, {3} missing, {4} relocated" -f $result.Count, $result.Dupes, $result.CrossDupes, $result.Missing, $result.Relocated.Count) -ForegroundColor DarkGray
@@ -109,6 +114,11 @@ function Update-PathScope {
     if ($Scope -eq 'User') {
         $sysIndicator = $result.Entries | Where-Object { $_ -like 'C:\Program Files*' -or $_ -like 'C:\ProgramData*' }
         foreach ($p in $sysIndicator) { Write-Host "  Note machine-scoped in User - $p" -ForegroundColor DarkCyan }
+    }
+
+    if ($ReadOnly) {
+        Write-Host "  Inspect only" -ForegroundColor DarkGray
+        return [pscustomobject]@{ Entries = $result.Entries; Relocated = $result.Relocated }
     }
 
     if ($result.Joined -eq $raw -and $result.Relocated.Count -eq 0) {
@@ -128,23 +138,39 @@ if ($MyInvocation.InvocationName -eq '.') { return }
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 $machineEntries = @()
 $relocatedToUser = @()
-if (-not $isAdmin) {
-    Write-Warning 'Not elevated — Machine PATH will be skipped (cross-scope dedup disabled).'
+if ($Scope -in @('All', 'Machine')) {
+    if ($isAdmin) {
+        $machineResult = Update-PathScope -Scope Machine
+        $machineEntries = @($machineResult.Entries)
+        $relocatedToUser = @($machineResult.Relocated)
+    } else {
+        Write-Warning 'Not elevated - Machine PATH will be inspected only.'
+        $machineResult = Update-PathScope -Scope Machine -ReadOnly
+        $machineEntries = @($machineResult.Entries)
+    }
 } else {
-    $machineResult = Update-PathScope -Scope Machine
+    $machineRaw = [Environment]::GetEnvironmentVariable('Path', 'Machine')
+    $machineResult = Get-SortedPath -Raw $machineRaw -KeepMissing:$script:KeepMissing
     $machineEntries = @($machineResult.Entries)
-    $relocatedToUser = @($machineResult.Relocated)
 }
 
-if ($relocatedToUser.Count -gt 0) {
+if ($Scope -eq 'All' -and $relocatedToUser.Count -gt 0) {
     $userRaw = [Environment]::GetEnvironmentVariable('Path', 'User')
     $userParts = if ($userRaw) { $userRaw -split ';' | Where-Object { $_ } } else { @() }
     $newUserRaw = (@($userParts) + @($relocatedToUser)) -join ';'
-    [Environment]::SetEnvironmentVariable('Path', $newUserRaw, 'User')
-    Write-Host ("  Merged {0} relocated entries into User PATH" -f $relocatedToUser.Count) -ForegroundColor Green
+    if ($PSCmdlet.ShouldProcess('User PATH', 'Merge relocated Machine entries')) {
+        [Environment]::SetEnvironmentVariable('Path', $newUserRaw, 'User')
+        Write-Host ("  Merged {0} relocated entries into User PATH" -f $relocatedToUser.Count) -ForegroundColor Green
+    }
 }
 
-[void](Update-PathScope -Scope User -ExcludeFromMachine $machineEntries)
+if ($Scope -in @('All', 'User')) {
+    [void](Update-PathScope -Scope User -ExcludeFromMachine $machineEntries)
+}
+
+if ($Scope -ne 'User' -and -not $isAdmin) {
+    Write-Warning 'Run elevated to let this script rewrite Machine PATH.'
+}
 
 $env:Path = [Environment]::GetEnvironmentVariable('Path', 'Machine') + ';' + [Environment]::GetEnvironmentVariable('Path', 'User')
 Write-Host 'Session PATH refreshed.' -ForegroundColor Cyan
