@@ -39,6 +39,7 @@ Run from elevated PowerShell. Re-runs are state-aware.
 |---|---|
 | Test | `make test` |
 | Sync AI | `.\scripts\sync-ai.ps1` |
+| Install/update Codex | `& .\scripts\inst-cdx.ps1` |
 | Run installer | `& .\scripts\inst-<name>.ps1` |
 | Start AHK | `& .\init-autohotkey.ahk` |
 

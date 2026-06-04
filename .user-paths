@@ -1,5 +1,6 @@
 $env:LOCALAPPDATA\Microsoft\WinGet\Links
 $env:LOCALAPPDATA\Microsoft\WindowsApps
+$env:LOCALAPPDATA\Programs\OpenAI\Codex\bin
 $env:USERPROFILE\winconf\bin
 $env:USERPROFILE\gdrive\bin
 $env:USERPROFILE\miniconda3

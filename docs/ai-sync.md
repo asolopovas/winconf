@@ -7,6 +7,7 @@
 | Task | Command |
 |---|---|
 | All | `.\scripts\sync-ai.ps1` |
+| Install/update Codex | `.\scripts\inst-cdx.ps1` |
 | Skip auth | `.\scripts\sync-ai.ps1 -SkipAuth` |
 | Skip MCP | `.\scripts\sync-ai.ps1 -SkipMcp` |
 | Skip skills | `.\scripts\sync-ai.ps1 -SkipSkills` |
