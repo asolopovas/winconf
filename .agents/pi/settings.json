@@ -1,0 +1,21 @@
+{
+  "packages": [
+    "npm:pi-subagents",
+    "npm:pi-mcp-adapter",
+    {
+      "source": "npm:pi-web-access",
+      "skills": []
+    },
+    {
+      "source": "npm:pi-lens",
+      "skills": [
+        "+skills/lsp-navigation"
+      ]
+    },
+    "npm:pi-claude-oauth-adapter"
+  ],
+  "defaultProvider": "openai-codex",
+  "defaultModel": "gpt-5.5",
+  "defaultThinkingLevel": "high",
+  "lastChangelogVersion": "0.78.0"
+}

@@ -134,4 +134,56 @@ Describe "sync-ai.ps1" {
             Should -Invoke wsl -Exactly 1
         }
     }
+
+    Context "with central Windows agent config" {
+        BeforeEach {
+            $script:winconfDir = Join-Path $script:tmpHome "winconf"
+            $script:agentsDir = Join-Path $script:winconfDir ".agents"
+            $script:promptDir = Join-Path $script:agentsDir "prompts"
+            $script:npmDir = Join-Path $script:agentsDir "pi\npm"
+            New-Item -ItemType Directory (Join-Path $script:agentsDir "skills\powershell-windows") -Force | Out-Null
+            New-Item -ItemType Directory (Join-Path $script:agentsDir "agents\codex") -Force | Out-Null
+            New-Item -ItemType Directory (Join-Path $script:agentsDir "agents\claude") -Force | Out-Null
+            New-Item -ItemType Directory (Join-Path $script:agentsDir "agents\opencode") -Force | Out-Null
+            New-Item -ItemType Directory $script:promptDir -Force | Out-Null
+            New-Item -ItemType Directory $script:npmDir -Force | Out-Null
+            Set-Content (Join-Path $script:agentsDir "skills\powershell-windows\SKILL.md") "---`nname: powershell-windows`n---`n"
+            Set-Content (Join-Path $script:agentsDir "agents\codex\review.toml") 'name = "review"'
+            Set-Content (Join-Path $script:agentsDir "agents\claude\review.md") "---`nname: review`n---`n"
+            Set-Content (Join-Path $script:agentsDir "agents\opencode\review.md") "---`ndescription: review`n---`n"
+            Set-Content (Join-Path $script:promptDir "gw.md") "---`ndescription: Commit and push`n---`ncommit and push`n"
+            Set-Content (Join-Path $script:agentsDir "pi\settings.json") '{"packages":["npm:pi-subagents"]}'
+            Set-Content (Join-Path $script:npmDir "package.json") '{"dependencies":{"pi-subagents":"^0.27.0"}}'
+        }
+
+        It "links shared agent and prompt directories" {
+            & $script:scriptPath -SkipAuth -SkipMcp
+            Test-Path (Join-Path $script:tmpHome ".agents\skills\powershell-windows\SKILL.md") | Should -BeTrue
+            Test-Path (Join-Path $script:tmpHome ".pi\agent\prompts\gw.md") | Should -BeTrue
+            Test-Path (Join-Path $script:tmpHome ".codex\prompts\gw.md") | Should -BeTrue
+            Test-Path (Join-Path $script:tmpHome ".claude\commands\gw.md") | Should -BeTrue
+            Test-Path (Join-Path $script:tmpHome ".config\opencode\commands\gw.md") | Should -BeTrue
+            Test-Path (Join-Path $script:tmpHome ".opencode\commands\gw.md") | Should -BeTrue
+            Test-Path (Join-Path $script:tmpHome ".agents\skills\powershell-windows\SKILL.md") | Should -BeTrue
+            Test-Path (Join-Path $script:tmpHome ".codex\agents\review.toml") | Should -BeTrue
+            Test-Path (Join-Path $script:tmpHome ".claude\agents\review.md") | Should -BeTrue
+            Test-Path (Join-Path $script:tmpHome ".config\opencode\agents\review.md") | Should -BeTrue
+            Test-Path (Join-Path $script:tmpHome ".config\opencode\agent\review.md") | Should -BeTrue
+            (Get-Item -LiteralPath (Join-Path $script:tmpHome ".agents") -Force).LinkType | Should -Not -BeNullOrEmpty
+            (Get-Item -LiteralPath (Join-Path $script:tmpHome ".codex\prompts") -Force).LinkType | Should -Not -BeNullOrEmpty
+            (Get-Item -LiteralPath (Join-Path $script:tmpHome ".claude\commands") -Force).LinkType | Should -Not -BeNullOrEmpty
+            (Get-Item -LiteralPath (Join-Path $script:tmpHome ".config\opencode\commands") -Force).LinkType | Should -Not -BeNullOrEmpty
+            (Get-Item -LiteralPath (Join-Path $script:tmpHome ".codex\agents") -Force).LinkType | Should -Not -BeNullOrEmpty
+            (Get-Item -LiteralPath (Join-Path $script:tmpHome ".claude\agents") -Force).LinkType | Should -Not -BeNullOrEmpty
+            (Get-Item -LiteralPath (Join-Path $script:tmpHome ".config\opencode\agents") -Force).LinkType | Should -Not -BeNullOrEmpty
+        }
+
+        It "links Pi settings and npm package from winconf" {
+            & $script:scriptPath -SkipAuth -SkipMcp
+            Get-Content (Join-Path $script:tmpHome ".pi\agent\settings.json") -Raw | Should -Match 'pi-subagents'
+            Get-Content (Join-Path $script:tmpHome ".pi\agent\npm\package.json") -Raw | Should -Match 'pi-subagents'
+            (Get-Item -LiteralPath (Join-Path $script:tmpHome ".pi\agent\settings.json") -Force).LinkType | Should -Not -BeNullOrEmpty
+            (Get-Item -LiteralPath (Join-Path $script:tmpHome ".pi\agent\npm\package.json") -Force).LinkType | Should -Not -BeNullOrEmpty
+        }
+    }
 }

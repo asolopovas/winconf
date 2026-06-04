@@ -1,6 +1,6 @@
 # AI sync
 
-`scripts/sync-ai.ps1` aligns Claude Code, OpenCode, Codex, and Copilot across Windows and WSL: auth, settings, MCP servers, and skills.
+`scripts/sync-ai.ps1` aligns Claude Code, OpenCode, Codex, Copilot, and Pi across Windows and WSL: auth, settings, MCP servers, skills, and prompts.
 
 ## Run
 
@@ -22,6 +22,9 @@ Strict mode stops unexpected errors.
 | Settings | `$claudeSettings` | Claude Windows/WSL settings |
 | MCP | `$mcpServers` | `claude mcp`, OpenCode config |
 | Skills | WSL `~/dotfiles/.agents/skills` | `~/winconf/.agents/skills`, linked Windows agent skill paths |
+| Prompts | `~/winconf/.agents/prompts` | Windows `~/.pi/agent/prompts`, `~/.codex/prompts`, `~/.claude/commands`, `~/.config/opencode/commands`, `~/.opencode/commands` junctions |
+| Agent definitions | `~/winconf/.agents/agents/{codex,claude,opencode}` | Windows tool-specific agent directories |
+| Pi config | `~/winconf/.agents/pi/settings.json`, `~/winconf/.agents/pi/npm/package.json` | Windows `~/.pi/agent` symlinks |
 
 Current MCP: `context7` via `npx @upstash/context7-mcp`.
 
@@ -30,8 +33,23 @@ Current MCP: `context7` via `npx @upstash/context7-mcp`.
 | Path | Role |
 |---|---|
 | WSL `~/dotfiles/.agents/skills` | source of truth for skills |
+| Windows `~/winconf/.agents` | canonical Windows agent config root |
 | Windows `~/winconf/.agents/skills` | mirrored canonical Windows skills |
+| Windows `~/winconf/.agents/prompts` | canonical prompt files such as `/gw` and `/doc-refactor` |
+| Windows `~/winconf/.agents/agents/codex` | canonical Codex custom agent `.toml` files |
+| Windows `~/winconf/.agents/agents/claude` | canonical Claude Code subagent `.md` files |
+| Windows `~/winconf/.agents/agents/opencode` | canonical OpenCode agent `.md` files |
+| Windows `~/winconf/.agents/pi` | canonical Pi settings and extension package config |
 | Windows `~/.agents` | junction to `~/winconf/.agents` for Codex and VS Code/Copilot-compatible agents |
+| Windows `~/.pi/agent/prompts` | junction to canonical prompt files for Pi |
+| Windows `~/.codex/prompts` | junction to canonical prompt files for Codex |
+| Windows `~/.claude/commands` | junction to canonical prompt files for Claude Code commands |
+| Windows `~/.config/opencode/commands` | junction to canonical prompt files for OpenCode commands |
+| Windows `~/.opencode/commands` | compatibility junction to canonical prompt files for OpenCode commands |
+| Windows `~/.codex/agents` | junction to canonical Codex custom agents |
+| Windows `~/.claude/agents` | junction to canonical Claude Code subagents |
+| Windows `~/.config/opencode/agents` | junction to canonical OpenCode agents |
+| Windows `~/.config/opencode/agent` | compatibility junction to canonical OpenCode agents |
 | Windows `~/.claude/skills` | junction to canonical skills for Claude Code |
 | Windows `~/.config/opencode/skills` | junction to canonical skills for OpenCode |
 | Windows `~/.copilot/skills` | junction to canonical skills for Copilot |

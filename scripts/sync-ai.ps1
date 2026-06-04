@@ -7,14 +7,36 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+$winconfDir = Join-Path $env:USERPROFILE 'winconf'
 $claudeCredPath = Join-Path $env:USERPROFILE '.claude\.credentials.json'
 $claudeSettingsPath = Join-Path $env:USERPROFILE '.claude\settings.json'
 $winAuthPath = Join-Path $env:USERPROFILE '.local\share\opencode\auth.json'
 $opencodeConfigPath = Join-Path $env:USERPROFILE '.config\opencode\opencode.json'
 $homeAgentsDir = Join-Path $env:USERPROFILE '.agents'
-$winconfAgentsDir = Join-Path $env:USERPROFILE 'winconf\.agents'
+$winconfAgentsDir = Join-Path $winconfDir '.agents'
 $agentsSkillsDir = Join-Path $winconfAgentsDir 'skills'
+$agentsPromptsDir = Join-Path $winconfAgentsDir 'prompts'
+$agentsDefinitionsDir = Join-Path $winconfAgentsDir 'agents'
+$agentsCodexDir = Join-Path $agentsDefinitionsDir 'codex'
+$agentsClaudeDir = Join-Path $agentsDefinitionsDir 'claude'
+$agentsOpenCodeDir = Join-Path $agentsDefinitionsDir 'opencode'
+$agentsPiDir = Join-Path $winconfAgentsDir 'pi'
+$agentsPiSettingsPath = Join-Path $agentsPiDir 'settings.json'
+$agentsPiNpmPackagePath = Join-Path $agentsPiDir 'npm\package.json'
+$piAgentDir = Join-Path $env:USERPROFILE '.pi\agent'
+$piPromptsDir = Join-Path $piAgentDir 'prompts'
+$piSettingsPath = Join-Path $piAgentDir 'settings.json'
+$piNpmPackagePath = Join-Path $piAgentDir 'npm\package.json'
+$codexPromptsDir = Join-Path $env:USERPROFILE '.codex\prompts'
+$claudeCommandsDir = Join-Path $env:USERPROFILE '.claude\commands'
+$opencodeCommandsDir = Join-Path $env:USERPROFILE '.config\opencode\commands'
+$homeOpenCodeCommandsDir = Join-Path $env:USERPROFILE '.opencode\commands'
+$codexAgentsDir = Join-Path $env:USERPROFILE '.codex\agents'
+$claudeAgentsDir = Join-Path $env:USERPROFILE '.claude\agents'
+$opencodeAgentsDir = Join-Path $env:USERPROFILE '.config\opencode\agents'
+$opencodeAgentDir = Join-Path $env:USERPROFILE '.config\opencode\agent'
 $claudeSkillsDir = Join-Path $env:USERPROFILE '.claude\skills'
+$codexSkillsDir = Join-Path $env:USERPROFILE '.codex\skills'
 $opencodeSkillsDir = Join-Path $env:USERPROFILE '.config\opencode\skills'
 $copilotSkillsDir = Join-Path $env:USERPROFILE '.copilot\skills'
 $windowsSkillNames = @(
@@ -55,6 +77,22 @@ function Out-JsonFile($Path, $Value) {
     $json = ($Value | ConvertTo-Json -Depth 20) -replace "`r`n", "`n"
     if (-not $json.EndsWith("`n")) { $json += "`n" }
     [IO.File]::WriteAllText($Path, $json)
+}
+function Set-FileLink {
+    [CmdletBinding(SupportsShouldProcess)]
+    param($Path, $Target)
+    if (-not (Test-Path -LiteralPath $Target)) { return }
+    if (-not $PSCmdlet.ShouldProcess($Path, "Link to $Target")) { return }
+    $item = Get-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
+    if ($item -and $item.LinkType -and (@($item.Target) -contains $Target)) { return }
+    if ($item) { Remove-Item -LiteralPath $Path -Recurse -Force }
+    $parent = Split-Path $Path -Parent
+    if (-not (Test-Path -LiteralPath $parent)) { New-Item -ItemType Directory -Path $parent -Force | Out-Null }
+    New-Item -ItemType SymbolicLink -Path $Path -Target $Target -Force | Out-Null
+}
+function Remove-LinkToTarget($Path, $Target) {
+    $item = Get-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
+    if ($item -and $item.LinkType -and (@($item.Target) -contains $Target)) { Remove-Item -LiteralPath $Path -Force }
 }
 function Sync-ClaudeSetting($Path) {
     $settings = Read-Json $Path
@@ -108,6 +146,30 @@ function Sync-McpOpenCode {
     Out-JsonFile $opencodeConfigPath $config
 }
 function Sync-Mcp { Sync-McpClaude; Sync-McpOpenCode }
+function Sync-AgentConfig {
+    if (Test-Path -LiteralPath $winconfAgentsDir) { Set-DirectoryLink $homeAgentsDir $winconfAgentsDir }
+    if (Test-Path -LiteralPath $agentsSkillsDir) {
+        Remove-LinkToTarget $codexSkillsDir $agentsSkillsDir
+        foreach ($target in @($claudeSkillsDir, $opencodeSkillsDir, $copilotSkillsDir)) {
+            Set-DirectoryLink $target $agentsSkillsDir
+        }
+    }
+    if (Test-Path -LiteralPath $agentsPromptsDir) {
+        Set-DirectoryLink $piPromptsDir $agentsPromptsDir
+        Set-DirectoryLink $codexPromptsDir $agentsPromptsDir
+        Set-DirectoryLink $claudeCommandsDir $agentsPromptsDir
+        Set-DirectoryLink $opencodeCommandsDir $agentsPromptsDir
+        Set-DirectoryLink $homeOpenCodeCommandsDir $agentsPromptsDir
+    }
+    if (Test-Path -LiteralPath $agentsCodexDir) { Set-DirectoryLink $codexAgentsDir $agentsCodexDir }
+    if (Test-Path -LiteralPath $agentsClaudeDir) { Set-DirectoryLink $claudeAgentsDir $agentsClaudeDir }
+    if (Test-Path -LiteralPath $agentsOpenCodeDir) {
+        Set-DirectoryLink $opencodeAgentsDir $agentsOpenCodeDir
+        Set-DirectoryLink $opencodeAgentDir $agentsOpenCodeDir
+    }
+    Set-FileLink $piSettingsPath $agentsPiSettingsPath
+    Set-FileLink $piNpmPackagePath $agentsPiNpmPackagePath
+}
 function Get-WslSkillsPath {
     if (-not (Get-Command wsl.exe -ErrorAction SilentlyContinue)) { return $null }
     wsl.exe bash -lc '[ -d ~/dotfiles/.agents/skills ] && wslpath -w ~/dotfiles/.agents/skills' 2>$null |
@@ -138,6 +200,7 @@ function Sync-Skill {
         if (Test-Path -LiteralPath $tmp) { Remove-Item -LiteralPath $tmp -Recurse -Force -ErrorAction SilentlyContinue }
     }
     Set-DirectoryLink $homeAgentsDir $winconfAgentsDir
+    Remove-LinkToTarget $codexSkillsDir $agentsSkillsDir
     foreach ($target in @($claudeSkillsDir, $opencodeSkillsDir, $copilotSkillsDir)) {
         Set-DirectoryLink $target $agentsSkillsDir
     }
@@ -147,5 +210,5 @@ function Sync-Skill {
 $ok = $true
 if (-not $SkipAuth) { $ok = Sync-Auth }
 if (-not $SkipMcp) { Sync-Mcp }
-if (-not $SkipSkills) { Sync-Skill }
+if (-not $SkipSkills) { Sync-Skill; Sync-AgentConfig }
 if (-not $ok) { exit 1 }
