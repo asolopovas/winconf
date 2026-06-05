@@ -1,6 +1,29 @@
 BeforeAll {
     $script:root = Split-Path $PSScriptRoot -Parent
     $script:scripts = Join-Path $script:root "scripts"
+
+    function New-TestHome {
+        $script:tmpHome = Join-Path $TestDrive ([System.IO.Path]::GetRandomFileName())
+        New-Item -ItemType Directory -Path $script:tmpHome | Out-Null
+        $env:USERPROFILE = $script:tmpHome
+    }
+
+    function New-TestSshDir {
+        $script:sshDir = Join-Path $script:tmpHome ".ssh"
+        New-Item -ItemType Directory -Path $script:sshDir -Force | Out-Null
+    }
+
+    function Set-TestPublicKey($Name) {
+        Set-Content -Path (Join-Path $script:sshDir $Name) -Value "ssh-ed25519 AAAA test@host"
+    }
+
+    function New-PnpmShim {
+        $pnpmBin = Join-Path $script:tmpHome "pnpm\bin"
+        New-Item -ItemType Directory -Path $pnpmBin -Force | Out-Null
+        Set-Content -Path (Join-Path $pnpmBin "pnpm.ps1") -Value '$args -join " " | Add-Content -LiteralPath $env:PNPM_TEST_LOG; $global:LASTEXITCODE = 0'
+    }
+
+    function Get-UserPathEntries { [Environment]::GetEnvironmentVariable("Path", "User") -split ";" }
 }
 
 Describe "inst-ssh.ps1 generate" {
@@ -10,9 +33,7 @@ Describe "inst-ssh.ps1 generate" {
     }
 
     BeforeEach {
-        $script:tmpHome = Join-Path $TestDrive ([System.IO.Path]::GetRandomFileName())
-        New-Item -ItemType Directory $script:tmpHome | Out-Null
-        $env:USERPROFILE = $script:tmpHome
+        New-TestHome
         Mock Write-Host { }
     }
 
@@ -23,23 +44,21 @@ Describe "inst-ssh.ps1 generate" {
     It "creates .ssh dir and calls ssh-keygen" {
         Mock ssh-keygen { $global:LASTEXITCODE = 0 }
         & $script:path -Action generate
-        Test-Path "$($script:tmpHome)\.ssh" | Should -BeTrue
+        Test-Path (Join-Path $script:tmpHome ".ssh") | Should -BeTrue
         Should -Invoke ssh-keygen -Exactly 2
     }
 
     It "skips when key exists without -Force" {
-        $sshDir = Join-Path $script:tmpHome ".ssh"
-        New-Item -ItemType Directory $sshDir | Out-Null
-        Set-Content "$sshDir\id_ed25519" "key"
+        New-TestSshDir
+        Set-Content (Join-Path $script:sshDir "id_ed25519") "key"
         Mock ssh-keygen { }
         & $script:path -Action generate
         Should -Invoke ssh-keygen -Exactly 0
     }
 
     It "regenerates when -Force is set" {
-        $sshDir = Join-Path $script:tmpHome ".ssh"
-        New-Item -ItemType Directory $sshDir | Out-Null
-        Set-Content "$sshDir\id_ed25519" "key"
+        New-TestSshDir
+        Set-Content (Join-Path $script:sshDir "id_ed25519") "key"
         Mock ssh-keygen { $global:LASTEXITCODE = 0 }
         & $script:path -Action generate -Force
         Should -Invoke ssh-keygen -Exactly 2
@@ -53,10 +72,8 @@ Describe "inst-ssh.ps1 copy-id" {
     }
 
     BeforeEach {
-        $script:tmpHome = Join-Path $TestDrive ([System.IO.Path]::GetRandomFileName())
-        $script:sshDir = Join-Path $script:tmpHome ".ssh"
-        New-Item -ItemType Directory $script:sshDir -Force | Out-Null
-        $env:USERPROFILE = $script:tmpHome
+        New-TestHome
+        New-TestSshDir
         Mock Write-Host { }
         Mock ssh { $global:LASTEXITCODE = 0 }
     }
@@ -66,13 +83,13 @@ Describe "inst-ssh.ps1 copy-id" {
     }
 
     It "copies ed25519 key to host" {
-        Set-Content "$($script:sshDir)\id_ed25519.pub" "ssh-ed25519 AAAA test@host"
+        Set-TestPublicKey "id_ed25519.pub"
         & $script:path -Action copy-id -Target "srv"
         Should -Invoke ssh -Exactly 1
     }
 
     It "falls back to rsa when ed25519 missing" {
-        Set-Content "$($script:sshDir)\id_rsa.pub" "ssh-rsa AAAA test@host"
+        Set-TestPublicKey "id_rsa.pub"
         & $script:path -Action copy-id -Target "srv"
         Should -Invoke ssh -Exactly 1
     }
@@ -94,17 +111,12 @@ Describe "inst-pi.ps1" {
     }
 
     BeforeEach {
-        $script:tmpHome = Join-Path $TestDrive ([System.IO.Path]::GetRandomFileName())
-        New-Item -ItemType Directory $script:tmpHome | Out-Null
-        $env:USERPROFILE = $script:tmpHome
+        New-TestHome
         $env:LOCALAPPDATA = $script:tmpHome
         $env:PNPM_HOME = $null
         $env:PNPM_TEST_LOG = Join-Path $script:tmpHome "pnpm.log"
         $env:Path = $script:origPath
-        $script:getCommandCalls = 0
-        $pnpmBin = Join-Path $script:tmpHome "pnpm\bin"
-        New-Item -ItemType Directory $pnpmBin -Force | Out-Null
-        Set-Content -Path (Join-Path $pnpmBin "pnpm.ps1") -Value '$args -join " " | Add-Content -LiteralPath $env:PNPM_TEST_LOG; $global:LASTEXITCODE = 0'
+        New-PnpmShim
         Mock Write-Host { }
         Mock winget { $global:LASTEXITCODE = 0 }
     }
@@ -118,6 +130,7 @@ Describe "inst-pi.ps1" {
     }
 
     It "installs pnpm first when missing and installs pi" {
+        $script:getCommandCalls = 0
         Mock Get-Command {
             param([string]$Name)
 
@@ -127,9 +140,7 @@ Describe "inst-pi.ps1" {
                 return [pscustomobject]@{ Name = "pnpm" }
             }
 
-            if ($Name -eq "winget") {
-                return [pscustomobject]@{ Name = "winget" }
-            }
+            if ($Name -eq "winget") { return [pscustomobject]@{ Name = "winget" } }
 
             return Microsoft.PowerShell.Core\Get-Command @PSBoundParameters
         }
@@ -145,13 +156,8 @@ Describe "inst-pi.ps1" {
         Mock Get-Command {
             param([string]$Name)
 
-            if ($Name -eq "pnpm") {
-                return [pscustomobject]@{ Name = "pnpm" }
-            }
-
-            if ($Name -eq "winget") {
-                return [pscustomobject]@{ Name = "winget" }
-            }
+            if ($Name -eq "pnpm") { return [pscustomobject]@{ Name = "pnpm" } }
+            if ($Name -eq "winget") { return [pscustomobject]@{ Name = "winget" } }
 
             return Microsoft.PowerShell.Core\Get-Command @PSBoundParameters
         }
@@ -160,7 +166,10 @@ Describe "inst-pi.ps1" {
         & $script:path
 
         Should -Invoke winget -Exactly 0
-        Get-Content -Path $env:PNPM_TEST_LOG | Should -Be @("add -g --ignore-scripts @earendil-works/pi-coding-agent", "add -g --ignore-scripts @earendil-works/pi-coding-agent")
+        Get-Content -Path $env:PNPM_TEST_LOG | Should -Be @(
+            "add -g --ignore-scripts @earendil-works/pi-coding-agent",
+            "add -g --ignore-scripts @earendil-works/pi-coding-agent"
+        )
     }
 }
 
@@ -174,18 +183,15 @@ Describe "inst-bun.ps1" {
     }
 
     BeforeEach {
-        $script:tmpHome = Join-Path $TestDrive ([System.IO.Path]::GetRandomFileName())
+        New-TestHome
         $script:bunBin = Join-Path $script:tmpHome ".bun\bin"
-        New-Item -ItemType Directory (Join-Path $script:tmpHome ".bun") | Out-Null
-        $env:USERPROFILE = $script:tmpHome
+        New-Item -ItemType Directory -Path (Join-Path $script:tmpHome ".bun") | Out-Null
         [Environment]::SetEnvironmentVariable("Path", $script:bunBin, "User")
         Mock winget { $global:LASTEXITCODE = 0 }
         Mock Get-Command {
             param([string]$Name)
 
-            if ($Name -eq "winget") {
-                return [pscustomobject]@{ Name = "winget" }
-            }
+            if ($Name -eq "winget") { return [pscustomobject]@{ Name = "winget" } }
 
             return Microsoft.PowerShell.Core\Get-Command @PSBoundParameters
         }
@@ -205,8 +211,8 @@ Describe "inst-bun.ps1" {
         Should -Invoke winget -Exactly 1 -ParameterFilter { ($args -join " ") -eq "list --id Oven-sh.Bun --exact" }
         Should -Invoke winget -Exactly 1 -ParameterFilter { ($args -join " ") -eq "uninstall --id Oven-sh.Bun --exact --silent --accept-source-agreements" }
         Test-Path (Join-Path $script:tmpHome ".bun") | Should -BeFalse
-        ([Environment]::GetEnvironmentVariable("Path", "User") -split ";") -contains $script:bunBin | Should -BeFalse
-        ($env:Path -split ";") -contains $script:bunBin | Should -BeFalse
+        Get-UserPathEntries | Should -Not -Contain $script:bunBin
+        ($env:Path -split ";") | Should -Not -Contain $script:bunBin
     }
 
     It "installs winget bun when requested" {
@@ -223,8 +229,8 @@ Describe "inst-bun.ps1" {
         Should -Invoke winget -Exactly 1 -ParameterFilter { ($args -join " ") -eq "list --id Oven-sh.Bun --exact" }
         Should -Invoke winget -Exactly 1 -ParameterFilter { ($args -join " ") -eq "install --id Oven-sh.Bun --exact --silent --accept-source-agreements --accept-package-agreements" }
         Test-Path (Join-Path $script:tmpHome ".bun") | Should -BeTrue
-        ([Environment]::GetEnvironmentVariable("Path", "User") -split ";") -contains $script:linkDir | Should -BeTrue
-        ($env:Path -split ";") -contains $script:linkDir | Should -BeTrue
-        ([Environment]::GetEnvironmentVariable("Path", "User") -split ";") -contains $script:bunBin | Should -BeFalse
+        Get-UserPathEntries | Should -Contain $script:linkDir
+        ($env:Path -split ";") | Should -Contain $script:linkDir
+        Get-UserPathEntries | Should -Not -Contain $script:bunBin
     }
 }

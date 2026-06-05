@@ -2,23 +2,31 @@ BeforeAll {
     $root = Split-Path $PSScriptRoot -Parent
     $modulePath = Join-Path $root "powershell\modules\helpers"
     Import-Module $modulePath -Force
+
+    function Set-UserPath($Value) { [Environment]::SetEnvironmentVariable("Path", $Value, "User") }
+    function Get-UserPath { [Environment]::GetEnvironmentVariable("Path", "User") }
+    function New-HelloFile($Name) {
+        $file = Join-Path $TestDrive $Name
+        Set-Content -Path $file -Value "hello" -NoNewline
+        $file
+    }
+    function New-ShaFile($Name, $Hash, $FileName) {
+        $shaFile = Join-Path $TestDrive $Name
+        Set-Content -Path $shaFile -Value "$Hash  $FileName" -NoNewline
+        $shaFile
+    }
 }
 
 Describe "Get-RootName" {
-    It "strips extension from filename" {
-        Get-RootName "setup.exe" | Should -Be "setup"
-    }
+    It "returns <Expected> for <Path>" -TestCases @(
+        @{ Path = "setup.exe"; Expected = "setup" },
+        @{ Path = "readme"; Expected = "readme" },
+        @{ Path = "C:\tools\app.msi"; Expected = "app" },
+        @{ Path = "archive.tar.gz"; Expected = "archive.tar" }
+    ) {
+        param($Path, $Expected)
 
-    It "returns name when no extension" {
-        Get-RootName "readme" | Should -Be "readme"
-    }
-
-    It "handles path with directory" {
-        Get-RootName "C:\tools\app.msi" | Should -Be "app"
-    }
-
-    It "strips only last extension from double extension" {
-        Get-RootName "archive.tar.gz" | Should -Be "archive.tar"
+        Get-RootName $Path | Should -Be $Expected
     }
 }
 
@@ -45,45 +53,37 @@ Describe "IIf" {
 }
 
 Describe "Format-String" {
-    It "converts to snakecase" {
-        Format-String "snakecase" "Hello World" | Should -Be "hello_world"
+    It "formats <Text> as <Style>" -TestCases @(
+        @{ Style = "snakecase"; Text = "Hello World"; Expected = "hello_world" },
+        @{ Style = "camelcase"; Text = "HelloWorld"; Expected = "helloWorld" },
+        @{ Style = "pascalcase"; Text = "helloWorld"; Expected = "HelloWorld" }
+    ) {
+        param($Style, $Text, $Expected)
+
+        Format-String $Style $Text | Should -Be $Expected
     }
 
-    It "converts to camelcase" {
-        Format-String "camelcase" "HelloWorld" | Should -Be "helloWorld"
-    }
+    It "returns null for unsupported input" -TestCases @(
+        @{ Style = "snakecase"; Text = "" },
+        @{ Style = "kebabcase"; Text = "test" }
+    ) {
+        param($Style, $Text)
 
-    It "converts to pascalcase" {
-        Format-String "pascalcase" "helloWorld" | Should -Be "HelloWorld"
-    }
-
-    It "returns null on empty string" {
-        $result = Format-String "snakecase" "" -ErrorAction SilentlyContinue
-        $result | Should -BeNullOrEmpty
-    }
-
-    It "returns null on invalid case" {
-        $result = Format-String "kebabcase" "test" -ErrorAction SilentlyContinue
-        $result | Should -BeNullOrEmpty
+        Format-String $Style $Text -ErrorAction SilentlyContinue | Should -BeNullOrEmpty
     }
 }
 
 Describe "Test-EnvPath" {
-    BeforeEach {
-        $script:origPath = [Environment]::GetEnvironmentVariable("Path", "User")
-    }
-
-    AfterEach {
-        [Environment]::SetEnvironmentVariable("Path", $script:origPath, "User")
-    }
+    BeforeEach { $script:origPath = Get-UserPath }
+    AfterEach { Set-UserPath $script:origPath }
 
     It "returns true for exact match" {
-        [Environment]::SetEnvironmentVariable("Path", "C:\bin;C:\tools", "User")
+        Set-UserPath "C:\bin;C:\tools"
         Test-EnvPath -Path "C:\bin" | Should -BeTrue
     }
 
     It "returns false for substring that is not an exact path entry" {
-        [Environment]::SetEnvironmentVariable("Path", "C:\binary;C:\tools", "User")
+        Set-UserPath "C:\binary;C:\tools"
         Test-EnvPath -Path "C:\bin" | Should -BeFalse
     }
 
@@ -92,32 +92,25 @@ Describe "Test-EnvPath" {
     }
 
     It "matches ignoring trailing backslash" {
-        [Environment]::SetEnvironmentVariable("Path", "C:\bin\;C:\tools", "User")
+        Set-UserPath "C:\bin\;C:\tools"
         Test-EnvPath -Path "C:\bin" | Should -BeTrue
     }
 }
 
 Describe "SortEnvPaths" {
-    BeforeEach {
-        $script:origPath = [Environment]::GetEnvironmentVariable("Path", "User")
-    }
-
-    AfterEach {
-        [Environment]::SetEnvironmentVariable("Path", $script:origPath, "User")
-    }
+    BeforeEach { $script:origPath = Get-UserPath }
+    AfterEach { Set-UserPath $script:origPath }
 
     It "sorts paths alphabetically" {
-        [Environment]::SetEnvironmentVariable("Path", "C:\zebra;C:\alpha;C:\middle", "User")
+        Set-UserPath "C:\zebra;C:\alpha;C:\middle"
         SortEnvPaths
-        $result = [Environment]::GetEnvironmentVariable("Path", "User")
-        $result | Should -Be "C:\alpha;C:\middle;C:\zebra"
+        Get-UserPath | Should -Be "C:\alpha;C:\middle;C:\zebra"
     }
 
     It "removes empty entries" {
-        [Environment]::SetEnvironmentVariable("Path", "C:\beta;;C:\alpha;", "User")
+        Set-UserPath "C:\beta;;C:\alpha;"
         SortEnvPaths
-        $result = [Environment]::GetEnvironmentVariable("Path", "User")
-        $result | Should -Be "C:\alpha;C:\beta"
+        Get-UserPath | Should -Be "C:\alpha;C:\beta"
     }
 }
 
@@ -126,34 +119,24 @@ Describe "Test-Sha" {
         $script:knownHash = "2CF24DBA5FB0A30E26E83B2AC5B9E29E1B161E5C1FA7425E73043362938B9824"
     }
 
-    It "matches correct hash" {
-        $file = Join-Path $TestDrive "test.bin"
-        Set-Content -Path $file -Value "hello" -NoNewline
-
-        $shaFile = Join-Path $TestDrive "test.sha256"
-        Set-Content -Path $shaFile -Value "$($script:knownHash)  test.bin" -NoNewline
-
+    BeforeEach {
         Mock Write-Host { }
+    }
+
+    It "matches correct hash" {
+        $file = New-HelloFile "test.bin"
+        $shaFile = New-ShaFile "test.sha256" $script:knownHash "test.bin"
         Test-Sha -ShaOrFilePath $shaFile -FileToCheck $file | Should -Be "Hash matches!"
     }
 
     It "detects mismatched hash" {
-        $file = Join-Path $TestDrive "test2.bin"
-        Set-Content -Path $file -Value "hello" -NoNewline
-
-        $shaFile = Join-Path $TestDrive "test2.sha256"
-        $badHash = "0" * 64
-        Set-Content -Path $shaFile -Value "$badHash  test2.bin" -NoNewline
-
-        Mock Write-Host { }
+        $file = New-HelloFile "test2.bin"
+        $shaFile = New-ShaFile "test2.sha256" ("0" * 64) "test2.bin"
         Test-Sha -ShaOrFilePath $shaFile -FileToCheck $file | Should -Be "Hash doesn't match!"
     }
 
     It "accepts raw hash string instead of file" {
-        $file = Join-Path $TestDrive "test3.bin"
-        Set-Content -Path $file -Value "hello" -NoNewline
-
-        Mock Write-Host { }
+        $file = New-HelloFile "test3.bin"
         Test-Sha -ShaOrFilePath $script:knownHash -FileToCheck $file | Should -Be "Hash matches!"
     }
 }

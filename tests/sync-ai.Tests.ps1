@@ -1,6 +1,30 @@
 BeforeAll {
     $script:root = Split-Path $PSScriptRoot -Parent
     $script:scriptPath = Join-Path $script:root "scripts" "sync-ai.ps1"
+
+    function Join-Home($Path) { Join-Path $script:tmpHome $Path }
+    function Invoke-SyncAiAuth { & $script:scriptPath -SkipMcp -SkipSkills }
+    function Invoke-SyncAiConfig { & $script:scriptPath -SkipAuth -SkipMcp }
+    function Read-Json($Path) { Get-Content -Path $Path -Raw | ConvertFrom-Json }
+    function New-TestCredentials {
+        param([string]$ClaudeDir = (Join-Home ".claude"))
+
+        New-Item -ItemType Directory -Path $ClaudeDir -Force | Out-Null
+        @{
+            claudeAiOauth = @{
+                accessToken  = "test-access-token-123"
+                refreshToken = "test-refresh-token-456"
+                expiresAt    = 1700000000
+            }
+        } | ConvertTo-Json -Depth 5 | Set-Content -Path (Join-Path $ClaudeDir ".credentials.json")
+    }
+    function Assert-HomePath($Path) { Test-Path (Join-Home $Path) | Should -BeTrue }
+    function Assert-HomeLink {
+        param([string]$Path, [string]$LinkType)
+
+        $actual = (Get-Item -LiteralPath (Join-Home $Path) -Force).LinkType
+        if ($LinkType) { $actual | Should -Be $LinkType } else { $actual | Should -Not -BeNullOrEmpty }
+    }
 }
 
 Describe "sync-ai.ps1" {
@@ -29,7 +53,7 @@ Describe "sync-ai.ps1" {
 
     Context "when credentials file has no claudeAiOauth" {
         BeforeEach {
-            $claudeDir = Join-Path $script:tmpHome ".claude"
+            $claudeDir = Join-Home ".claude"
             New-Item -ItemType Directory $claudeDir | Out-Null
             Set-Content (Join-Path $claudeDir ".credentials.json") '{"someOtherKey": true}'
         }
@@ -42,26 +66,17 @@ Describe "sync-ai.ps1" {
 
     Context "with valid credentials" {
         BeforeEach {
-            $script:claudeDir = Join-Path $script:tmpHome ".claude"
-            New-Item -ItemType Directory $script:claudeDir | Out-Null
-            $creds = @{
-                claudeAiOauth = @{
-                    accessToken  = "test-access-token-123"
-                    refreshToken = "test-refresh-token-456"
-                    expiresAt    = 1700000000
-                }
-            }
-            Set-Content (Join-Path $script:claudeDir ".credentials.json") ($creds | ConvertTo-Json -Depth 5)
-
-            $script:opencodeDir = Join-Path $script:tmpHome ".local" "share" "opencode"
+            $script:claudeDir = Join-Home ".claude"
+            $script:opencodeDir = Join-Home ".local\share\opencode"
+            New-TestCredentials $script:claudeDir
             New-Item -ItemType Directory $script:opencodeDir -Force | Out-Null
         }
 
         It "creates Windows opencode auth file with correct tokens" {
-            & $script:scriptPath -SkipMcp -SkipSkills
+            Invoke-SyncAiAuth
             $authPath = Join-Path $script:opencodeDir "auth.json"
             Test-Path $authPath | Should -BeTrue
-            $auth = Get-Content $authPath -Raw | ConvertFrom-Json
+            $auth = Read-Json $authPath
             $auth.anthropic.type | Should -Be "oauth"
             $auth.anthropic.access | Should -Be "test-access-token-123"
             $auth.anthropic.refresh | Should -Be "test-refresh-token-456"
@@ -71,17 +86,17 @@ Describe "sync-ai.ps1" {
         It "merges into existing opencode auth file" {
             $authPath = Join-Path $script:opencodeDir "auth.json"
             Set-Content $authPath '{"openai": {"key": "sk-existing"}}'
-            & $script:scriptPath -SkipMcp -SkipSkills
-            $auth = Get-Content $authPath -Raw | ConvertFrom-Json
+            Invoke-SyncAiAuth
+            $auth = Read-Json $authPath
             $auth.openai.key | Should -Be "sk-existing"
             $auth.anthropic.access | Should -Be "test-access-token-123"
         }
 
         It "creates Claude settings with no attribution" {
-            & $script:scriptPath -SkipMcp -SkipSkills
+            Invoke-SyncAiAuth
             $settingsPath = Join-Path $script:claudeDir "settings.json"
             Test-Path $settingsPath | Should -BeTrue
-            $settings = Get-Content $settingsPath -Raw | ConvertFrom-Json
+            $settings = Read-Json $settingsPath
             $settings.includeCoAuthoredBy | Should -BeFalse
             $settings.includeGitInstructions | Should -BeFalse
             $settings.attribution.commit | Should -Be ""
@@ -91,62 +106,53 @@ Describe "sync-ai.ps1" {
         It "merges settings into existing Claude settings file" {
             $settingsPath = Join-Path $script:claudeDir "settings.json"
             Set-Content $settingsPath '{"model": "opus", "customSetting": true}'
-            & $script:scriptPath -SkipMcp -SkipSkills
-            $settings = Get-Content $settingsPath -Raw | ConvertFrom-Json
+            Invoke-SyncAiAuth
+            $settings = Read-Json $settingsPath
             $settings.model | Should -Be "opus"
             $settings.customSetting | Should -BeTrue
             $settings.includeCoAuthoredBy | Should -BeFalse
             $settings.attribution.commit | Should -Be ""
         }
 
-        It "creates .claude directory if it does not exist" {
+        It "creates settings next to credentials" {
             Remove-Item $script:claudeDir -Recurse -Force
-            $credsDir = Join-Path $script:tmpHome ".claude"
-            New-Item -ItemType Directory $credsDir | Out-Null
-            $creds = @{
-                claudeAiOauth = @{
-                    accessToken  = "test-access-token-123"
-                    refreshToken = "test-refresh-token-456"
-                    expiresAt    = 1700000000
-                }
-            }
-            Set-Content (Join-Path $credsDir ".credentials.json") ($creds | ConvertTo-Json -Depth 5)
-            & $script:scriptPath -SkipMcp -SkipSkills
-            Test-Path (Join-Path $credsDir "settings.json") | Should -BeTrue
+            New-TestCredentials $script:claudeDir
+            Invoke-SyncAiAuth
+            Test-Path (Join-Path $script:claudeDir "settings.json") | Should -BeTrue
         }
 
         It "writes auth file with unix line endings" {
-            & $script:scriptPath -SkipMcp -SkipSkills
-            $authPath = Join-Path $script:opencodeDir "auth.json"
-            $raw = [System.IO.File]::ReadAllText($authPath)
-            $raw | Should -Not -Match "`r`n"
+            Invoke-SyncAiAuth
+            [System.IO.File]::ReadAllText((Join-Path $script:opencodeDir "auth.json")) | Should -Not -Match "`r`n"
         }
 
         It "writes settings file with unix line endings" {
-            & $script:scriptPath -SkipMcp -SkipSkills
-            $settingsPath = Join-Path $script:claudeDir "settings.json"
-            $raw = [System.IO.File]::ReadAllText($settingsPath)
-            $raw | Should -Not -Match "`r`n"
+            Invoke-SyncAiAuth
+            [System.IO.File]::ReadAllText((Join-Path $script:claudeDir "settings.json")) | Should -Not -Match "`r`n"
         }
 
         It "handles missing WSL" {
-            & $script:scriptPath -SkipMcp -SkipSkills
+            Invoke-SyncAiAuth
             Should -Invoke wsl -Exactly 1
         }
     }
 
     Context "with central Windows agent config" {
         BeforeEach {
-            $script:winconfDir = Join-Path $script:tmpHome "winconf"
+            $script:winconfDir = Join-Home "winconf"
             $script:agentsDir = Join-Path $script:winconfDir ".agents"
             $script:promptDir = Join-Path $script:agentsDir "prompts"
             $script:npmDir = Join-Path $script:agentsDir "pi\npm"
-            New-Item -ItemType Directory (Join-Path $script:agentsDir "skills\powershell-windows") -Force | Out-Null
-            New-Item -ItemType Directory (Join-Path $script:agentsDir "agents\codex") -Force | Out-Null
-            New-Item -ItemType Directory (Join-Path $script:agentsDir "agents\claude") -Force | Out-Null
-            New-Item -ItemType Directory (Join-Path $script:agentsDir "agents\opencode") -Force | Out-Null
-            New-Item -ItemType Directory $script:promptDir -Force | Out-Null
-            New-Item -ItemType Directory $script:npmDir -Force | Out-Null
+
+            @(
+                "skills\powershell-windows",
+                "agents\codex",
+                "agents\claude",
+                "agents\opencode",
+                "prompts",
+                "pi\npm"
+            ) | ForEach-Object { New-Item -ItemType Directory (Join-Path $script:agentsDir $_) -Force | Out-Null }
+
             Set-Content (Join-Path $script:agentsDir "skills\powershell-windows\SKILL.md") "---`nname: powershell-windows`n---`n"
             Set-Content (Join-Path $script:agentsDir "agents\codex\review.toml") 'name = "review"'
             Set-Content (Join-Path $script:agentsDir "agents\claude\review.md") "---`nname: review`n---`n"
@@ -157,42 +163,47 @@ Describe "sync-ai.ps1" {
         }
 
         It "links shared agent and prompt directories" {
-            & $script:scriptPath -SkipAuth -SkipMcp
-            Test-Path (Join-Path $script:tmpHome ".agents\skills\powershell-windows\SKILL.md") | Should -BeTrue
-            Test-Path (Join-Path $script:tmpHome ".pi\agent\prompts\gw.md") | Should -BeTrue
-            Test-Path (Join-Path $script:tmpHome ".codex\prompts\gw.md") | Should -BeTrue
-            Test-Path (Join-Path $script:tmpHome ".codex\commands\gw.md") | Should -BeTrue
-            Test-Path (Join-Path $script:tmpHome ".claude\commands\gw.md") | Should -BeTrue
-            Test-Path (Join-Path $script:tmpHome ".config\opencode\commands\gw.md") | Should -BeTrue
-            Test-Path (Join-Path $script:tmpHome ".opencode\commands\gw.md") | Should -BeTrue
-            Test-Path (Join-Path $script:tmpHome ".agents\skills\powershell-windows\SKILL.md") | Should -BeTrue
-            Test-Path (Join-Path $script:tmpHome ".codex\agents\review.toml") | Should -BeTrue
-            Test-Path (Join-Path $script:tmpHome ".claude\agents\review.md") | Should -BeTrue
-            Test-Path (Join-Path $script:tmpHome ".config\opencode\agents\review.md") | Should -BeTrue
-            Test-Path (Join-Path $script:tmpHome ".config\opencode\agent\review.md") | Should -BeTrue
-            (Get-Item -LiteralPath (Join-Path $script:tmpHome ".agents") -Force).LinkType | Should -Not -BeNullOrEmpty
-            (Get-Item -LiteralPath (Join-Path $script:tmpHome ".codex\prompts\gw.md") -Force).LinkType | Should -Be "HardLink"
-            (Get-Item -LiteralPath (Join-Path $script:tmpHome ".codex\commands\gw.md") -Force).LinkType | Should -Be "HardLink"
-            (Get-Item -LiteralPath (Join-Path $script:tmpHome ".claude\commands") -Force).LinkType | Should -Not -BeNullOrEmpty
-            (Get-Item -LiteralPath (Join-Path $script:tmpHome ".config\opencode\commands") -Force).LinkType | Should -Not -BeNullOrEmpty
-            (Get-Item -LiteralPath (Join-Path $script:tmpHome ".codex\agents") -Force).LinkType | Should -Not -BeNullOrEmpty
-            (Get-Item -LiteralPath (Join-Path $script:tmpHome ".claude\agents") -Force).LinkType | Should -Not -BeNullOrEmpty
-            (Get-Item -LiteralPath (Join-Path $script:tmpHome ".config\opencode\agents") -Force).LinkType | Should -Not -BeNullOrEmpty
+            Invoke-SyncAiConfig
+
+            @(
+                ".agents\skills\powershell-windows\SKILL.md",
+                ".pi\agent\prompts\gw.md",
+                ".codex\prompts\gw.md",
+                ".codex\commands\gw.md",
+                ".claude\commands\gw.md",
+                ".config\opencode\commands\gw.md",
+                ".opencode\commands\gw.md",
+                ".codex\agents\review.toml",
+                ".claude\agents\review.md",
+                ".config\opencode\agents\review.md",
+                ".config\opencode\agent\review.md"
+            ) | ForEach-Object { Assert-HomePath $_ }
+
+            @{
+                ".agents" = $null
+                ".codex\prompts\gw.md" = "HardLink"
+                ".codex\commands\gw.md" = "HardLink"
+                ".claude\commands" = $null
+                ".config\opencode\commands" = $null
+                ".codex\agents" = $null
+                ".claude\agents" = $null
+                ".config\opencode\agents" = $null
+            }.GetEnumerator() | ForEach-Object { Assert-HomeLink $_.Key $_.Value }
         }
 
         It "keeps Codex prompt hard links in sync with winconf prompts" {
-            & $script:scriptPath -SkipAuth -SkipMcp
+            Invoke-SyncAiConfig
             Set-Content (Join-Path $script:promptDir "gw.md") "---`ndescription: updated`n---`nupdated`n"
-            Get-Content (Join-Path $script:tmpHome ".codex\prompts\gw.md") -Raw | Should -Match "updated"
-            Get-Content (Join-Path $script:tmpHome ".codex\commands\gw.md") -Raw | Should -Match "updated"
+            Get-Content (Join-Home ".codex\prompts\gw.md") -Raw | Should -Match "updated"
+            Get-Content (Join-Home ".codex\commands\gw.md") -Raw | Should -Match "updated"
         }
 
         It "links Pi settings and npm package from winconf" {
-            & $script:scriptPath -SkipAuth -SkipMcp
-            Get-Content (Join-Path $script:tmpHome ".pi\agent\settings.json") -Raw | Should -Match 'pi-subagents'
-            Get-Content (Join-Path $script:tmpHome ".pi\agent\npm\package.json") -Raw | Should -Match 'pi-subagents'
-            (Get-Item -LiteralPath (Join-Path $script:tmpHome ".pi\agent\settings.json") -Force).LinkType | Should -Not -BeNullOrEmpty
-            (Get-Item -LiteralPath (Join-Path $script:tmpHome ".pi\agent\npm\package.json") -Force).LinkType | Should -Not -BeNullOrEmpty
+            Invoke-SyncAiConfig
+            Get-Content (Join-Home ".pi\agent\settings.json") -Raw | Should -Match 'pi-subagents'
+            Get-Content (Join-Home ".pi\agent\npm\package.json") -Raw | Should -Match 'pi-subagents'
+            Assert-HomeLink ".pi\agent\settings.json"
+            Assert-HomeLink ".pi\agent\npm\package.json"
         }
     }
 }
