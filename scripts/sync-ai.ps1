@@ -70,7 +70,7 @@ function Set-Link {
     param(
         [Parameter(Mandatory)][string]$Path,
         [Parameter(Mandatory)][string]$Target,
-        [ValidateSet('Junction', 'SymbolicLink')][string]$ItemType = 'Junction'
+        [ValidateSet('Junction', 'SymbolicLink', 'HardLink')][string]$ItemType = 'Junction'
     )
     if (-not (Test-Path -LiteralPath $Target)) { return }
     if (-not $PSCmdlet.ShouldProcess($Path, "Link to $Target")) { return }
@@ -85,14 +85,14 @@ function New-Link($Path, $Target) { @{ Path = $Path; Target = $Target } }
 function Set-LinkMap($Links, [string]$ItemType = 'Junction') {
     foreach ($link in $Links) { Set-Link -Path $link.Path -Target $link.Target -ItemType $ItemType }
 }
-function Set-MarkdownFileLinks($Path, $Target) {
+function Set-MarkdownFileLinks($Path, $Target, [ValidateSet('SymbolicLink', 'HardLink')][string]$ItemType = 'SymbolicLink') {
     if (-not (Test-Path -LiteralPath $Target)) { return }
     $item = Get-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
     if ($item -and $item.LinkType) { Remove-Item -LiteralPath $Path -Force }
     if (-not (Test-Path -LiteralPath $Path)) { New-Item -ItemType Directory -Path $Path -Force | Out-Null }
     Get-ChildItem -LiteralPath $Path -Filter '*.md' -File -ErrorAction SilentlyContinue | Where-Object LinkType | Remove-Item -Force
     foreach ($source in Get-ChildItem -LiteralPath $Target -Filter '*.md' -File) {
-        Set-Link -Path (Join-Path $Path $source.Name) -Target $source.FullName -ItemType SymbolicLink
+        Set-Link -Path (Join-Path $Path $source.Name) -Target $source.FullName -ItemType $ItemType
     }
 }
 function Remove-LinkToTarget($Path, $Target) {
@@ -169,8 +169,8 @@ function Sync-AgentConfig {
         (New-Link $opencodeAgentDir $agentsOpenCodeDir)
     )
     Remove-LinkToTarget $codexSkillsDir $agentsSkillsDir
-    Set-MarkdownFileLinks $codexPromptsDir $agentsPromptsDir
-    Set-MarkdownFileLinks $codexCommandsDir $agentsPromptsDir
+    Set-MarkdownFileLinks $codexPromptsDir $agentsPromptsDir HardLink
+    Set-MarkdownFileLinks $codexCommandsDir $agentsPromptsDir HardLink
     Set-LinkMap @(
         (New-Link $piSettingsPath $agentsPiSettingsPath)
         (New-Link $piNpmPackagePath $agentsPiNpmPackagePath)

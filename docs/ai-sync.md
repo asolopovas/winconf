@@ -22,7 +22,7 @@ Strict mode stops unexpected errors.
 | Settings | `$claudeSettings` | Claude Windows/WSL settings |
 | MCP | `$mcpServers` | `claude mcp`, OpenCode config |
 | Skills | WSL `~/dotfiles/.agents/skills` | `~/winconf/.agents/skills`, linked Windows agent skill paths |
-| Prompts | `~/winconf/.agents/prompts` | Windows `~/.pi/agent/prompts`, `~/.claude/commands`, `~/.config/opencode/commands`, `~/.opencode/commands` junctions; Codex `~/.codex/prompts` and `~/.codex/commands` file symlinks |
+| Prompts | `~/winconf/.agents/prompts` | Windows `~/.pi/agent/prompts`, `~/.claude/commands`, `~/.config/opencode/commands`, `~/.opencode/commands` junctions; Codex `~/.codex/prompts` and `~/.codex/commands` hard links |
 | Agent definitions | `~/winconf/.agents/agents/{codex,claude,opencode}` | Windows tool-specific agent directories |
 | Pi config | `~/winconf/.agents/pi/settings.json`, `~/winconf/.agents/pi/npm/package.json` | Windows `~/.pi/agent` symlinks |
 
@@ -42,8 +42,8 @@ Current MCP: `context7` via `npx @upstash/context7-mcp`.
 | Windows `~/winconf/.agents/pi` | canonical Pi settings and extension package config |
 | Windows `~/.agents` | junction to `~/winconf/.agents` for Codex and VS Code/Copilot-compatible agents |
 | Windows `~/.pi/agent/prompts` | junction to canonical prompt files for Pi |
-| Windows `~/.codex/prompts/*.md` | file symlinks to canonical Codex prompt files; invoke as `/prompts:name` |
-| Windows `~/.codex/commands/*.md` | file symlinks to canonical Codex command files when supported by the installed Codex version |
+| Windows `~/.codex/prompts/*.md` | hard links to canonical Codex prompt files; invoke as `/prompts:name` |
+| Windows `~/.codex/commands/*.md` | hard links to canonical Codex command files when supported by the installed Codex version |
 | Windows `~/.claude/commands` | junction to canonical prompt files for Claude Code commands |
 | Windows `~/.config/opencode/commands` | junction to canonical prompt files for OpenCode commands |
 | Windows `~/.opencode/commands` | compatibility junction to canonical prompt files for OpenCode commands |

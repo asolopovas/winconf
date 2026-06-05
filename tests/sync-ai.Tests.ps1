@@ -171,13 +171,20 @@ Describe "sync-ai.ps1" {
             Test-Path (Join-Path $script:tmpHome ".config\opencode\agents\review.md") | Should -BeTrue
             Test-Path (Join-Path $script:tmpHome ".config\opencode\agent\review.md") | Should -BeTrue
             (Get-Item -LiteralPath (Join-Path $script:tmpHome ".agents") -Force).LinkType | Should -Not -BeNullOrEmpty
-            (Get-Item -LiteralPath (Join-Path $script:tmpHome ".codex\prompts\gw.md") -Force).LinkType | Should -Not -BeNullOrEmpty
-            (Get-Item -LiteralPath (Join-Path $script:tmpHome ".codex\commands\gw.md") -Force).LinkType | Should -Not -BeNullOrEmpty
+            (Get-Item -LiteralPath (Join-Path $script:tmpHome ".codex\prompts\gw.md") -Force).LinkType | Should -Be "HardLink"
+            (Get-Item -LiteralPath (Join-Path $script:tmpHome ".codex\commands\gw.md") -Force).LinkType | Should -Be "HardLink"
             (Get-Item -LiteralPath (Join-Path $script:tmpHome ".claude\commands") -Force).LinkType | Should -Not -BeNullOrEmpty
             (Get-Item -LiteralPath (Join-Path $script:tmpHome ".config\opencode\commands") -Force).LinkType | Should -Not -BeNullOrEmpty
             (Get-Item -LiteralPath (Join-Path $script:tmpHome ".codex\agents") -Force).LinkType | Should -Not -BeNullOrEmpty
             (Get-Item -LiteralPath (Join-Path $script:tmpHome ".claude\agents") -Force).LinkType | Should -Not -BeNullOrEmpty
             (Get-Item -LiteralPath (Join-Path $script:tmpHome ".config\opencode\agents") -Force).LinkType | Should -Not -BeNullOrEmpty
+        }
+
+        It "keeps Codex prompt hard links in sync with winconf prompts" {
+            & $script:scriptPath -SkipAuth -SkipMcp
+            Set-Content (Join-Path $script:promptDir "gw.md") "---`ndescription: updated`n---`nupdated`n"
+            Get-Content (Join-Path $script:tmpHome ".codex\prompts\gw.md") -Raw | Should -Match "updated"
+            Get-Content (Join-Path $script:tmpHome ".codex\commands\gw.md") -Raw | Should -Match "updated"
         }
 
         It "links Pi settings and npm package from winconf" {
