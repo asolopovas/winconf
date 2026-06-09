@@ -1,5 +1,8 @@
 # Spec-driven testing (plan → generate → heal)
 
+> **v0.1.0 note:** this workflow relies on `attach` and `show --annotate`, which are not in
+> v0.1.0 (newer builds only). Use it only on a build that provides those commands.
+
 End-to-end workflow for authoring and maintaining Playwright tests using `playwright-cli`. The three sections below can be used independently:
 
 - **Planning** — explore the app, produce a spec file describing what to test.

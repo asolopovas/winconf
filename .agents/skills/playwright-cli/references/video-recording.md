@@ -1,5 +1,8 @@
 # Video Recording
 
+> **v0.1.0 note:** only `video-start` / `video-stop` exist in v0.1.0. `video-chapter` is
+> newer-builds-only, and `video-start` takes no filename argument in v0.1.0.
+
 Capture browser automation sessions as video for debugging, documentation, or verification. Produces WebM (VP8/VP9 codec).
 
 ## Basic Recording

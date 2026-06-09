@@ -1,5 +1,9 @@
 # Browser Session Management
 
+> **v0.1.0 note:** `attach`/`detach` are not in v0.1.0 (newer builds only). For an extension
+> connection use `open --extension`. Named sessions (`-s=<name>`), `list`, `close-all`,
+> and `kill-all` all work in v0.1.0.
+
 Run multiple isolated browser sessions concurrently with state persistence.
 
 ## Named Browser Sessions

@@ -1,5 +1,7 @@
 # Running Playwright Tests
 
+> **v0.1.0 note:** `playwright-cli attach <id>` is not available in v0.1.0 (newer builds only).
+
 To run Playwright tests, use the `npx playwright test` command, or a package manager script. To avoid opening the interactive html report, use `PLAYWRIGHT_HTML_OPEN=never` environment variable.
 
 ```bash

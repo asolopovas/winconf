@@ -1,5 +1,8 @@
 # Test Generation
 
+> **v0.1.0 note:** `generate-locator` and the global `--raw` flag are not in v0.1.0 (newer
+> builds only). On v0.1.0, omit `--raw` and read values from the line after `### Result`.
+
 Generate Playwright test code automatically as you interact with the browser.
 
 ## How It Works
