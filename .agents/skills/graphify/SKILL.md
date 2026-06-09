@@ -630,6 +630,10 @@ When the user asks to install the post-commit auto-rebuild hook or wire graphify
 
 ## Troubleshooting
 
+### Windows: `UnicodeEncodeError` from `python -c` blocks
+
+On Windows, Python's stdout defaults to the legacy `cp1252` codec, so any `python -c "..."` step that `print()`s a non-ASCII character — node labels with accents/CJK, or the report's `·`/`→`/`—` separators — crashes with `UnicodeEncodeError: 'charmap' codec can't encode character`. The file writes are safe (they all pass `encoding="utf-8"`); only printing to the terminal fails. Force UTF-8 stdout for every interpreter call on Windows by exporting `PYTHONUTF8=1` (and `PYTHONIOENCODING=utf-8`) before the block, e.g. `PYTHONUTF8=1 $(cat graphify-out/.graphify_python) -c "..."`, or in PowerShell `$env:PYTHONUTF8 = "1"` once at the start of the session. To read report sections back for pasting into chat, prefer reading `graphify-out/GRAPH_REPORT.md` as a file rather than re-printing it through Python.
+
 ### PowerShell 5.1: Vertical scrolling stops working
 
 If vertical scrolling breaks in PowerShell after running graphify, this is caused by ANSI escape sequences from the `graspologic` library. Graphify v0.3.10+ suppresses this output, but if you still see the issue:
