@@ -14,8 +14,8 @@
     },
     "npm:pi-claude-oauth-adapter"
   ],
-  "defaultProvider": "openai-codex",
-  "defaultModel": "gpt-5.5",
-  "defaultThinkingLevel": "high",
-  "lastChangelogVersion": "0.78.1"
+  "defaultProvider": "anthropic",
+  "defaultModel": "claude-opus-4-8",
+  "defaultThinkingLevel": "medium",
+  "lastChangelogVersion": "0.79.0"
 }
