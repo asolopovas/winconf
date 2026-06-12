@@ -244,10 +244,6 @@
             "keys": "alt+up"
         },
         {
-            "id": "User.closePane",
-            "keys": "alt+q"
-        },
-        {
             "id": "Terminal.MoveFocusDown",
             "keys": "ctrl+down"
         },
@@ -264,8 +260,28 @@
             "keys": "alt+right"
         },
         {
+            "id": "User.closePane",
+            "keys": "ctrl+w"
+        },
+        {
             "id": null,
             "keys": "ctrl+alt+left"
+        },
+        {
+            "id": null,
+            "keys": "alt+f4"
+        },
+        {
+            "id": "Terminal.ClearBuffer",
+            "keys": "ctrl+l"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+k"
+        },
+        {
+            "id": "Terminal.CloseWindow",
+            "keys": "alt+shift+q"
         }
     ],
     "launchMode": "default",
