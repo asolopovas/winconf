@@ -4,6 +4,7 @@ $env:USERPROFILE\.cargo\bin
 $env:LOCALAPPDATA\Programs\Microsoft VS Code
 $env:LOCALAPPDATA\pnpm
 $env:LOCALAPPDATA\pnpm\bin
+$env:APPDATA\npm
 $env:LOCALAPPDATA\Programs\OpenAI\Codex\bin
 $env:USERPROFILE\winconf\bin
 $env:USERPROFILE\src\news-search

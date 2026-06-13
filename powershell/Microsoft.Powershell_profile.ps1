@@ -2,6 +2,32 @@ $root = [System.IO.Path]::Combine($env:USERPROFILE, 'winconf')
 $psdir = [System.IO.Path]::Combine($root, 'powershell')
 
 try {
+    $userPathsFile = [System.IO.Path]::Combine($root, '.user-paths')
+    if ([System.IO.File]::Exists($userPathsFile)) {
+        $pathParts = @($env:Path -split ';' | Where-Object { $_ })
+        $seenPaths = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+        foreach ($pathPart in $pathParts) { $null = $seenPaths.Add($pathPart.TrimEnd('\')) }
+
+        $profilePaths = @()
+        foreach ($line in [System.IO.File]::ReadLines($userPathsFile)) {
+            if (-not $line) { continue }
+            $trimmedLine = $line.Trim()
+            if ((-not $trimmedLine) -or $trimmedLine.StartsWith('#')) { continue }
+            $expandedPath = $ExecutionContext.InvokeCommand.ExpandString($trimmedLine).TrimEnd('\')
+            if ($expandedPath -and [System.IO.Directory]::Exists($expandedPath) -and $seenPaths.Add($expandedPath)) {
+                $profilePaths += $expandedPath
+            }
+        }
+
+        if ($profilePaths.Count -gt 0) {
+            $env:Path = (@($pathParts) + @($profilePaths)) -join ';'
+        }
+    }
+} catch {
+    Write-Warning "Error refreshing profile PATH: $_"
+}
+
+try {
     . $root\functions.ps1
     . $psdir\modules\aliases\remove-aliases.ps1
     Import-Module $psdir\modules\aliases
