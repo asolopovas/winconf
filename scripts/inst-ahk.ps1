@@ -1,54 +1,42 @@
-param (
-    [int]$version = 2
-)
+$ErrorActionPreference = 'Stop'
 
-. $env:userprofile\winconf\functions.ps1
+$repo = "$env:USERPROFILE\winconf"
+$ahkExe = "$env:ProgramFiles\AutoHotkey\v2\AutoHotkey64.exe"
+$taskName = "AutoHotkey-Init-$env:UserName-v2"
 
-$domain = (Get-CimInstance -ClassName Win32_ComputerSystem  | Select-Object Name,Domain).name
+if (-not (Test-Path -LiteralPath $ahkExe)) {
+    Write-Warning "AutoHotkey v2 not found at $ahkExe - skipping task setup."
+    return
+}
 
-function UpdateOrCreateRegKey($path, $name, $value, $type = 'DWord') {
-    if (Test-RegistryValue -Path $path -Value $name) {
-        Set-ItemProperty -Path $path -Name $name -Value $value | Out-Null
-    } else {
-        New-ItemProperty -Path $path -Name $name -Value $value -PropertyType $type | Out-Null
+foreach ($old in @("Autohotkey-$env:UserName", "Autohotkey-$($env:UserName)v2", "AutoHotkey-Init-$env:UserName")) {
+    if (Get-ScheduledTask -TaskName $old -ErrorAction SilentlyContinue) {
+        Write-Host "Removing legacy task: $old" -ForegroundColor Yellow
+        Unregister-ScheduledTask -TaskName $old -Confirm:$false
     }
 }
 
-$autohotkeyPath = if ($version -eq 1) { "$env:USERPROFILE\winconf\configs\autohotkey" } else { "$env:USERPROFILE\winconf" }
-$autohotkeyExec = if ($version -eq 1) { "C:\Program Files\AutoHotkey\AutoHotkey.exe" } else { "C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe" }
+# Re-registered every run so changes to exe path, arguments, or settings heal
+# themselves; Stop+Start applies the current scripts (v2 #SingleInstance Force).
+$task = New-ScheduledTask `
+    -Action (New-ScheduledTaskAction -Execute $ahkExe -WorkingDirectory $repo -Argument "$repo\init-autohotkey.ahk") `
+    -Trigger (New-ScheduledTaskTrigger -AtLogOn -User "$env:USERDOMAIN\$env:UserName") `
+    -Principal (New-ScheduledTaskPrincipal -GroupId 'BUILTIN\Administrators' -RunLevel Highest) `
+    -Settings (New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1))
 
-$oldTaskNames = @("Autohotkey-$env:UserName", "Autohotkey-$env:UserName" + "v2")
-foreach ($oldTask in $oldTaskNames) {
-    if (Test-ScheduledTask $oldTask) {
-        Write-Host "Removing old task: $oldTask" -ForegroundColor Yellow
-        Unregister-ScheduledTask -TaskName $oldTask -Confirm:$false
+Register-ScheduledTask -TaskName $taskName -InputObject $task -Force | Out-Null
+Stop-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
+Start-ScheduledTask -TaskName $taskName
+Write-Host "Task '$taskName' registered and started." -ForegroundColor Green
+
+$registryTweaks = @{
+    'registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\System'   = @{ DisableLockWorkstation = 1 }
+    'registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' = @{ DisabledHotkeys = 'K' }
+    'registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer' = @{ NoWinKeys = 1 }
+}
+foreach ($key in $registryTweaks.Keys) {
+    if (-not (Test-Path $key)) { New-Item -Path $key -Force | Out-Null }
+    foreach ($name in $registryTweaks[$key].Keys) {
+        Set-ItemProperty -Path $key -Name $name -Value $registryTweaks[$key][$name]
     }
 }
-
-$taskName = "AutoHotkey-Init-$env:UserName"
-if ($version -eq 2) {
-    $taskName += "-v2"
-}
-
-if (-not (Test-ScheduledTask $taskName)) {
-    $A = New-ScheduledTaskAction -Execute $autohotkeyExec -WorkingDirectory $autohotkeyPath -Argument "$autohotkeyPath\init-autohotkey.ahk"
-    $T = New-ScheduledTaskTrigger -AtLogon -User "$domain\$env:UserName"
-    $P = New-ScheduledTaskPrincipal -GroupId "BUILTIN\Administrators" -RunLevel Highest
-    $S = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1)
-    $D = New-ScheduledTask -Action $A -Principal $P -Trigger $T -Settings $S
-    Register-ScheduledTask -TaskName $taskName -InputObject $D
-    Start-ScheduledTask -TaskName $taskName
-}
-
-$policies_path = "registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\System"
-New-Item -Path $policies_path -ErrorAction SilentlyContinue | Out-Null
-UpdateOrCreateRegKey $policies_path "DisableLockWorkstation" 1
-
-$windows_hotkeys = "registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
-$windows_hotkeys_1 = "registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"
-
-New-Item -Path $windows_hotkeys -ErrorAction SilentlyContinue | Out-Null
-New-Item -Path $windows_hotkeys_1 -ErrorAction SilentlyContinue | Out-Null
-
-UpdateOrCreateRegKey $windows_hotkeys "DisabledHotkeys" "K" "String"
-UpdateOrCreateRegKey $windows_hotkeys_1 "NoWinKeys" 1

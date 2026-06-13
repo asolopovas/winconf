@@ -1,5 +1,9 @@
 $env:LOCALAPPDATA\Microsoft\WinGet\Links
 $env:LOCALAPPDATA\Microsoft\WindowsApps
+# winget zip-portables get their dir appended to PATH once at install and other
+# installers can clobber it; globs keep these pinned across version/hash changes
+$env:LOCALAPPDATA\Microsoft\WinGet\Packages\Google.PlatformTools*\platform-tools
+$env:LOCALAPPDATA\Microsoft\WinGet\Packages\Ninja-build.Ninja*
 $env:USERPROFILE\.cargo\bin
 $env:LOCALAPPDATA\Programs\Microsoft VS Code
 $env:LOCALAPPDATA\pnpm

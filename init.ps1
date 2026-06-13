@@ -5,7 +5,6 @@ Start-Transcript -Path "$ENV:TEMP\winconf.log" -Append
 $DOTFILES = "$env:userprofile\winconf"
 $SCRIPTS_DIR = "$DOTFILES\scripts"
 $REPO_URL = 'https://github.com/asolopovas/winconf.git'
-$AUTOHOTKEYVERSION = 2
 $USER = $env:USERNAME
 $PINNED_SOFTWARE = @(
     'ScreamingFrog.SEOSpider'
@@ -28,7 +27,6 @@ $ESSENTIAL_SOFTWARE = @(
 
 $SOURCE_FILES = @(
     'cleanup'
-    'inst-paths'
     'paths-doctor'
     'inst-fonts'
     'inst-pwsh'
@@ -69,44 +67,19 @@ function Test-Command {
     return [bool](Get-Command $command -ErrorAction SilentlyContinue)
 }
 
-function Add-GitToUserPath {
-    Write-Status "Wiring Git into User PATH..." -ForegroundColor Yellow
-    $gitCmd = "$env:ProgramFiles\Git\cmd"
-    $gitUsrBin = "$env:ProgramFiles\Git\usr\bin"
-    if (-not (Test-Path $gitCmd)) {
-        Write-Status "  Git not found at $gitCmd, skipping" -ForegroundColor DarkYellow
-        return
-    }
-    $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
-    $rawParts = @()
-    if ($userPath) { $rawParts = $userPath -split ';' | Where-Object { $_ } | ForEach-Object { $_.TrimEnd('\') } }
-    $seen = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
-    $userParts = foreach ($p in $rawParts) { if ($seen.Add($p)) { $p } }
-    $removed = $rawParts.Count - $userParts.Count
-    $added = @()
-    foreach ($p in @($gitCmd, $gitUsrBin)) {
-        $t = $p.TrimEnd('\')
-        if ($seen.Add($t)) {
-            $userParts = @($userParts) + $t
-            $added += $t
-        }
-    }
-    foreach ($p in $added) { Write-Status "  + $p" -ForegroundColor Green }
-    if ($removed -gt 0) { Write-Status "  Removed $removed duplicate User PATH entries" -ForegroundColor DarkYellow }
-    if ($added.Count -or $removed -gt 0) {
-        [Environment]::SetEnvironmentVariable('Path', ($userParts -join ';'), 'User')
-    } else {
-        Write-Status "  Already configured" -ForegroundColor DarkGray
-    }
+# Registry PATH is owned by paths-doctor.ps1; here we only need git resolvable
+# in the current session (the Git installer writes Machine PATH itself).
+function Add-GitToSessionPath {
     $env:Path = [Environment]::GetEnvironmentVariable('Path', 'Machine') + ';' + [Environment]::GetEnvironmentVariable('Path', 'User')
+    if (-not (Test-Command git) -and (Test-Path "$env:ProgramFiles\Git\cmd")) {
+        $env:Path += ";$env:ProgramFiles\Git\cmd"
+    }
 }
 
 function SourceFile {
     param ($file)
     Write-Status "`nSourcing $file ..." -ForegroundColor DarkCyan
-    if ($file -eq 'inst-ahk') {
-        & "$SCRIPTS_DIR\$file.ps1" -version $AUTOHOTKEYVERSION
-    } elseif ($file -eq 'inst-modules' -and $isUpdate) {
+    if ($file -eq 'inst-modules' -and $isUpdate) {
         & "$SCRIPTS_DIR\$file.ps1" -Update
     } else {
         & "$SCRIPTS_DIR\$file.ps1"
@@ -135,7 +108,7 @@ if ($isUpdate) {
         exit 0
     }
 
-    Add-GitToUserPath
+    Add-GitToSessionPath
 
     Write-Status "`nPulling latest changes..." -ForegroundColor Green
     Set-Location -Path $DOTFILES
@@ -196,7 +169,7 @@ if ($isUpdate) {
     }
     Write-Status "  Software installation complete" -ForegroundColor Green
 
-    Add-GitToUserPath
+    Add-GitToSessionPath
 
     if (-not (Test-Command git)) {
         Write-Status "git still not resolvable on PATH after wiring. Aborting." -ForegroundColor Red

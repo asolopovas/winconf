@@ -14,8 +14,14 @@ try {
             $trimmedLine = $line.Trim()
             if ((-not $trimmedLine) -or $trimmedLine.StartsWith('#')) { continue }
             $expandedPath = $ExecutionContext.InvokeCommand.ExpandString($trimmedLine).TrimEnd('\')
-            if ($expandedPath -and [System.IO.Directory]::Exists($expandedPath) -and $seenPaths.Add($expandedPath)) {
-                $profilePaths += $expandedPath
+            if (-not $expandedPath) { continue }
+            $resolvedPaths = if ($expandedPath.Contains('*')) {
+                @(Resolve-Path -Path $expandedPath -ErrorAction SilentlyContinue | ForEach-Object { $_.Path.TrimEnd('\') })
+            } elseif ([System.IO.Directory]::Exists($expandedPath)) {
+                @($expandedPath)
+            } else { @() }
+            foreach ($resolvedPath in $resolvedPaths) {
+                if ($seenPaths.Add($resolvedPath)) { $profilePaths += $resolvedPath }
             }
         }
 

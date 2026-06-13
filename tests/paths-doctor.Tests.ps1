@@ -6,102 +6,105 @@ BeforeAll {
     $script:sysRoot = [Environment]::GetFolderPath('Windows').TrimEnd('\')
 }
 
-Describe 'Get-SortedPath' {
+Describe 'Get-CleanPath' {
     BeforeEach { Mock Write-Host { } }
 
     It 'returns empty result for null/empty input' {
-        $r = Get-SortedPath -Raw ''
-        $r.Count       | Should -Be 0
-        $r.Joined      | Should -BeNullOrEmpty
-        $r.Dupes       | Should -Be 0
-        $r.Missing     | Should -Be 0
-        $r.CrossDupes  | Should -Be 0
+        $r = Get-CleanPath -Raw ''
+        $r.Entries.Count   | Should -Be 0
+        $r.Joined          | Should -BeNullOrEmpty
+        $r.Relocated.Count | Should -Be 0
     }
 
     It 'puts Windows system paths before everything else' {
         $raw = "C:\Tools;$sysRoot\system32;$sysRoot;C:\Apps"
-        $r = Get-SortedPath -Raw $raw -KeepMissing:$true 2>$null
+        $r = Get-CleanPath -Raw $raw -KeepMissing
         $entries = $r.Joined -split ';'
         $entries[0] | Should -Be $sysRoot
         $entries[1] | Should -Be "$sysRoot\system32"
     }
 
     It 'sorts non-system paths alphabetically' {
-        $raw = 'C:\Zeta;C:\Alpha;C:\Mike'
-        $r = Get-SortedPath -Raw $raw -KeepMissing:$true
+        $r = Get-CleanPath -Raw 'C:\Zeta;C:\Alpha;C:\Mike' -KeepMissing
         $r.Joined | Should -Be 'C:\Alpha;C:\Mike;C:\Zeta'
     }
 
     It 'deduplicates case-insensitively' {
-        $raw = 'C:\Foo;c:\foo;C:\FOO\;C:\Bar'
-        $r = Get-SortedPath -Raw $raw -KeepMissing:$true
-        $r.Count | Should -Be 2
-        $r.Dupes | Should -Be 2
+        $r = Get-CleanPath -Raw 'C:\Foo;c:\foo;C:\FOO\;C:\Bar' -KeepMissing
+        $r.Entries.Count | Should -Be 2
     }
 
     It 'trims whitespace and trailing backslashes' {
-        $raw = '  C:\Foo\  ;C:\Bar\'
-        $r = Get-SortedPath -Raw $raw -KeepMissing:$true
+        $r = Get-CleanPath -Raw '  C:\Foo\  ;C:\Bar\' -KeepMissing
         $r.Entries | Should -Contain 'C:\Foo'
         $r.Entries | Should -Contain 'C:\Bar'
     }
 
     It 'drops empty entries from double semicolons' {
-        $raw = 'C:\Foo;;;C:\Bar'
-        $r = Get-SortedPath -Raw $raw -KeepMissing:$true
-        $r.Count | Should -Be 2
+        $r = Get-CleanPath -Raw 'C:\Foo;;;C:\Bar' -KeepMissing
+        $r.Entries.Count | Should -Be 2
     }
 
     It 'eliminates dead paths by default' {
         $alive = $TestDrive
         $dead  = Join-Path $TestDrive 'does-not-exist'
-        $r = Get-SortedPath -Raw "$alive;$dead"
-        $r.Count   | Should -Be 1
-        $r.Missing | Should -Be 1
-        $r.Entries | Should -Contain ([string]$alive).TrimEnd('\')
+        $r = Get-CleanPath -Raw "$alive;$dead"
+        $r.Entries.Count | Should -Be 1
+        $r.Entries       | Should -Contain ([string]$alive).TrimEnd('\')
     }
 
-    It 'keeps dead paths when -KeepMissing implied via param' {
+    It 'keeps dead paths with -KeepMissing' {
         $dead = Join-Path $TestDrive 'nope'
-        $r = Get-SortedPath -Raw $dead -KeepMissing:$true
-        $r.Count   | Should -Be 1
-        $r.Missing | Should -Be 0
+        $r = Get-CleanPath -Raw $dead -KeepMissing
+        $r.Entries.Count | Should -Be 1
     }
 
-    It 'removes entries already present in Machine scope' {
+    It 'removes entries listed in -Exclude' {
         $a = (New-Item -ItemType Directory (Join-Path $TestDrive 'a')).FullName
         $b = (New-Item -ItemType Directory (Join-Path $TestDrive 'b')).FullName
-        $r = Get-SortedPath -Raw "$a;$b" -ExcludeFromMachine @($a)
-        $r.CrossDupes | Should -Be 1
-        $r.Entries    | Should -Not -Contain $a
-        $r.Entries    | Should -Contain $b
+        $r = Get-CleanPath -Raw "$a;$b" -Exclude @($a)
+        $r.Entries | Should -Not -Contain $a
+        $r.Entries | Should -Contain $b
+    }
+
+    It 'adds -Require entries that are not present yet' {
+        $a = (New-Item -ItemType Directory (Join-Path $TestDrive 'req-a')).FullName
+        $b = (New-Item -ItemType Directory (Join-Path $TestDrive 'req-b')).FullName
+        $r = Get-CleanPath -Raw $a -Require @($b, $a)
+        $r.Entries | Should -Contain $a
+        $r.Entries | Should -Contain $b
+        $r.Entries.Count | Should -Be 2
+    }
+
+    It 'ignores null and empty -Require entries' {
+        $a = (New-Item -ItemType Directory (Join-Path $TestDrive 'req-c')).FullName
+        $r = Get-CleanPath -Raw $a -Require @($null, '')
+        $r.Entries.Count | Should -Be 1
     }
 
     It 'produces a stable result that is idempotent under a second pass' {
         $a = (New-Item -ItemType Directory (Join-Path $TestDrive 'idem-a')).FullName
         $b = (New-Item -ItemType Directory (Join-Path $TestDrive 'idem-b')).FullName
-        $first  = Get-SortedPath -Raw "$b;$a;$a" -KeepMissing:$true
-        $second = Get-SortedPath -Raw $first.Joined -KeepMissing:$true
+        $first  = Get-CleanPath -Raw "$b;$a;$a" -KeepMissing
+        $second = Get-CleanPath -Raw $first.Joined -KeepMissing
         $second.Joined | Should -Be $first.Joined
-        $second.Dupes  | Should -Be 0
     }
 
     It 'normalizes path traversal segments' {
-        $r = Get-SortedPath -Raw 'C:\Program Files\Foo\..\Bar' -KeepMissing:$true
+        $r = Get-CleanPath -Raw 'C:\Program Files\Foo\..\Bar' -KeepMissing
         $r.Entries | Should -Contain 'C:\Program Files\Bar'
     }
 
-    It 'relocates user-scoped Machine entries when -RelocateUserScoped is set' {
+    It 'relocates user-scoped entries when -Relocate is set' {
         $userRoot = [Environment]::GetFolderPath('UserProfile').TrimEnd('\')
-        $raw = "C:\Tools;$userRoot\AppData\Local\Foo"
-        $r = Get-SortedPath -Raw $raw -KeepMissing:$true -RelocateUserScoped
+        $r = Get-CleanPath -Raw "C:\Tools;$userRoot\AppData\Local\Foo" -KeepMissing -Relocate
         $r.Relocated.Count | Should -Be 1
         $r.Entries | Should -Not -Contain "$userRoot\AppData\Local\Foo"
     }
 
-    It 'does not relocate without -RelocateUserScoped' {
+    It 'does not relocate without -Relocate' {
         $userRoot = [Environment]::GetFolderPath('UserProfile').TrimEnd('\')
-        $r = Get-SortedPath -Raw "$userRoot\AppData\Local\Foo" -KeepMissing:$true
+        $r = Get-CleanPath -Raw "$userRoot\AppData\Local\Foo" -KeepMissing
         $r.Relocated.Count | Should -Be 0
     }
 }
@@ -133,13 +136,50 @@ Describe 'Format-PathEntry' {
     }
 }
 
+Describe 'Get-DesiredUserPath' {
+    BeforeEach {
+        $script:upFile = Join-Path $TestDrive 'user-paths'
+        $script:upDir = (New-Item -ItemType Directory (Join-Path $TestDrive "up-$([IO.Path]::GetRandomFileName())")).FullName
+        $env:WINCONF_TEST_DIR = $script:upDir
+    }
+
+    AfterEach { $env:WINCONF_TEST_DIR = $null }
+
+    It 'returns nothing when the file is absent' {
+        Get-DesiredUserPath -File (Join-Path $TestDrive 'absent') | Should -BeNullOrEmpty
+    }
+
+    It 'expands env vars and skips comments, blanks, and missing dirs' {
+        Set-Content $upFile @"
+# comment
+
+`$env:WINCONF_TEST_DIR
+$TestDrive\not-there
+"@
+        $r = @(Get-DesiredUserPath -File $upFile)
+        $r | Should -Be @($script:upDir)
+    }
+
+    It 'resolves glob lines to existing directories' {
+        $pkg = New-Item -ItemType Directory (Join-Path $script:upDir 'Tool.Name_abc123\bin')
+        Set-Content $upFile "$script:upDir\Tool.Name*\bin"
+        $r = @(Get-DesiredUserPath -File $upFile)
+        $r | Should -Be @($pkg.FullName)
+    }
+
+    It 'returns nothing for globs with no match' {
+        Set-Content $upFile "$script:upDir\NoSuch*\bin"
+        Get-DesiredUserPath -File $upFile | Should -BeNullOrEmpty
+    }
+}
+
 Describe 'Final invariants' {
     BeforeEach { Mock Write-Host { } }
 
     It 'final output has no duplicates and no dead entries' {
         $live = (New-Item -ItemType Directory (Join-Path $TestDrive 'live')).FullName
         $dead = Join-Path $TestDrive 'ghost'
-        $r = Get-SortedPath -Raw "$live;$live;$dead;$sysRoot"
+        $r = Get-CleanPath -Raw "$live;$live;$dead;$sysRoot"
         $entries = $r.Joined -split ';'
         ($entries | Group-Object | Where-Object Count -gt 1).Count | Should -Be 0
         foreach ($e in $entries) {
@@ -156,9 +196,7 @@ Describe 'paths-doctor.ps1 script invocation' {
     }
 
     It 'supports -WhatIf via SupportsShouldProcess' {
-        Get-Command $script:path | Select-Object -ExpandProperty Parameters | ForEach-Object {
-            $_.Keys | Should -Contain 'WhatIf'
-        }
+        (Get-Command $script:path).Parameters.Keys | Should -Contain 'WhatIf'
     }
 
     It 'exposes -KeepMissing switch' {

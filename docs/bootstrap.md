@@ -22,7 +22,7 @@ Transcript: `$env:TEMP\winconf.log`.
 
 ## Order
 
-`cleanup` -> `inst-paths` -> `paths-doctor` -> `inst-fonts` -> `inst-pwsh` -> `inst-terminal` -> `inst-ahk` -> `wsl-exclusions` -> `inst-modules` -> `inst-scoop` -> `inst-software` with `-Software` -> `inst-aimp-delete-helper`.
+`cleanup` -> `paths-doctor` -> `inst-fonts` -> `inst-pwsh` -> `inst-terminal` -> `inst-ahk` -> `wsl-exclusions` -> `inst-modules` -> `inst-scoop` -> `inst-software` with `-Software` -> `inst-aimp-delete-helper`.
 
 Add scripts only after prerequisites.
 
