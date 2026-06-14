@@ -1,0 +1,1 @@
+irm https://raw.githubusercontent.com/asolopovas/winconf/main/init-software.ps1|iex

@@ -8,8 +8,8 @@
 |---|---|
 | Local | `.\init.ps1` |
 | Local plus apps | `.\init.ps1 -Software` |
-| Remote | `iwr https://raw.githubusercontent.com/asolopovas/winconf/main/init.ps1 | iex` |
-| Remote plus apps | `iwr https://raw.githubusercontent.com/asolopovas/winconf/main/init-software.ps1 | iex` |
+| Remote | `irm asolopovas.github.io/winconf/go\|iex` |
+| Remote plus apps | `irm asolopovas.github.io/winconf/apps\|iex` |
 
 Transcript: `$env:TEMP\winconf.log`.
 

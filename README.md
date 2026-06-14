@@ -8,8 +8,8 @@ Run from elevated PowerShell. Re-runs are state-aware.
 
 | Scope | Command |
 |---|---|
-| Core | `iwr https://raw.githubusercontent.com/asolopovas/winconf/main/init.ps1 | iex` |
-| Core plus apps | `iwr https://raw.githubusercontent.com/asolopovas/winconf/main/init-software.ps1 | iex` |
+| Core | `irm asolopovas.github.io/winconf/go\|iex` |
+| Core plus apps | `irm asolopovas.github.io/winconf/apps\|iex` |
 | Existing clone | `.\init.ps1` |
 | Existing clone plus apps | `.\init.ps1 -Software` |
 
