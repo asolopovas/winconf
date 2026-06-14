@@ -22,7 +22,7 @@ Repo is source of truth. Keep details in docs, scripts, tests, or checked plans.
 
 ## Commands
 
-Bootstrap `.\init.ps1`; apps `.\init.ps1 -Software`; remote `iwr https://raw.githubusercontent.com/asolopovas/winconf/main/init.ps1 | iex`; test `make test`; sync AI `.\scripts\sync-ai.ps1`; helpers `. .\functions.ps1`.
+Bootstrap `.\init.ps1`; apps `.\init.ps1 -Software`; remote `irm asolopovas.github.io/winconf/go|iex`; test `make test`; sync AI `.\scripts\sync-ai.ps1`; helpers `. .\functions.ps1`.
 
 ## Docs
 
