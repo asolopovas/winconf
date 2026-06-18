@@ -21,7 +21,7 @@ Strict mode stops unexpected errors.
 | Auth | `~/.claude/.credentials.json` | OpenCode Windows/WSL auth |
 | Settings | `$claudeSettings` | Claude Windows/WSL settings |
 | MCP | `$mcpServers` | `claude mcp`, OpenCode config |
-| Skills | WSL `~/dotfiles/.agents/skills` | `~/winconf/.agents/skills`, linked Windows agent skill paths |
+| Skills | `~/winconf/.agents/skills` (canonical); new Windows-relevant skills pulled additively from WSL `~/dotfiles/.agents/skills` | `~/.claude/skills`, `~/.config/opencode/skills`, `~/.copilot/skills`, `~/.pi/agent/skills` junctions |
 | Prompts | `~/winconf/.agents/prompts` | Windows `~/.pi/agent/prompts`, `~/.claude/commands`, `~/.config/opencode/commands`, `~/.opencode/commands` junctions; Codex `~/.codex/prompts` and `~/.codex/commands` hard links |
 | Agent definitions | `~/winconf/.agents/agents/{codex,claude,opencode}` | Windows tool-specific agent directories |
 | Pi config | `~/winconf/.agents/pi/settings.json`, `~/winconf/.agents/pi/npm/package.json` | Windows `~/.pi/agent` symlinks |
@@ -32,9 +32,9 @@ Current MCP: `context7` via `npx @upstash/context7-mcp`.
 
 | Path | Role |
 |---|---|
-| WSL `~/dotfiles/.agents/skills` | source of truth for skills |
+| Windows `~/winconf/.agents/skills` | canonical source of truth for skills |
+| WSL `~/dotfiles/.agents/skills` | additive upstream; Windows-relevant skills not yet in winconf are copied from here |
 | Windows `~/winconf/.agents` | canonical Windows agent config root |
-| Windows `~/winconf/.agents/skills` | mirrored canonical Windows skills |
 | Windows `~/winconf/.agents/prompts` | canonical prompt files such as `/gw` and `/doc-refactor` |
 | Windows `~/winconf/.agents/agents/codex` | canonical Codex custom agent `.toml` files |
 | Windows `~/winconf/.agents/agents/claude` | canonical Claude Code subagent `.md` files |
@@ -54,8 +54,9 @@ Current MCP: `context7` via `npx @upstash/context7-mcp`.
 | Windows `~/.claude/skills` | junction to canonical skills for Claude Code |
 | Windows `~/.config/opencode/skills` | junction to canonical skills for OpenCode |
 | Windows `~/.copilot/skills` | junction to canonical skills for Copilot |
+| Windows `~/.pi/agent/skills` | junction to canonical skills for Pi |
 
-Only WSL skill directories containing `SKILL.md` and listed in `$windowsSkillNames` are copied. GitHub skill sources are not fetched. Linux-only stacks such as Laravel and WordPress stay in WSL.
+`~/winconf/.agents/skills` is canonical. The WSL merge is additive-only: a Windows-relevant skill (listed in `$windowsSkillNames`, containing `SKILL.md`) is copied from WSL only when winconf does not already have it — existing winconf skills are never overwritten or deleted. GitHub skill sources are not fetched. Linux-only stacks such as Laravel and WordPress stay in WSL by not being listed.
 
 ## Re-run after
 

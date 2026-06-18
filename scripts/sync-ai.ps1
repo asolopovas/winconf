@@ -25,6 +25,7 @@ $agentsPiSettingsPath = Join-Path $agentsPiDir 'settings.json'
 $agentsPiNpmPackagePath = Join-Path $agentsPiDir 'npm\package.json'
 $piAgentDir = Join-Path $env:USERPROFILE '.pi\agent'
 $piPromptsDir = Join-Path $piAgentDir 'prompts'
+$piSkillsDir = Join-Path $piAgentDir 'skills'
 $piSettingsPath = Join-Path $piAgentDir 'settings.json'
 $piNpmPackagePath = Join-Path $piAgentDir 'npm\package.json'
 $codexPromptsDir = Join-Path $env:USERPROFILE '.codex\prompts'
@@ -42,6 +43,7 @@ $opencodeSkillsDir = Join-Path $env:USERPROFILE '.config\opencode\skills'
 $copilotSkillsDir = Join-Path $env:USERPROFILE '.copilot\skills'
 $windowsSkillNames = @(
     'chrome-devtools'
+    'docs-refactor'
     'docker-expert'
     'docker-patterns'
     'go-patterns'
@@ -159,6 +161,7 @@ function Sync-AgentConfig {
         (New-Link $claudeSkillsDir $agentsSkillsDir)
         (New-Link $opencodeSkillsDir $agentsSkillsDir)
         (New-Link $copilotSkillsDir $agentsSkillsDir)
+        (New-Link $piSkillsDir $agentsSkillsDir)
         (New-Link $piPromptsDir $agentsPromptsDir)
         (New-Link $claudeCommandsDir $agentsPromptsDir)
         (New-Link $opencodeCommandsDir $agentsPromptsDir)
@@ -183,34 +186,38 @@ function Get-WslSkillsPath {
         Select-Object -Last 1 |
         ForEach-Object { $_.Trim() }
 }
-function Sync-Skill {
+# winconf/.agents/skills is the canonical source of truth. This step is
+# ADDITIVE-ONLY: it copies Windows-relevant skills from WSL dotfiles (when WSL
+# is present) that winconf does NOT already have. It never overwrites a
+# winconf-authored skill and never deletes one. Linux-only stacks (laravel,
+# wordpress, ...) stay in WSL by virtue of not being in $windowsSkillNames.
+function Merge-WslSkill {
     $sourceDir = Get-WslSkillsPath
-    if (-not $sourceDir -or -not (Test-Path -LiteralPath $sourceDir)) { Out-Status 'WSL ~/dotfiles/.agents/skills not found'; return }
-    $skills = @(Get-ChildItem -LiteralPath $sourceDir -Directory | Where-Object { ($windowsSkillNames -contains $_.Name) -and (Test-Path -LiteralPath (Join-Path $_.FullName 'SKILL.md')) })
-    if (-not $skills) { Out-Status 'No Windows-relevant WSL skills found'; return }
-
-    $root = Split-Path $agentsSkillsDir -Parent
-    $tmp = Join-Path $root "skills.tmp.$PID"
-    if (-not (Test-Path -LiteralPath $root)) { New-Item -ItemType Directory -Path $root -Force | Out-Null }
-    if (Test-Path -LiteralPath $tmp) { Remove-Item -LiteralPath $tmp -Recurse -Force }
-    New-Item -ItemType Directory -Path $tmp -Force | Out-Null
-    try {
-        foreach ($skill in $skills) { Copy-Item -LiteralPath $skill.FullName -Destination (Join-Path $tmp $skill.Name) -Recurse -Force }
-        $item = Get-Item -LiteralPath $agentsSkillsDir -Force -ErrorAction SilentlyContinue
-        if ($item) {
-            if ($item.LinkType) { Remove-Item -LiteralPath $agentsSkillsDir -Force }
-            else { Remove-Item -LiteralPath $agentsSkillsDir -Recurse -Force }
-        }
-        Move-Item -LiteralPath $tmp -Destination $agentsSkillsDir
-    } finally {
-        if (Test-Path -LiteralPath $tmp) { Remove-Item -LiteralPath $tmp -Recurse -Force -ErrorAction SilentlyContinue }
+    if (-not $sourceDir -or -not (Test-Path -LiteralPath $sourceDir)) {
+        Out-Status 'WSL skills source not found; using winconf canonical skills as-is'
+        return
     }
+    if (-not (Test-Path -LiteralPath $agentsSkillsDir)) { New-Item -ItemType Directory -Path $agentsSkillsDir -Force | Out-Null }
+    $skills = @(Get-ChildItem -LiteralPath $sourceDir -Directory | Where-Object {
+            ($windowsSkillNames -contains $_.Name) -and
+            (Test-Path -LiteralPath (Join-Path $_.FullName 'SKILL.md')) -and
+            -not (Test-Path -LiteralPath (Join-Path $agentsSkillsDir $_.Name))
+        })
+    foreach ($skill in $skills) {
+        Copy-Item -LiteralPath $skill.FullName -Destination (Join-Path $agentsSkillsDir $skill.Name) -Recurse -Force
+    }
+    if ($skills) { Out-Status ("Added {0} new WSL skill(s) to winconf canonical set: {1}" -f $skills.Count, ($skills.Name -join ', ')) }
+}
+function Sync-Skill {
+    Merge-WslSkill
+    if (-not (Test-Path -LiteralPath $agentsSkillsDir)) { Out-Status 'No canonical skills dir; skipping skill links'; return }
     Set-DirectoryLink $homeAgentsDir $winconfAgentsDir
     Remove-LinkToTarget $codexSkillsDir $agentsSkillsDir
-    foreach ($target in @($claudeSkillsDir, $opencodeSkillsDir, $copilotSkillsDir)) {
+    foreach ($target in @($claudeSkillsDir, $opencodeSkillsDir, $copilotSkillsDir, $piSkillsDir)) {
         Set-DirectoryLink $target $agentsSkillsDir
     }
-    Out-Status ("Synced {0} Windows skill(s)" -f $skills.Count)
+    $count = @(Get-ChildItem -LiteralPath $agentsSkillsDir -Directory).Count
+    Out-Status ("Linked {0} canonical skill(s) to claude/opencode/copilot/pi" -f $count)
 }
 
 $ok = $true

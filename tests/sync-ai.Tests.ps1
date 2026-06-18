@@ -167,6 +167,10 @@ Describe "sync-ai.ps1" {
 
             @(
                 ".agents\skills\powershell-windows\SKILL.md",
+                ".claude\skills\powershell-windows\SKILL.md",
+                ".config\opencode\skills\powershell-windows\SKILL.md",
+                ".copilot\skills\powershell-windows\SKILL.md",
+                ".pi\agent\skills\powershell-windows\SKILL.md",
                 ".pi\agent\prompts\gw.md",
                 ".codex\prompts\gw.md",
                 ".codex\commands\gw.md",
