@@ -1,6 +1,8 @@
 [CmdletBinding(SupportsShouldProcess)]
 param(
-    [switch]$KeepMissing,
+    # By default entries whose directory is currently missing are KEPT (a dir may
+    # be on a removable/network drive or mid-update). Pass -PruneMissing to remove them.
+    [switch]$PruneMissing,
     [ValidateSet('All', 'Machine', 'User')]
     [string]$Scope = 'All'
 )
@@ -13,11 +15,19 @@ $windowsRoot = [Environment]::GetFolderPath('Windows').TrimEnd('\')
 $userRoot = [Environment]::GetFolderPath('UserProfile').TrimEnd('\')
 $usersRoot = Split-Path $userRoot -Parent
 
+# Canonical form used for BOTH storage and comparison: env vars are expanded so dedup
+# treats %LOCALAPPDATA%\X and C:\Users\..\X as one entry and the persisted REG_SZ value
+# holds a literal path (no %VAR% left to rot). Pure function - no side effects.
 function Format-PathEntry([string]$Path) {
-    $entry = $Path.Trim().TrimEnd('\')
-    $expanded = [Environment]::ExpandEnvironmentVariables($entry)
-    if ($expanded -match '\.\.' -and $expanded -match '^[A-Za-z]:') {
-        try { return [IO.Path]::GetFullPath($expanded).TrimEnd('\') } catch { }
+    $entry = [Environment]::ExpandEnvironmentVariables($Path.Trim()).TrimEnd('\')
+    if (-not $entry) { return }
+    # Resolve '.'/'..' segments ONLY for a drive-rooted absolute path with no leftover
+    # %VAR% (an undefined var stays literal). [IO.Path]::GetFullPath would otherwise
+    # re-root a bare drive ('C:'), UNC ('\\srv\s'), or relative ('foo') entry against
+    # the process working directory and corrupt it - so leave every other form verbatim.
+    if ($entry -notmatch '%[^%]+%' -and
+        $entry -match '^[A-Za-z]:[\\/]' -and $entry -match '(^|[\\/])\.\.?([\\/]|$)') {
+        try { return [IO.Path]::GetFullPath($entry).TrimEnd('\') } catch { return $entry }
     }
     $entry
 }
@@ -56,12 +66,12 @@ function Get-CleanPath {
         [string[]]$Exclude = @(),
         [string[]]$Require = @(),
         [switch]$Relocate,
-        [switch]$KeepMissing,
+        [switch]$PruneMissing,
         [switch]$Quiet
     )
 
-    $entries = @($Raw -split ';' | Where-Object { $_.Trim() } | ForEach-Object { Format-PathEntry $_ })
-    foreach ($required in @($Require | Where-Object { $_ } | ForEach-Object { Format-PathEntry $_ })) {
+    $entries = @($Raw -split ';' | Where-Object { $_.Trim() } | ForEach-Object { Format-PathEntry $_ } | Where-Object { $_ })
+    foreach ($required in @($Require | Where-Object { $_ } | ForEach-Object { Format-PathEntry $_ } | Where-Object { $_ })) {
         if ($entries -notcontains $required) {
             if (-not $Quiet) { Write-Host "  Adding required - $required" -ForegroundColor DarkYellow }
             $entries += $required
@@ -69,7 +79,9 @@ function Get-CleanPath {
     }
 
     $seen = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
-    $excludeSet = [Collections.Generic.HashSet[string]]::new([string[]]$Exclude, [StringComparer]::OrdinalIgnoreCase)
+    $excludeSet = [Collections.Generic.HashSet[string]]::new(
+        [string[]]@($Exclude | Where-Object { $_ } | ForEach-Object { Format-PathEntry $_ } | Where-Object { $_ }),
+        [StringComparer]::OrdinalIgnoreCase)
     $relocated = [Collections.Generic.List[string]]::new()
 
     $kept = @(foreach ($entry in $entries) {
@@ -82,16 +94,25 @@ function Get-CleanPath {
             if (-not $Quiet) { Write-Host "  Removing cross-scope - $entry" -ForegroundColor DarkYellow }
             continue
         }
-        if (-not $KeepMissing -and -not (Test-Path -LiteralPath ([Environment]::ExpandEnvironmentVariables($entry)))) {
-            if (-not $Quiet) { Write-Host "  Removing missing - $entry" -ForegroundColor DarkYellow }
-            continue
+        if ($PruneMissing) {
+            # Test-Path -LiteralPath throws on illegal-char entries under EAP=Stop
+            # (PS 5.1); treat any failure as "cannot prove missing" and keep the entry.
+            $missing = $false
+            try { $missing = -not (Test-Path -LiteralPath $entry) } catch { $missing = $false }
+            if ($missing) {
+                if (-not $Quiet) { Write-Host "  Removing missing - $entry" -ForegroundColor DarkYellow }
+                continue
+            }
         }
         $entry
     })
 
+    # Group system paths ahead of the rest for hardening, but preserve each entry's
+    # ORIGINAL relative order within its group (stable partition) - never alphabetize,
+    # because earlier-on-PATH wins and reordering silently changes which binary resolves.
     [pscustomobject]@{
-        Joined    = (@($kept | Where-Object { Test-SystemPath $_ } | Sort-Object) +
-                     @($kept | Where-Object { -not (Test-SystemPath $_) } | Sort-Object)) -join ';'
+        Joined    = (@($kept | Where-Object { Test-SystemPath $_ }) +
+                     @($kept | Where-Object { -not (Test-SystemPath $_) })) -join ';'
         Entries   = $kept
         Relocated = @($relocated)
     }
@@ -108,7 +129,7 @@ function Update-PathScope {
 
     Write-Host "[$Target PATH]" -ForegroundColor Cyan
     $raw = [Environment]::GetEnvironmentVariable('Path', $Target)
-    $result = Get-CleanPath -Raw $raw -Exclude $Exclude -Require $Require -KeepMissing:$KeepMissing -Relocate:($Target -eq 'Machine')
+    $result = Get-CleanPath -Raw $raw -Exclude $Exclude -Require $Require -PruneMissing:$PruneMissing -Relocate:($Target -eq 'Machine')
 
     if ($Target -eq 'User') {
         foreach ($entry in @($result.Entries | Where-Object { $_ -like 'C:\Program Files*' -or $_ -like 'C:\ProgramData*' })) {
@@ -120,10 +141,14 @@ function Update-PathScope {
         Write-Host '  Inspect only' -ForegroundColor DarkGray
     } elseif ($result.Joined -eq $raw) {
         Write-Host '  Already clean' -ForegroundColor Green
+    } elseif (-not $result.Joined -and $raw) {
+        Write-Warning "  Refusing to write an empty $Target PATH (raw had content) - skipped"
     } elseif ($PSCmdlet.ShouldProcess("$Target PATH", 'Rewrite')) {
         New-Item -ItemType Directory -Path $backupDir -Force | Out-Null
         $backup = Join-Path $backupDir "$Target-$stamp.txt"
-        Set-Content -LiteralPath $backup -Value $raw -NoNewline -Encoding UTF8
+        # UTF-8 without BOM: a BOM would otherwise glue onto the first entry if the
+        # backup is ever piped back into PATH.
+        [IO.File]::WriteAllText($backup, $raw, [Text.UTF8Encoding]::new($false))
         Write-Host "  Backup - $backup" -ForegroundColor DarkGray
         [Environment]::SetEnvironmentVariable('Path', $result.Joined, $Target)
         Write-Host '  Updated' -ForegroundColor Green
@@ -142,7 +167,7 @@ $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIden
 Sync-SessionPath
 
 $machine = if ($Scope -eq 'User') {
-    Get-CleanPath -Raw ([Environment]::GetEnvironmentVariable('Path', 'Machine')) -KeepMissing:$KeepMissing -Quiet
+    Get-CleanPath -Raw ([Environment]::GetEnvironmentVariable('Path', 'Machine')) -PruneMissing:$PruneMissing -Quiet
 } else {
     if (-not $isAdmin) { Write-Warning 'Not elevated - Machine PATH inspected only; run elevated to rewrite it.' }
     Update-PathScope -Target Machine -ReadOnly:(-not $isAdmin)
