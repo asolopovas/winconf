@@ -14,6 +14,7 @@ $PINNED_SOFTWARE = @(
 )
 $ESSENTIAL_SOFTWARE = @(
     'AutoHotkey.AutoHotkey'
+    'Bitwarden.CLI'
     'Git.Git'
     'junegunn.fzf'
     "Microsoft.PowerToys"
