@@ -326,3 +326,32 @@ function CreateSymLink {
 
     New-Item -ItemType SymbolicLink -Path $Src -Target $Target -Force
 }
+
+function sync-skills {
+    $winconf = Join-Path $env:USERPROFILE 'winconf'
+    $sub = Join-Path $winconf 'agents'
+
+    if (-not (Test-Path -LiteralPath $sub)) {
+        Write-Error "sync-skills: missing submodule $sub (run: git -C `"$winconf`" submodule update --init)"
+        return
+    }
+
+    Push-Location $winconf
+    try {
+        Write-Host 'sync-skills: fetching latest agents from remote...'
+        git submodule sync --quiet agents
+        git -C $sub fetch --quiet origin
+        git -C $sub checkout --quiet main 2>$null
+        git -C $sub pull --quiet --ff-only
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error "sync-skills: could not fast-forward agents (local edits or diverged); resolve in $sub"
+            return
+        }
+
+        Write-Host 'sync-skills: re-linking skills into claude, codex, opencode, pi...'
+        & (Join-Path $winconf 'scripts\sync-ai.ps1') -SkipAuth -SkipMcp
+    }
+    finally {
+        Pop-Location
+    }
+}
