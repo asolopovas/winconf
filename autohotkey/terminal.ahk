@@ -17,21 +17,25 @@ if (!IsSet(REGISTER_TERMINAL_HOTKEYS) || REGISTER_TERMINAL_HOTKEYS) {
     Hotkey("<^>!Enter", (*) => QueueTerminalToggle("Powershell"), "T5 B")
     Hotkey("#+Enter", (*) => OpenNewTab("Ubuntu"))
     Hotkey("<^>!+Enter", (*) => OpenNewTab("Powershell"))
-    Hotkey("#F12", (*) => ActivateAnyTerminal())
+    Hotkey("#F12", (*) => LaunchAdminTerminal())
 }
 
-ActivateAnyTerminal() {
-    windowID := "ahk_class CASCADIA_HOSTING_WINDOW_CLASS"
-    if (WinExist(windowID)) {
-        WinActivate(windowID)
-    } else {
-        RunTerminal("new-tab -p PowerShell")
-    }
+LaunchAdminTerminal() {
+    RunTerminalAdmin("-w new new-tab -p PowerShell")
 }
 
 TerminalPath() => EnvGet("LOCALAPPDATA") . "\Microsoft\WindowsApps\wt.exe"
 
 RunTerminal(arguments) {
+    try {
+        RunAsUser(TerminalPath(), arguments)
+        return true
+    } catch {
+        return false
+    }
+}
+
+RunTerminalAdmin(arguments) {
     terminal_path := TerminalPath()
 
     try {
