@@ -18,5 +18,10 @@
   "defaultModel": "claude-opus-4-8",
   "defaultThinkingLevel": "high",
   "lastChangelogVersion": "0.80.2",
-  "theme": "dark"
+  "theme": "dark",
+  "enableInstallTelemetry": false,
+  "warnings": {
+    "anthropicExtraUsage": false
+  },
+  "doubleEscapeAction": "tree"
 }
