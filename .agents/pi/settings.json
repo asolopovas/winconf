@@ -16,7 +16,7 @@
   ],
   "defaultProvider": "anthropic",
   "defaultModel": "claude-opus-4-8",
-  "defaultThinkingLevel": "medium",
+  "defaultThinkingLevel": "high",
   "lastChangelogVersion": "0.80.2",
   "theme": "dark"
 }
