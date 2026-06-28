@@ -4,6 +4,7 @@ $env:LOCALAPPDATA\Microsoft\WindowsApps
 # installers can clobber it; globs keep these pinned across version/hash changes
 $env:LOCALAPPDATA\Microsoft\WinGet\Packages\Google.PlatformTools*\platform-tools
 $env:LOCALAPPDATA\Microsoft\WinGet\Packages\Ninja-build.Ninja*
+$env:LOCALAPPDATA\Microsoft\WinGet\Packages\Gyan.FFmpeg*\*\bin
 $env:USERPROFILE\.cargo\bin
 $env:LOCALAPPDATA\Programs\Microsoft VS Code
 $env:LOCALAPPDATA\pnpm

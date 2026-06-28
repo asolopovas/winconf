@@ -1,0 +1,22 @@
+{
+  "packages": [
+    "npm:pi-subagents",
+    "npm:pi-mcp-adapter",
+    {
+      "source": "npm:pi-web-access",
+      "skills": []
+    },
+    {
+      "source": "npm:pi-lens",
+      "skills": [
+        "+skills/lsp-navigation"
+      ]
+    },
+    "npm:pi-claude-oauth-adapter"
+  ],
+  "defaultProvider": "anthropic",
+  "defaultModel": "claude-opus-4-8",
+  "defaultThinkingLevel": "medium",
+  "lastChangelogVersion": "0.80.2",
+  "theme": "dark"
+}

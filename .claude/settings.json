@@ -11,8 +11,8 @@
   },
   "effortLevel": "high",
   "autoUpdatesChannel": "latest",
+  "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
   "theme": "dark-daltonized",
-  "editorMode": "vim",
-  "tui": "fullscreen"
+  "editorMode": "vim"
 }
