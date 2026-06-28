@@ -101,18 +101,10 @@ prune = list(dict.fromkeys(deleted + changed)) or None
 
 # Use build_merge() — reads graph.json directly without NetworkX round-trip
 # so edge direction (calls, implements, imports) is always preserved (#801).
-# dedup=False is REQUIRED here. The default fuzzy entity-dedup runs over the WHOLE
-# merged graph (existing + new) and collapses same-named symbols across UNCHANGED
-# files (e.g. app.go<->apps.go, config.go, vscode.go), silently dropping legitimate
-# nodes — observed dropping ~49 nodes on a 7-file update. prune already removes the
-# old versions of changed files cleanly, and AST IDs are deterministic, so build()'s
-# exact-ID dedup is sufficient; the fuzzy layer only causes cross-file corruption on
-# incremental merges. Full rebuilds (Step 4) still dedup normally.
 G = build_merge(
     [new_extraction],
     graph_path='graphify-out/graph.json',
     prune_sources=prune,
-    dedup=False,
 )
 print(f'[graphify update] Merged: {G.number_of_nodes()} nodes, {G.number_of_edges()} edges')
 
@@ -173,32 +165,6 @@ if old_data:
 
 Before the merge step, save the old graph: `cp graphify-out/graph.json graphify-out/.graphify_old.json`
 Clean up after: `rm -f graphify-out/.graphify_old.json`
-
-### If Step 4 prints "Refusing to overwrite" (net node decrease)
-
-`to_json` guards against shrinkage: if the merged graph has fewer nodes than the existing `graph.json`, it refuses to write and leaves `graph.json` untouched. With `dedup=False` (above) this should not happen for an additive update, but it can when an edit genuinely deletes symbols, or if a stale run left fuzzy-collapsed nodes. Do NOT pass `force=True` blindly. First verify the removals are confined to changed/deleted files — anything removed from an UNCHANGED file is corruption, not a legitimate decrease:
-
-```bash
-$(cat graphify-out/.graphify_python) -c "
-import json
-from collections import Counter
-from pathlib import Path
-old = json.loads(Path('graphify-out/.graphify_old.json').read_text(encoding='utf-8'))
-new = json.loads(Path('graphify-out/.graphify_extract.json').read_text(encoding='utf-8'))
-changed = set()
-inc = json.loads(Path('graphify-out/.graphify_incremental.json').read_text(encoding='utf-8'))
-for files in inc.get('new_files', {}).values(): changed.update(files)
-changed.update(inc.get('deleted_files', []))
-on = {n['id']: n for n in old['nodes']}; nn = {n['id']: n for n in new['nodes']}
-removed = set(on) - set(nn)
-bad = Counter((on[i].get('source_file') or '?') for i in removed if (on[i].get('source_file') or '') not in changed)
-print('removed total:', len(removed))
-print('removed from UNCHANGED files (should be empty):')
-for s, c in bad.most_common(): print(f'  {c:3}  {s}')
-"
-```
-
-If the "UNCHANGED files" list is empty, the decrease is legitimate (code was deleted) — re-run the Step 4 build with `to_json(..., force=True)`. If it is NOT empty, the merge corrupted unchanged files (fuzzy dedup): confirm `dedup=False` was passed, re-run the merge from the intact `graph.json` (still on disk, the guard never wrote), and only fall back to a full rebuild (`/graphify .`) if it persists.
 
 ---
 

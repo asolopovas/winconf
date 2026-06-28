@@ -1,5 +1,5 @@
 ---
-name: graphify-windows
+name: graphify
 description: "Use for any question about a codebase, its architecture, file relationships, or project content — especially when graphify-out/ exists, where the question should be treated as a graphify query first. Turns any input (code, docs, papers, images, videos) into a persistent knowledge graph with god nodes, community detection, and query/path/explain tools."
 ---
 
@@ -62,67 +62,45 @@ Only when the path is one or more `https://github.com/...` URLs, or several loca
 
 ### Step 1 - Ensure graphify is installed
 
-```powershell
-# Detect Python with graphify — uv/pipx-aware (fixes #831)
-New-Item -ItemType Directory -Force -Path graphify-out | Out-Null
-$GRAPHIFY_PYTHON = $null
-
-function Find-GraphifyPython {
-    # 1. uv tool install — 'uv tool dir' is authoritative, respects UV_TOOL_DIR automatically
-    if (Get-Command uv -ErrorAction SilentlyContinue) {
-        $uvDir = (uv tool dir 2>$null).Trim()
-        if ($uvDir) {
-            $py = Join-Path $uvDir "graphifyy\Scripts\python.exe"
-            if (Test-Path $py) {
-                & $py -c "import graphify" 2>$null
-                if ($LASTEXITCODE -eq 0) { return $py }
-            }
-        }
-    }
-    # 2. pipx install — 'pipx environment' respects PIPX_HOME automatically
-    if (Get-Command pipx -ErrorAction SilentlyContinue) {
-        $venvs = (pipx environment --value PIPX_LOCAL_VENVS 2>$null).Trim()
-        if ($venvs) {
-            $py = Join-Path $venvs "graphifyy\Scripts\python.exe"
-            if (Test-Path $py) {
-                & $py -c "import graphify" 2>$null
-                if ($LASTEXITCODE -eq 0) { return $py }
-            }
-        }
-    }
-    # 3. Active venv / conda / pip-into-current-env
-    $pyCmd = Get-Command python -ErrorAction SilentlyContinue
-    if ($pyCmd) {
-        & $pyCmd.Source -c "import graphify" 2>$null
-        if ($LASTEXITCODE -eq 0) {
-            return (& $pyCmd.Source -c "import sys; print(sys.executable)").Trim()
-        }
-    }
-    return $null
-}
-
-# Try to find the right Python (uv → pipx → active env)
-$GRAPHIFY_PYTHON = Find-GraphifyPython
-
-# Not found — install then re-detect
-if (-not $GRAPHIFY_PYTHON) {
-    if (Get-Command uv -ErrorAction SilentlyContinue) {
-        uv tool install --upgrade graphifyy -q 2>&1 | Select-Object -Last 3
-    } else {
-        pip install graphifyy -q 2>&1 | Select-Object -Last 3
-    }
-    $GRAPHIFY_PYTHON = Find-GraphifyPython
-}
-
-# Save interpreter path — all subsequent steps read this
-$GRAPHIFY_PYTHON | Out-File -FilePath graphify-out\.graphify_python -Encoding utf8 -NoNewline
+```bash
+# Detect the correct Python interpreter (handles uv tool, pipx, venv, system installs)
+PYTHON=""
+GRAPHIFY_BIN=$(which graphify 2>/dev/null)
+# 1. uv tool installs — most reliable on modern Mac/Linux
+if [ -z "$PYTHON" ] && command -v uv >/dev/null 2>&1; then
+    _UV_PY=$(uv tool run graphifyy python -c "import sys; print(sys.executable)" 2>/dev/null)
+    if [ -n "$_UV_PY" ]; then PYTHON="$_UV_PY"; fi
+fi
+# 2. Read shebang from graphify binary (pipx and direct pip installs)
+if [ -z "$PYTHON" ] && [ -n "$GRAPHIFY_BIN" ]; then
+    _SHEBANG=$(head -1 "$GRAPHIFY_BIN" | tr -d '#!')
+    case "$_SHEBANG" in
+        *[!a-zA-Z0-9/_.-]*) ;;
+        *) "$_SHEBANG" -c "import graphify" 2>/dev/null && PYTHON="$_SHEBANG" ;;
+    esac
+fi
+# 3. Fall back to python3
+if [ -z "$PYTHON" ]; then PYTHON="python3"; fi
+if ! "$PYTHON" -c "import graphify" 2>/dev/null; then
+    if command -v uv >/dev/null 2>&1; then
+        uv tool install --upgrade graphifyy -q 2>&1 | tail -3
+        _UV_PY=$(uv tool run graphifyy python -c "import sys; print(sys.executable)" 2>/dev/null)
+        if [ -n "$_UV_PY" ]; then PYTHON="$_UV_PY"; fi
+    else
+        "$PYTHON" -m pip install graphifyy -q 2>/dev/null \
+          || "$PYTHON" -m pip install graphifyy -q --break-system-packages 2>&1 | tail -3
+    fi
+fi
+# Write interpreter path for all subsequent steps (persists across invocations)
+mkdir -p graphify-out
+"$PYTHON" -c "import sys; open('graphify-out/.graphify_python', 'w', encoding='utf-8').write(sys.executable)"
 # Save scan root so `graphify update` (no args) knows where to look next time
-(Resolve-Path INPUT_PATH).Path | Out-File -FilePath graphify-out\.graphify_root -Encoding utf8 -NoNewline
+echo "$(cd INPUT_PATH && pwd)" > graphify-out/.graphify_root
 ```
 
 If the import succeeds, print nothing and move straight to Step 2.
 
-**In every subsequent block, run Python through the saved interpreter — `& (Get-Content graphify-out\.graphify_python)` in place of a bare `python3` — so every step uses the interpreter that actually has graphify.**
+**In every subsequent bash block, replace `python3` with `$(cat graphify-out/.graphify_python)` to use the correct interpreter.**
 
 ### Step 2 - Detect files
 
@@ -265,9 +243,9 @@ All three in one message. Not three separate messages.
 Each subagent receives this exact prompt (substitute FILE_LIST, CHUNK_NUM, TOTAL_CHUNKS, DEEP_MODE, and CHUNK_PATH).
 
 CHUNK_PATH must be an **absolute** path — derive it before dispatching:
-```powershell
-$PROJECT_ROOT = Get-Content graphify-out\.graphify_root
-# Then for chunk N: $CHUNK_PATH = Join-Path $PROJECT_ROOT "graphify-out\.graphify_chunk_0N.json"
+```bash
+PROJECT_ROOT=$(cat graphify-out/.graphify_root)
+# Then for chunk N: CHUNK_PATH="${PROJECT_ROOT}/graphify-out/.graphify_chunk_0N.json"
 ```
 
 Subagent prompt template:
@@ -606,13 +584,13 @@ Both are non-default subcommands. `--update` re-extracts only new or changed fil
 
 ## For /graphify query
 
-When `graphify-out/graph.json` already exists and the user asks a question about the corpus, answer from the graph rather than rebuilding it:
+When `graphify-out/graph.json` already exists and the user asks a question about the corpus, run the query directly:
 
 ```bash
 graphify query "<question>"
 ```
 
-If the `graphify query` CLI is unavailable, fall back to an inline NetworkX traversal of `graphify-out/graph.json`. Answer using only what the graph output contains, and quote `source_location` when citing a specific fact. For the BFS/DFS traversal modes, the `--budget` cap, the NetworkX fallback, `save-result` feedback, and the `/graphify path` and `/graphify explain` flows, see `references/query.md`.
+Answer using only what the graph output contains, and quote `source_location` when citing a specific fact. Before traversal, expand the question against the graph's own vocabulary so a wording mismatch does not collapse the answer to noise. For that vocab-expansion step, the `--dfs` / `--budget` modes, `save-result` feedback, and the `/graphify path` and `/graphify explain` flows, see `references/query.md`.
 
 ---
 
@@ -625,23 +603,6 @@ Neither is part of the default build. When the user runs `/graphify add <url>` t
 ## For the commit hook and native CLAUDE.md integration
 
 When the user asks to install the post-commit auto-rebuild hook or wire graphify into a project's CLAUDE.md, see `references/hooks.md`.
-
----
-
-## Troubleshooting
-
-### Windows: `UnicodeEncodeError` from `python -c` blocks
-
-On Windows, Python's stdout defaults to the legacy `cp1252` codec, so any `python -c "..."` step that `print()`s a non-ASCII character — node labels with accents/CJK, or the report's `·`/`→`/`—` separators — crashes with `UnicodeEncodeError: 'charmap' codec can't encode character`. The file writes are safe (they all pass `encoding="utf-8"`); only printing to the terminal fails. Force UTF-8 stdout for every interpreter call on Windows by exporting `PYTHONUTF8=1` (and `PYTHONIOENCODING=utf-8`) before the block, e.g. `PYTHONUTF8=1 $(cat graphify-out/.graphify_python) -c "..."`, or in PowerShell `$env:PYTHONUTF8 = "1"` once at the start of the session. To read report sections back for pasting into chat, prefer reading `graphify-out/GRAPH_REPORT.md` as a file rather than re-printing it through Python.
-
-### PowerShell 5.1: Vertical scrolling stops working
-
-If vertical scrolling breaks in PowerShell after running graphify, this is caused by ANSI escape sequences from the `graspologic` library. Graphify v0.3.10+ suppresses this output, but if you still see the issue:
-
-1. **Upgrade graphify**: `pip install --upgrade graphifyy`
-2. **Use Windows Terminal** instead of the legacy PowerShell console — Windows Terminal handles ANSI codes correctly
-3. **Reset your terminal**: close and reopen PowerShell
-4. **Skip graspologic**: uninstall it (`pip uninstall graspologic`) and graphify will fall back to NetworkX's built-in Louvain algorithm, which produces no ANSI output
 
 ---
 
