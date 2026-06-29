@@ -1,7 +1,7 @@
 .PHONY: test sync
 
 sync:
-	git submodule update --init --remote agents
+	pwsh -NoProfile -File scripts/sync-agents.ps1
 	pwsh -NoProfile -File scripts/sync-ai.ps1 -SkipAuth -SkipMcp
 
 test:
