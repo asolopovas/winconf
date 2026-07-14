@@ -4,6 +4,7 @@
     "pr": ""
   },
   "includeGitInstructions": false,
+  "model": "opus[1m]",
   "enabledPlugins": {
     "gopls-lsp@claude-plugins-official": true,
     "rust-analyzer-lsp@claude-plugins-official": true,

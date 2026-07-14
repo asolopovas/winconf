@@ -11,6 +11,7 @@ $env:LOCALAPPDATA\pnpm
 $env:LOCALAPPDATA\pnpm\bin
 $env:APPDATA\npm
 $env:LOCALAPPDATA\Programs\OpenAI\Codex\bin
+$env:USERPROFILE\.local\bin
 $env:USERPROFILE\winconf\bin
 $env:USERPROFILE\src\news-search
 $env:USERPROFILE\src\excel-to-pdf
